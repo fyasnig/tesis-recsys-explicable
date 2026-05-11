@@ -1,0 +1,14 @@
+categoria,hallazgo,valor_resultado,implicacion_tesis
+Señal dominante,Co-compra (S1) importancia SHAP,64.8% importancia relativa (vs 40% peso teórico),La varianza amplifica el peso teórico — S1 discrimina mucho más de lo que sugiere W
+Señal dominante,Contraste Top#1 vs Bottom#N,|delta| S1=0.294 vs S2=0.022 (13x mayor),Co-compra determina el ranking de forma casi exclusiva en el Top-3
+Validación,Concordancia SHAP-LIME,ρ=1.000 — ranking idéntico,Dos métodos XAI independientes confirman el mismo orden de importancia
+Validación,Calibración score_final,"ρ=1.000 hit-rate-decil, D10 tiene 27x más hits que D1",El scoring predice compras reales — validez externa del modelo
+Diseño,Neutralidad respecto a privacidad,0.9% variación de S1 entre grupos de privacidad,El modelo no discrimina por perfil de privacidad — diseño privacy-by-design válido
+Diseño,Confianza local por usuario,"Media=0.807, 0.3pp diferencia entre grupos de privacidad",Las explicaciones son igualmente estables para todos los perfiles
+Diseño,Señales independientes,|ρ|<0.09 en 9/10 pares (excepción: recencia-popularidad ρ=0.545),El modelo captura 5 dimensiones genuinamente distintas — sin redundancia
+Comportamiento emergente,Umbral implícito en posición 1-3,Gap Top1-3→4-5: −16pp en S1 vs −8.5pp entre 4-5 y 6-10,Los tres primeros puestos son candidatos con co-compra muy fuerte — umbral no diseñado
+Comportamiento emergente,Fallback por categoría de dominio,ABIS_BOOK S1=67.6% vs GIFT_CARD S1=57.1% (gap=10.5pp),El sistema adapta señales al dominio sin intervención explícita
+Robustez,Cold-start vs historial rico,S1: 65.7% vs 64.9% — diferencia <1pp,El grafo de co-compra global compensa la falta de historial individual
+Limitación,Señal temporal (S3),W=20% pero importancia=1.7% (std=0.0034),Dataset Amazon USA tiene estacionalidad uniforme — señal no discrimina
+Anomalía,Grupo 4 razones visibles,Hit rate=36.48% vs 5.78% con 2 razones (6x),MAX_REASONS=4 selecciona items puramente basados en señales de ítem — alta precisión
+Anomalía,Grupo 1 razón visibles,Hit rate=12.23% — supera a grupos de 2 y 3 razones,Una sola razón fuerte (co-compra directa) predice mejor que varias razones débiles
