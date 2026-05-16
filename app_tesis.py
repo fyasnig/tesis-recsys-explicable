@@ -1518,3 +1518,154 @@ elif "Hallazgos 17" in pagina:
                                  xaxis=dict(title="% de razones",gridcolor="rgba(255,255,255,0.05)"),
                                  yaxis=dict(gridcolor="rgba(0,0,0,0)"))
             st.plotly_chart(fig_st, use_container_width=True)
+
+
+elif "Hallazgos 14" in pagina:
+    st.markdown('<div class="main-header">Hallazgos 14 \u00b7 15 \u00b7 16</div>', unsafe_allow_html=True)
+    st.markdown('<div class="main-sub">HTE \u00b7 Fairness del cat\u00e1logo \u00b7 Cobertura del sistema</div>', unsafe_allow_html=True)
+    st.write("")
+    st.info("Tres an\u00e1lisis nuevos: HTE, fairness (rho=-0.233) y cobertura (36% sin recomendaciones).")
+    t14, t15, t16 = st.tabs(["HTE del Experimento","Fairness del Cat\u00e1logo","Cobertura del Sistema"])
+    with t14:
+        st.caption("Historial rico +0.064 (p<0.001) vs cold-start +0.026 (p=0.60 no sig.).")
+        if hte_df is None:
+            st.info("Corr\u00e9 el bloque de mejoras para generar hte_experimento.csv.")
+        else:
+            tab_h1, tab_h2, tab_h3 = st.tabs(["Por historial","Por tipo","Por categor\u00eda"])
+            for tab_sub, dim in [(tab_h1,"Volumen historial"),(tab_h2,"Tipo de comprador"),(tab_h3,"Categor\u00eda top")]:
+                with tab_sub:
+                    sub = hte_df[hte_df["dimension"]==dim].sort_values("efecto_hte", ascending=True)
+                    if sub.empty:
+                        st.info("Sin datos.")
+                        continue
+                    clrs = [COLORS["primary"] if e>0.04 else COLORS["accent"] if e>=0 else COLORS["danger"] for e in sub["efecto_hte"]]
+                    fig = go.Figure(go.Bar(y=sub["segmento"].str[:30], x=sub["efecto_hte"],
+                                          orientation="h", marker_color=clrs, marker_line_width=0,
+                                          text=[f"p={p:.3f}" for p in sub["pval"]],
+                                          textposition="outside", textfont=dict(color="#8A8880",size=9)))
+                    fig.add_vline(x=0.04, line_dash="dash", line_color=COLORS["neutral"])
+                    fig.update_layout(**pbase(), height=max(220,len(sub)*65),
+                                      margin=dict(l=0,r=100,t=10,b=0),
+                                      xaxis=dict(title="Efecto HTE",gridcolor="rgba(255,255,255,0.05)"),
+                                      yaxis=dict(gridcolor="rgba(0,0,0,0)"))
+                    st.plotly_chart(fig, use_container_width=True)
+    with t15:
+        st.caption("rho=-0.233. Q4=41.2% vs Q1=60.4% hit rate.")
+        if fair_df is None:
+            st.info("Corr\u00e9 el bloque de mejoras para generar fairness_catalogo.csv.")
+        else:
+            col_f1, col_f2 = st.columns([3,2])
+            with col_f1:
+                fs = fair_df.sort_values("n_usuarios_rec", ascending=False).copy()
+                n_tot = len(fs)
+                fs["xi"] = np.arange(1, n_tot+1) / n_tot * 100
+                fs["yi"] = fs["n_usuarios_rec"].cumsum() / fs["n_usuarios_rec"].sum() * 100
+                fig_l = go.Figure()
+                fig_l.add_trace(go.Scatter(x=fs["xi"],y=fs["yi"],mode="lines",name="Real",line=dict(color=COLORS["primary"],width=2)))
+                fig_l.add_trace(go.Scatter(x=[0,100],y=[0,100],mode="lines",name="Perfecta",line=dict(color=COLORS["neutral"],width=1,dash="dash")))
+                fig_l.add_hline(y=50, line_color=COLORS["accent"], line_width=0.8, line_dash="dot")
+                fig_l.add_hline(y=80, line_color=COLORS["danger"], line_width=0.8, line_dash="dot")
+                fig_l.update_layout(**pbase(), height=280, margin=dict(l=0,r=0,t=10,b=0),
+                                    xaxis=dict(title="% catalogo",gridcolor="rgba(255,255,255,0.05)"),
+                                    yaxis=dict(title="% recs",gridcolor="rgba(255,255,255,0.05)"),
+                                    legend=dict(orientation="h",y=1.1,font=dict(color="#8A8880",size=10)))
+                st.plotly_chart(fig_l, use_container_width=True)
+            with col_f2:
+                if "cuartil_freq" in fair_df.columns and "hit_rate" in fair_df.columns:
+                    hr_q = fair_df.groupby("cuartil_freq", observed=True)["hit_rate"].mean()*100
+                    fig_q = go.Figure(go.Bar(x=[str(l) for l in hr_q.index], y=hr_q.values,
+                                            marker_color=[COLORS["neutral"],COLORS["secondary"],COLORS["accent"],COLORS["primary"]],
+                                            marker_line_width=0,
+                                            text=[f"{v:.1f}%" for v in hr_q.values],
+                                            textposition="outside",textfont=dict(color="#8A8880",size=10)))
+                    fig_q.update_layout(**pbase(), height=280, margin=dict(l=0,r=0,t=10,b=40),
+                                        yaxis=dict(title="Hit rate (%)",gridcolor="rgba(255,255,255,0.05)"),
+                                        xaxis=dict(gridcolor="rgba(0,0,0,0)",tickangle=-15))
+                    st.plotly_chart(fig_q, use_container_width=True)
+    with t16:
+        st.caption("3,217/5,027 usuarios cubiertos (64%). Cold-start extremo = 23.9%.")
+        if cov_df is None:
+            st.info("Corr\u00e9 el bloque de mejoras para generar cobertura_sistema.csv.")
+        else:
+            con_df2 = cov_df[cov_df["tiene_recs"]==True]
+            sin_df2 = cov_df[cov_df["tiene_recs"]==False]
+            k1,k2,k3,k4 = st.columns(4)
+            k1.markdown('<div class="kpi-box"><div class="kpi-value">' + str(len(con_df2)) + '</div><div class="kpi-label">Con cobertura (64%)</div></div>', unsafe_allow_html=True)
+            k2.markdown('<div class="kpi-box"><div class="kpi-value" style="color:#D85A30">' + str(len(sin_df2)) + '</div><div class="kpi-label">Sin cobertura (36%)</div></div>', unsafe_allow_html=True)
+            k3.markdown('<div class="kpi-box"><div class="kpi-value">+226%</div><div class="kpi-label">M\u00e1s productos</div></div>', unsafe_allow_html=True)
+            k4.markdown('<div class="kpi-box"><div class="kpi-value" style="color:#EF9F27">23.9%</div><div class="kpi-label">Cold-start</div></div>', unsafe_allow_html=True)
+            st.write("")
+            metrics = [c for c in ["total_products","total_spent","num_orders","category_diversity"] if c in cov_df.columns]
+            labels  = ["Productos","Gasto ($)","Ordenes","Div. cat."][:len(metrics)]
+            fig_cv = go.Figure()
+            fig_cv.add_trace(go.Bar(name="Con cobertura",x=labels,y=[con_df2[m].mean() for m in metrics],marker_color=COLORS["primary"],marker_line_width=0))
+            fig_cv.add_trace(go.Bar(name="Sin cobertura",x=labels,y=[sin_df2[m].mean() for m in metrics],marker_color=COLORS["danger"],marker_line_width=0))
+            fig_cv.update_layout(**pbase(), barmode="group", height=280, margin=dict(l=0,r=0,t=10,b=0),
+                                 legend=dict(orientation="h",y=1.1,font=dict(color="#8A8880",size=10)),
+                                 yaxis=dict(gridcolor="rgba(255,255,255,0.05)"),xaxis=dict(gridcolor="rgba(0,0,0,0)"))
+            st.plotly_chart(fig_cv, use_container_width=True)
+
+elif "Hallazgos 17" in pagina:
+    st.markdown('<div class="main-header">Hallazgos 17 \u00b7 18</div>', unsafe_allow_html=True)
+    st.markdown('<div class="main-sub">Diversidad \u00b7 Razones XAI por categor\u00eda</div>', unsafe_allow_html=True)
+    st.write("")
+    st.info("H17: ILD mide diversidad de categorias. H18: razon XAI dominante por tipo de item. Propiedades emergentes del grafo.")
+    t17, t18 = st.tabs(["H17 ILD","H18 Razones por Categoria"])
+    with t17:
+        st.caption("ILD = n categorias distintas en recomendaciones. rho(ILD, hit_rate)=-0.562.")
+        if ild_df is None:
+            st.info("Corr\u00e9 el bloque ILD para generar ild_analisis.csv.")
+        else:
+            k1,k2,k3,k4 = st.columns(4)
+            k1.markdown('<div class="kpi-box"><div class="kpi-value">' + f'{ild_df["ild_category"].mean():.1f}' + '</div><div class="kpi-label">ILD media</div></div>', unsafe_allow_html=True)
+            k2.markdown('<div class="kpi-box"><div class="kpi-value">' + f'{ild_df["ild_category"].median():.0f}' + '</div><div class="kpi-label">ILD mediana</div></div>', unsafe_allow_html=True)
+            k3.markdown('<div class="kpi-box"><div class="kpi-value" style="color:#D85A30">' + f'{(ild_df["ild_category"]==1).mean():.1%}' + '</div><div class="kpi-label">Mono-categoria</div></div>', unsafe_allow_html=True)
+            k4.markdown('<div class="kpi-box"><div class="kpi-value" style="color:#1D9E75">' + f'{(ild_df["ild_category"]>=5).mean():.1%}' + '</div><div class="kpi-label">Muy diversos</div></div>', unsafe_allow_html=True)
+            st.write("")
+            col_a, col_b = st.columns(2)
+            with col_a:
+                ild_hist = ild_df["ild_category"].value_counts().sort_index()
+                fig_h = px.bar(x=ild_hist.index, y=ild_hist.values,
+                               color_discrete_sequence=[COLORS["primary"]],
+                               labels={"x":"N categorias","y":"N usuarios"}, template="plotly_dark")
+                fig_h.add_vline(x=ild_df["ild_category"].mean(), line_dash="dash", line_color=COLORS["accent"])
+                fig_h.update_layout(**pbase(), height=240, showlegend=False, margin=dict(l=0,r=0,t=10,b=0))
+                st.plotly_chart(fig_h, use_container_width=True)
+                st.caption("Pico en 1-2 especializados y cola larga hasta 20 generalistas.")
+            with col_b:
+                if "cuartil_hist" in ild_df.columns:
+                    ild_q = ild_df.groupby("cuartil_hist", observed=True)["ild_category"].median().reset_index()
+                    fig_q2 = px.bar(ild_q, x="cuartil_hist", y="ild_category",
+                                   color_discrete_sequence=[COLORS["secondary"]],
+                                   labels={"cuartil_hist":"Cuartil","ild_category":"ILD mediana"},
+                                   template="plotly_dark", text="ild_category")
+                    fig_q2.update_traces(texttemplate="%{text:.0f}", textposition="outside")
+                    fig_q2.update_layout(**pbase(), height=240, showlegend=False, margin=dict(l=0,r=0,t=10,b=0))
+                    st.plotly_chart(fig_q2, use_container_width=True)
+                    st.caption("ILD crece con el historial: Q1=3.0 a Q4=10.0.")
+    with t18:
+        st.caption("Repeat domina en 8/10 categorias. Gift Card no usa Popularidad sino Repeat.")
+        if raz_df is None:
+            st.info("Corr\u00e9 el bloque de analisis para generar razones_por_categoria.csv.")
+        else:
+            REASON_COLORS = {"Co-compra":COLORS["primary"],"Afinidad categoria":COLORS["secondary"],
+                             "Repeat":COLORS["accent"],"Popularidad":"#9B59B6","Estacionalidad":"#5DCAA5",
+                             "Afinidad marca":"#E74C3C","Importancia categoria":"#F39C12",
+                             "Recencia":COLORS["neutral"],"Importancia marca":"#1ABC9C","Sin razon":"#444","Otra":"#666"}
+            top_cats = raz_df["category"].value_counts().head(10).index.tolist()
+            cat_r = raz_df[raz_df["category"].isin(top_cats)].groupby(["category","reason_type"]).size().reset_index(name="n")
+            totals = cat_r.groupby("category")["n"].transform("sum")
+            cat_r["pct"] = cat_r["n"] / totals * 100
+            reason_order = ["Co-compra","Repeat","Afinidad categoria","Importancia categoria","Popularidad","Estacionalidad","Afinidad marca","Importancia marca","Recencia","Sin razon","Otra"]
+            fig_st = go.Figure()
+            for reason in reason_order:
+                sub = cat_r[cat_r["reason_type"]==reason]
+                if sub.empty: continue
+                cat_vals = {row["category"]: row["pct"] for _,row in sub.iterrows()}
+                fig_st.add_trace(go.Bar(name=reason, x=[cat_vals.get(c,0) for c in top_cats], y=top_cats,
+                                        orientation="h", marker_color=REASON_COLORS.get(reason,COLORS["neutral"]), marker_line_width=0))
+            fig_st.update_layout(**pbase(), barmode="stack", height=360, margin=dict(l=0,r=0,t=10,b=0),
+                                 legend=dict(orientation="h",y=1.12,font=dict(color="#8A8880",size=9),ncols=4),
+                                 xaxis=dict(title="% de razones",gridcolor="rgba(255,255,255,0.05)"),
+                                 yaxis=dict(gridcolor="rgba(0,0,0,0)"))
+            st.plotly_chart(fig_st, use_container_width=True)
