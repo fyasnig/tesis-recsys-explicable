@@ -106,6 +106,8 @@ with st.spinner("Cargando datos..."):
     hte_df    = load('hte_experimento.csv')
     fair_df   = load('fairness_catalogo.csv')
     cov_df    = load('cobertura_sistema.csv')
+    ild_df    = load('ild_analisis.csv')
+    raz_df    = load('razones_por_categoria.csv')
     if corr_df is not None and corr_df.columns[0] != corr_df.index[0]:
         corr_df = corr_df.set_index(corr_df.columns[0])
 
