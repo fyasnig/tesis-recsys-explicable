@@ -1214,7 +1214,7 @@ elif "Hallazgos 17" in pagina:
                 fig_st.add_trace(go.Bar(name=reason, x=[cat_vals.get(c,0) for c in top_cats], y=top_cats,
                                         orientation="h", marker_color=REASON_COLORS.get(reason,COLORS["neutral"]), marker_line_width=0))
             fig_st.update_layout(**pbase(), barmode="stack", height=360, margin=dict(l=0,r=0,t=10,b=0),
-                                 legend=dict(orientation="h",y=1.12,font=dict(color="#8A8880",size=9),ncols=4),
+                                 legend=dict(orientation="h",y=1.12,font=dict(color="#8A8880",size=9)),
                                  xaxis=dict(title="% de razones",gridcolor="rgba(255,255,255,0.05)"),
                                  yaxis=dict(gridcolor="rgba(0,0,0,0)"))
             st.plotly_chart(fig_st, use_container_width=True)
