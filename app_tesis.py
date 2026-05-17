@@ -122,194 +122,126 @@ if 'app_iniciada' not in st.session_state:
 if not st.session_state.app_iniciada:
     st.markdown("""
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap');
-
-    /* Reset y fondo */
-    html, body, [data-testid="stAppViewContainer"] {
-        background: #0A0D14 !important;
-    }
+    html, body, [data-testid="stAppViewContainer"] { background: #0A0D14 !important; }
     [data-testid="stAppViewContainer"]::before {
         content: '';
-        position: fixed;
-        top: 0; left: 0; right: 0; bottom: 0;
+        position: fixed; top:0; left:0; right:0; bottom:0;
         background:
             radial-gradient(ellipse 60% 50% at 15% 60%, rgba(29,158,117,0.12) 0%, transparent 70%),
-            radial-gradient(ellipse 50% 40% at 85% 25%, rgba(83,74,183,0.10) 0%, transparent 70%),
-            radial-gradient(ellipse 40% 30% at 50% 90%, rgba(29,158,117,0.05) 0%, transparent 70%);
-        pointer-events: none;
-        z-index: 0;
+            radial-gradient(ellipse 50% 40% at 85% 25%, rgba(83,74,183,0.10) 0%, transparent 70%);
+        pointer-events: none; z-index: 0;
     }
-    [data-testid="stSidebar"]          { display: none !important; }
-    [data-testid="stHeader"]           { background: transparent !important; border: none !important; }
-    [data-testid="stToolbar"]          { display: none !important; }
-    [data-testid="stDecoration"]       { display: none !important; }
-    .block-container { padding-top: 1rem !important; max-width: 100% !important; }
+    [data-testid="stSidebar"]    { display: none !important; }
+    [data-testid="stHeader"]     { background: transparent !important; }
+    [data-testid="stToolbar"]    { display: none !important; }
+    [data-testid="stDecoration"] { display: none !important; }
+    .block-container { padding-top: 0 !important; max-width: 100% !important; }
 
-    /* Layout principal */
     .w-page {
-        min-height: 95vh;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
-        padding: 2rem 1rem 1rem;
-        position: relative;
-        z-index: 1;
+        height: 100vh;
+        display: flex; flex-direction: column;
+        align-items: center; justify-content: center;
+        text-align: center; padding: 1.5rem;
+        position: relative; z-index: 1;
     }
-
-    /* Badge superior */
     .w-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
+        display: inline-flex; align-items: center; gap: 0.5rem;
         background: rgba(29,158,117,0.1);
         border: 1px solid rgba(29,158,117,0.3);
-        color: #1D9E75;
-        border-radius: 100px;
-        padding: 0.35rem 1.2rem;
-        font-size: 0.72rem;
-        font-weight: 600;
-        letter-spacing: 0.15em;
-        text-transform: uppercase;
+        color: #1D9E75; border-radius: 100px;
+        padding: 0.3rem 1.1rem; font-size: 0.72rem;
+        font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase;
         margin-bottom: 1.2rem;
         animation: fadeInUp 0.5s ease both;
     }
     .w-badge-dot {
-        width: 6px; height: 6px;
-        background: #1D9E75;
-        border-radius: 50%;
-        animation: pulse-green 2s ease-in-out infinite;
+        width: 6px; height: 6px; background: #1D9E75;
+        border-radius: 50%; animation: pulse-green 2s ease-in-out infinite;
     }
-
-    /* Titulo */
     .w-title {
         font-family: 'DM Serif Display', serif;
         font-size: clamp(2rem, 5vw, 3.8rem);
-        color: #ECE9E3;
-        letter-spacing: -0.04em;
-        line-height: 1;
-        margin: 0;
+        color: #ECE9E3; letter-spacing: -0.03em;
+        line-height: 1; margin: 0;
         animation: fadeInUp 0.6s ease 0.1s both;
     }
     .w-title-accent {
-        font-family: 'DM Serif Display', serif;
+        font-family: 'DM Serif Display', serif; font-style: italic;
         font-size: clamp(2rem, 5vw, 3.8rem);
-        font-style: italic;
-        letter-spacing: -0.04em;
-        line-height: 1.05;
-        margin: 0 0 0.5rem;
+        letter-spacing: -0.03em; line-height: 1.05; margin: 0 0 0.4rem;
         background: linear-gradient(100deg, #1D9E75 0%, #5DCAA5 40%, #1D9E75 80%);
         background-size: 200% auto;
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
+        -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         animation: fadeInUp 0.6s ease 0.15s both, shimmer 5s linear infinite;
     }
-
-    /* Linea divisora */
     .w-divider {
-        width: 48px; height: 1px;
+        width: 40px; height: 1px;
         background: linear-gradient(90deg, transparent, #1D9E75, transparent);
-        margin: 0.8rem auto 1.2rem;
+        margin: 0.8rem auto 1rem;
         animation: fadeInUp 0.6s ease 0.25s both;
     }
-
-    /* Descripcion */
     .w-desc {
-        font-family: 'DM Sans', sans-serif;
-        font-size: 0.92rem;
-        color: rgba(180,178,169,0.85);
-        line-height: 1.7;
-        max-width: 480px;
-        margin: 0 auto 1.5rem;
-        font-weight: 300;
-        animation: fadeInUp 0.6s ease 0.3s both;
+        font-size: 0.92rem; color: rgba(180,178,169,0.85);
+        line-height: 1.6; max-width: 460px; margin: 0 auto 1.5rem;
+        font-weight: 300; animation: fadeInUp 0.6s ease 0.3s both;
     }
     .w-desc strong { color: #ECE9E3; font-weight: 500; }
-
-    /* Stats grid */
     .w-stats {
-        display: flex;
-        gap: 1rem;
-        justify-content: center;
-        flex-wrap: wrap;
-        margin-bottom: 1.8rem;
+        display: flex; gap: 0.8rem; justify-content: center;
+        flex-wrap: wrap; margin-bottom: 2rem;
         animation: fadeInUp 0.6s ease 0.4s both;
     }
     .w-stat {
         background: rgba(255,255,255,0.025);
         border: 1px solid rgba(255,255,255,0.07);
-        border-radius: 14px;
-        padding: 0.75rem 1.1rem;
-        min-width: 90px;
-        position: relative;
-        overflow: hidden;
-        transition: border-color 0.3s, transform 0.3s;
+        border-radius: 12px; padding: 0.75rem 1.1rem;
+        min-width: 80px;
     }
-    .w-stat::after {
-        content: '';
-        position: absolute;
-        inset: 0;
-        background: linear-gradient(135deg, rgba(29,158,117,0.06) 0%, transparent 60%);
-        opacity: 0;
-        transition: opacity 0.3s;
-    }
-    .w-stat:hover { border-color: rgba(29,158,117,0.35); transform: translateY(-3px); }
-    .w-stat:hover::after { opacity: 1; }
     .w-stat-num {
         font-family: 'DM Serif Display', serif;
-        font-size: 1.5rem;
-        color: #1D9E75;
-        display: block;
-        line-height: 1;
-        margin-bottom: 0.4rem;
+        font-size: 1.5rem; color: #1D9E75;
+        display: block; line-height: 1; margin-bottom: 0.3rem;
     }
     .w-stat-lbl {
-        font-size: 0.65rem;
-        color: rgba(138,136,128,0.8);
-        text-transform: uppercase;
-        letter-spacing: 0.12em;
-        font-weight: 500;
+        font-size: 0.62rem; color: rgba(138,136,128,0.8);
+        text-transform: uppercase; letter-spacing: 0.12em; font-weight: 500;
     }
 
-    /* Boton */
-    div[data-testid="stButton"] > button {
-        background: linear-gradient(135deg, #1D9E75 0%, #17876A 100%) !important;
-        color: white !important;
-        border: none !important;
-        border-radius: 100px !important;
-        padding: 0.85rem 2.5rem !important;
-        font-family: 'DM Sans', sans-serif !important;
-        font-size: 0.95rem !important;
-        font-weight: 600 !important;
-        letter-spacing: 0.05em !important;
-        box-shadow: 0 0 0 1px rgba(29,158,117,0.3), 0 8px 32px rgba(29,158,117,0.3) !important;
-        transition: all 0.3s ease !important;
-        animation: fadeInUp 0.6s ease 0.5s both !important;
+    /* Barra de progreso animada */
+    .w-progress-wrap {
+        width: 200px; margin: 0 auto;
+        animation: fadeInUp 0.6s ease 0.5s both;
     }
-    div[data-testid="stButton"] > button:hover {
-        box-shadow: 0 0 0 1px rgba(29,158,117,0.5), 0 12px 40px rgba(29,158,117,0.45) !important;
-        transform: translateY(-2px) !important;
+    .w-progress-label {
+        font-size: 0.72rem; color: rgba(138,136,128,0.6);
+        letter-spacing: 0.1em; text-transform: uppercase;
+        margin-bottom: 0.5rem;
+    }
+    .w-progress-bar {
+        height: 2px; background: rgba(255,255,255,0.06);
+        border-radius: 2px; overflow: hidden;
+    }
+    .w-progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #1D9E75, #5DCAA5);
+        border-radius: 2px;
+        animation: progressFill 3s linear forwards;
+    }
+    @keyframes progressFill {
+        from { width: 0%; }
+        to   { width: 100%; }
     }
 
-    /* Tags tecnicas */
     .w-tags {
-        display: flex;
-        gap: 0.5rem;
-        justify-content: center;
-        flex-wrap: wrap;
-        margin-top: 1rem;
-        animation: fadeInUp 0.6s ease 0.65s both;
+        display: flex; gap: 0.4rem; justify-content: center;
+        flex-wrap: wrap; margin-top: 1.2rem;
+        animation: fadeInUp 0.6s ease 0.6s both;
     }
     .w-tag {
-        font-size: 0.65rem;
-        color: rgba(138,136,128,0.5);
-        letter-spacing: 0.1em;
-        text-transform: uppercase;
-        padding: 0.2rem 0.6rem;
-        border: 1px solid rgba(255,255,255,0.05);
-        border-radius: 4px;
+        font-size: 0.62rem; color: rgba(138,136,128,0.4);
+        letter-spacing: 0.1em; text-transform: uppercase;
+        padding: 0.2rem 0.5rem;
+        border: 1px solid rgba(255,255,255,0.04); border-radius: 4px;
     }
     </style>
 
@@ -318,61 +250,44 @@ if not st.session_state.app_iniciada:
         <span class="w-badge-dot"></span>
         Tesis de Maestría &nbsp;·&nbsp; Franco Yasnig
       </div>
-
       <div class="w-title">Sistema de Recomendación</div>
       <div class="w-title-accent">Explicable</div>
       <div class="w-divider"></div>
-
       <div class="w-desc">
         Sistema híbrido con <strong>explicabilidad XAI</strong>,
         control de privacidad granular y
         <strong>compliance regulatorio</strong> operacionalizado
         sobre Amazon Purchases 2018–2024.
       </div>
-
       <div class="w-stats">
-        <div class="w-stat">
-          <span class="w-stat-num">5,027</span>
-          <span class="w-stat-lbl">Usuarios</span>
+        <div class="w-stat"><span class="w-stat-num">5,027</span><span class="w-stat-lbl">Usuarios</span></div>
+        <div class="w-stat"><span class="w-stat-num">939K</span><span class="w-stat-lbl">Ítems</span></div>
+        <div class="w-stat"><span class="w-stat-num">19</span><span class="w-stat-lbl">Hallazgos</span></div>
+        <div class="w-stat"><span class="w-stat-num">10</span><span class="w-stat-lbl">Pantallas</span></div>
+        <div class="w-stat"><span class="w-stat-num">0.050</span><span class="w-stat-lbl">NDCG@10</span></div>
+      </div>
+      <div class="w-progress-wrap">
+        <div class="w-progress-label">Cargando sistema...</div>
+        <div class="w-progress-bar">
+          <div class="w-progress-fill"></div>
         </div>
-        <div class="w-stat">
-          <span class="w-stat-num">939K</span>
-          <span class="w-stat-lbl">Ítems</span>
-        </div>
-        <div class="w-stat">
-          <span class="w-stat-num">19</span>
-          <span class="w-stat-lbl">Hallazgos</span>
-        </div>
-        <div class="w-stat">
-          <span class="w-stat-num">10</span>
-          <span class="w-stat-lbl">Pantallas</span>
-        </div>
-        <div class="w-stat">
-          <span class="w-stat-num">0.050</span>
-          <span class="w-stat-lbl">NDCG@10</span>
-        </div>
+      </div>
+      <div class="w-tags">
+        <span class="w-tag">SHAP</span>
+        <span class="w-tag">LIME</span>
+        <span class="w-tag">GDPR</span>
+        <span class="w-tag">AI Act</span>
+        <span class="w-tag">XAI</span>
+        <span class="w-tag">Privacy-by-Design</span>
+        <span class="w-tag">AI Governance</span>
       </div>
     </div>
     """, unsafe_allow_html=True)
 
-    col_btn = st.columns([1, 1.5, 1])[1]
-    with col_btn:
-        if st.button("Explorar el sistema  →", use_container_width=True):
-            st.session_state.app_iniciada = True
-            st.rerun()
-
-    st.markdown("""
-    <div class="w-tags">
-      <span class="w-tag">SHAP</span>
-      <span class="w-tag">LIME</span>
-      <span class="w-tag">GDPR</span>
-      <span class="w-tag">AI Act</span>
-      <span class="w-tag">XAI</span>
-      <span class="w-tag">Privacy-by-Design</span>
-      <span class="w-tag">AI Governance</span>
-    </div>
-    """, unsafe_allow_html=True)
-    st.stop()
+    import time
+    time.sleep(3)
+    st.session_state.app_iniciada = True
+    st.rerun()
 
 
 
