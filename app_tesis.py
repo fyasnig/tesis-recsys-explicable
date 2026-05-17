@@ -682,23 +682,6 @@ with st.sidebar:
         "⚖️  Gobernanza Regulatoria",
     ], label_visibility="collapsed")
 
-    st.write("")
-    modo_defensa = st.toggle("🎓 Modo Defensa", value=False,
-        help="Oculta los textos técnicos largos. Ideal para presentar al tribunal.")
-    if modo_defensa:
-        st.markdown('<div class="defensa-badge">🎓 MODO DEFENSA ACTIVO</div>', unsafe_allow_html=True)
-        st.markdown("""
-        <script>
-        document.querySelector(".main").classList.add("modo-defensa");
-        </script>
-        """, unsafe_allow_html=True)
-    st.write("")
-    modo_defensa = st.toggle("🎓 Modo Defensa", value=False,
-        help="Oculta captions técnicos. Ideal para presentar al tribunal.")
-    if modo_defensa:
-        st.markdown('<div class="defensa-badge">🎓 MODO DEFENSA</div>', unsafe_allow_html=True)
-        st.markdown('<script>document.body.classList.add("modo-defensa")</script>',
-            unsafe_allow_html=True)
     st.markdown("""<hr>
     <div style="font-size:0.7rem;color:#8A8880;line-height:1.8">
       <b style="color:#E8E6E0">Dataset:</b> Amazon Purchases<br>
