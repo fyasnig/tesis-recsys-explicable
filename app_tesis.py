@@ -121,25 +121,184 @@ if 'app_iniciada' not in st.session_state:
 
 if not st.session_state.app_iniciada:
     st.markdown("""
-    <div class="welcome-card">
-      <div class="welcome-title">Sistema de Recomendación</div>
-      <div class="welcome-title shimmer-text">Explicable</div>
-      <div class="welcome-sub">Tesis de Maestría · Franco Yasnig · Amazon Purchases 2018–2024</div>
-      <div style="margin: 1.5rem 0 2rem">
-        <div class="stat-welcome"><span class="stat-num">5,027</span><span class="stat-lbl">Usuarios</span></div>
-        <div class="stat-welcome"><span class="stat-num">939K</span><span class="stat-lbl">Ítems</span></div>
-        <div class="stat-welcome"><span class="stat-num">19</span><span class="stat-lbl">Hallazgos XAI</span></div>
-        <div class="stat-welcome"><span class="stat-num">10</span><span class="stat-lbl">Pantallas</span></div>
-        <div class="stat-welcome"><span class="stat-num pulse-green">NDCG=0.050</span><span class="stat-lbl">Métrica offline</span></div>
+    <style>
+    /* Fondo con gradiente radial para la bienvenida */
+    [data-testid="stAppViewContainer"] {
+        background: radial-gradient(ellipse at 20% 50%, rgba(29,158,117,0.08) 0%, transparent 60%),
+                    radial-gradient(ellipse at 80% 20%, rgba(83,74,183,0.08) 0%, transparent 60%),
+                    #0E1117;
+    }
+    .welcome-outer {
+        min-height: 85vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+    }
+    .welcome-badge {
+        display: inline-block;
+        background: rgba(29,158,117,0.12);
+        border: 1px solid rgba(29,158,117,0.35);
+        color: #1D9E75;
+        border-radius: 30px;
+        padding: 0.3rem 1.1rem;
+        font-size: 0.78rem;
+        font-weight: 600;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        margin-bottom: 1.5rem;
+        animation: fadeInUp 0.5s ease forwards;
+    }
+    .welcome-h1 {
+        font-family: 'DM Serif Display', serif;
+        font-size: 3.8rem;
+        color: #E8E6E0;
+        letter-spacing: -0.03em;
+        line-height: 1.05;
+        margin: 0 0 0.2rem;
+        animation: fadeInUp 0.6s ease 0.1s both;
+    }
+    .welcome-h2 {
+        font-family: 'DM Serif Display', serif;
+        font-size: 3.8rem;
+        letter-spacing: -0.03em;
+        line-height: 1.05;
+        margin: 0 0 1rem;
+        background: linear-gradient(90deg, #1D9E75, #5DCAA5, #1D9E75);
+        background-size: 200% auto;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        animation: fadeInUp 0.6s ease 0.2s both, shimmer 4s linear infinite;
+    }
+    .welcome-desc {
+        font-size: 1rem;
+        color: #8A8880;
+        margin-bottom: 3rem;
+        line-height: 1.6;
+        max-width: 520px;
+        text-align: center;
+        animation: fadeInUp 0.6s ease 0.3s both;
+    }
+    .stats-row {
+        display: flex;
+        gap: 1.5rem;
+        margin-bottom: 3rem;
+        flex-wrap: wrap;
+        justify-content: center;
+        animation: fadeInUp 0.6s ease 0.4s both;
+    }
+    .stat-pill {
+        background: rgba(255,255,255,0.03);
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 12px;
+        padding: 1rem 1.5rem;
+        text-align: center;
+        min-width: 100px;
+        transition: border-color 0.3s ease;
+    }
+    .stat-pill:hover { border-color: rgba(29,158,117,0.4); }
+    .stat-pill-num {
+        font-family: 'DM Serif Display', serif;
+        font-size: 1.8rem;
+        color: #1D9E75;
+        display: block;
+        line-height: 1;
+        margin-bottom: 0.3rem;
+    }
+    .stat-pill-lbl {
+        font-size: 0.7rem;
+        color: #8A8880;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+    }
+    .welcome-btn-wrap {
+        animation: fadeInUp 0.6s ease 0.5s both;
+    }
+    .welcome-btn {
+        display: inline-block;
+        background: linear-gradient(135deg, #1D9E75 0%, #159060 100%);
+        color: white !important;
+        border: none;
+        border-radius: 50px;
+        padding: 0.9rem 2.8rem;
+        font-size: 1rem;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        cursor: pointer;
+        text-decoration: none;
+        box-shadow: 0 4px 24px rgba(29,158,117,0.35);
+        transition: all 0.3s ease;
+    }
+    .welcome-btn:hover {
+        box-shadow: 0 6px 32px rgba(29,158,117,0.55);
+        transform: translateY(-2px);
+    }
+    .divider-line {
+        width: 60px;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, #1D9E75, transparent);
+        margin: 0 auto 2rem;
+        animation: fadeInUp 0.6s ease 0.35s both;
+    }
+    .footer-note {
+        margin-top: 3rem;
+        font-size: 0.72rem;
+        color: rgba(138,136,128,0.5);
+        letter-spacing: 0.06em;
+        animation: fadeInUp 0.6s ease 0.6s both;
+    }
+    /* Ocultar sidebar en bienvenida */
+    [data-testid="stSidebar"] { display: none; }
+    [data-testid="stHeader"] { background: transparent; }
+    </style>
+
+    <div class="welcome-outer">
+      <div class="welcome-badge">✦ Tesis de Maestría · Franco Yasnig</div>
+      <div class="welcome-h1">Sistema de Recomendación</div>
+      <div class="welcome-h2">Explicable</div>
+      <div class="divider-line"></div>
+      <div class="welcome-desc">
+        Un sistema híbrido de recomendación con explicabilidad XAI,
+        control de privacidad granular y compliance regulatorio operacionalizado
+        sobre el dataset Amazon Purchases 2018–2024.
+      </div>
+      <div class="stats-row">
+        <div class="stat-pill">
+          <span class="stat-pill-num">5,027</span>
+          <span class="stat-pill-lbl">Usuarios</span>
+        </div>
+        <div class="stat-pill">
+          <span class="stat-pill-num">939K</span>
+          <span class="stat-pill-lbl">Ítems</span>
+        </div>
+        <div class="stat-pill">
+          <span class="stat-pill-num">19</span>
+          <span class="stat-pill-lbl">Hallazgos XAI</span>
+        </div>
+        <div class="stat-pill">
+          <span class="stat-pill-num">10</span>
+          <span class="stat-pill-lbl">Pantallas</span>
+        </div>
+        <div class="stat-pill">
+          <span class="stat-pill-num">NDCG</span>
+          <span class="stat-pill-lbl">0.050</span>
+        </div>
       </div>
     </div>
     """, unsafe_allow_html=True)
-    st.write("")
+
     col_btn = st.columns([1,2,1])[1]
     with col_btn:
-        if st.button("🚀  Explorar el sistema", use_container_width=True, type="primary"):
+        if st.button("Explorar el sistema  →", use_container_width=True, type="primary"):
             st.session_state.app_iniciada = True
             st.rerun()
+
+    st.markdown("""
+    <div style="text-align:center;margin-top:-1rem">
+      <div class="footer-note">SHAP · LIME · GDPR · AI Act · Amazon Purchases 2018–2024</div>
+    </div>
+    """, unsafe_allow_html=True)
     st.stop()
 
 
