@@ -682,6 +682,14 @@ with st.sidebar:
         "⚖️  Gobernanza Regulatoria",
     ], label_visibility="collapsed")
 
+    # ── Modo A/B para encuesta ──────────────────────
+    _modo = st.query_params.get("modo", "tratamiento")
+    mostrar_xai = (_modo != "control")
+    if not mostrar_xai:
+        st.markdown('''<div style="background:rgba(83,74,183,0.12);border:1px solid
+        rgba(83,74,183,0.3);border-radius:8px;padding:0.4rem 0.8rem;
+        font-size:0.72rem;color:#9B8FE0;margin-bottom:0.5rem;text-align:center">
+        🔬 Modo Evaluación</div>''', unsafe_allow_html=True)
     st.markdown("""<hr>
     <div style="font-size:0.7rem;color:#8A8880;line-height:1.8">
       <b style="color:#E8E6E0">Dataset:</b> Amazon Purchases<br>
@@ -820,7 +828,15 @@ if "Dashboard" in pagina:
     st.markdown('<div class="main-header">Dashboard de Usuario</div>', unsafe_allow_html=True)
     st.markdown('<div class="main-sub">Recomendaciones personalizadas con explicaciones XAI</div>', unsafe_allow_html=True)
     st.write("")
-    st.info("📖 **Cómo usar esta pantalla:** Seleccioná cualquiera de los 3,217 usuarios del estudio. Vas a ver su perfil de compras, las métricas del sistema de recomendación, y los productos recomendados con las razones por las que el modelo los eligió. Las etiquetas verdes en cada producto son las **explicaciones XAI** — el núcleo de esta tesis.")
+    if not mostrar_xai:
+        st.markdown('''<div style="background:rgba(83,74,183,0.08);border:1px solid
+        rgba(83,74,183,0.25);border-radius:10px;padding:0.85rem 1rem;
+        font-size:0.85rem;color:#B4B2A9;margin-bottom:1rem">
+        Estás viendo una lista de productos recomendados para este usuario.
+        Podés explorar distintos usuarios usando el selector de arriba.
+        </div>''', unsafe_allow_html=True)
+    if mostrar_xai:
+        st.info("📖 **Cómo usar esta pantalla:** Seleccioná cualquiera de los 3,217 usuarios del estudio. Vas a ver su perfil de compras, las métricas del sistema de recomendación, y los productos recomendados con las razones por las que el modelo los eligió. Las etiquetas verdes en cada producto son las **explicaciones XAI** — el núcleo de esta tesis.")
 
     if recs is None:
         st.error("No se encontró `app_recs_final.parquet`. Corré el Bloque 5 primero.")
