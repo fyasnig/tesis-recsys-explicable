@@ -122,181 +122,254 @@ if 'app_iniciada' not in st.session_state:
 if not st.session_state.app_iniciada:
     st.markdown("""
     <style>
-    /* Fondo con gradiente radial para la bienvenida */
-    [data-testid="stAppViewContainer"] {
-        background: radial-gradient(ellipse at 20% 50%, rgba(29,158,117,0.08) 0%, transparent 60%),
-                    radial-gradient(ellipse at 80% 20%, rgba(83,74,183,0.08) 0%, transparent 60%),
-                    #0E1117;
+    @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+    /* Reset y fondo */
+    html, body, [data-testid="stAppViewContainer"] {
+        background: #0A0D14 !important;
     }
-    .welcome-outer {
-        min-height: 85vh;
+    [data-testid="stAppViewContainer"]::before {
+        content: '';
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background:
+            radial-gradient(ellipse 60% 50% at 15% 60%, rgba(29,158,117,0.12) 0%, transparent 70%),
+            radial-gradient(ellipse 50% 40% at 85% 25%, rgba(83,74,183,0.10) 0%, transparent 70%),
+            radial-gradient(ellipse 40% 30% at 50% 90%, rgba(29,158,117,0.05) 0%, transparent 70%);
+        pointer-events: none;
+        z-index: 0;
+    }
+    [data-testid="stSidebar"]          { display: none !important; }
+    [data-testid="stHeader"]           { background: transparent !important; border: none !important; }
+    [data-testid="stToolbar"]          { display: none !important; }
+    [data-testid="stDecoration"]       { display: none !important; }
+    .block-container { padding-top: 1rem !important; max-width: 100% !important; }
+
+    /* Layout principal */
+    .w-page {
+        min-height: 95vh;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        padding: 2rem;
+        text-align: center;
+        padding: 2rem 1rem 1rem;
+        position: relative;
+        z-index: 1;
     }
-    .welcome-badge {
-        display: inline-block;
-        background: rgba(29,158,117,0.12);
-        border: 1px solid rgba(29,158,117,0.35);
+
+    /* Badge superior */
+    .w-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: rgba(29,158,117,0.1);
+        border: 1px solid rgba(29,158,117,0.3);
         color: #1D9E75;
-        border-radius: 30px;
-        padding: 0.3rem 1.1rem;
-        font-size: 0.78rem;
+        border-radius: 100px;
+        padding: 0.35rem 1.2rem;
+        font-size: 0.72rem;
         font-weight: 600;
-        letter-spacing: 0.12em;
+        letter-spacing: 0.15em;
         text-transform: uppercase;
-        margin-bottom: 1.5rem;
-        animation: fadeInUp 0.5s ease forwards;
+        margin-bottom: 2.5rem;
+        animation: fadeInUp 0.5s ease both;
     }
-    .welcome-h1 {
+    .w-badge-dot {
+        width: 6px; height: 6px;
+        background: #1D9E75;
+        border-radius: 50%;
+        animation: pulse-green 2s ease-in-out infinite;
+    }
+
+    /* Titulo */
+    .w-title {
         font-family: 'DM Serif Display', serif;
-        font-size: 3.8rem;
-        color: #E8E6E0;
-        letter-spacing: -0.03em;
-        line-height: 1.05;
-        margin: 0 0 0.2rem;
+        font-size: clamp(2.8rem, 7vw, 5.5rem);
+        color: #ECE9E3;
+        letter-spacing: -0.04em;
+        line-height: 1;
+        margin: 0;
         animation: fadeInUp 0.6s ease 0.1s both;
     }
-    .welcome-h2 {
+    .w-title-accent {
         font-family: 'DM Serif Display', serif;
-        font-size: 3.8rem;
-        letter-spacing: -0.03em;
+        font-size: clamp(2.8rem, 7vw, 5.5rem);
+        font-style: italic;
+        letter-spacing: -0.04em;
         line-height: 1.05;
-        margin: 0 0 1rem;
-        background: linear-gradient(90deg, #1D9E75, #5DCAA5, #1D9E75);
+        margin: 0 0 0.5rem;
+        background: linear-gradient(100deg, #1D9E75 0%, #5DCAA5 40%, #1D9E75 80%);
         background-size: 200% auto;
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        animation: fadeInUp 0.6s ease 0.2s both, shimmer 4s linear infinite;
+        background-clip: text;
+        animation: fadeInUp 0.6s ease 0.15s both, shimmer 5s linear infinite;
     }
-    .welcome-desc {
-        font-size: 1rem;
-        color: #8A8880;
-        margin-bottom: 3rem;
-        line-height: 1.6;
-        max-width: 520px;
-        text-align: center;
+
+    /* Linea divisora */
+    .w-divider {
+        width: 48px; height: 1px;
+        background: linear-gradient(90deg, transparent, #1D9E75, transparent);
+        margin: 1.5rem auto 1.8rem;
+        animation: fadeInUp 0.6s ease 0.25s both;
+    }
+
+    /* Descripcion */
+    .w-desc {
+        font-family: 'DM Sans', sans-serif;
+        font-size: 1.05rem;
+        color: rgba(180,178,169,0.85);
+        line-height: 1.7;
+        max-width: 480px;
+        margin: 0 auto 3rem;
+        font-weight: 300;
         animation: fadeInUp 0.6s ease 0.3s both;
     }
-    .stats-row {
+    .w-desc strong { color: #ECE9E3; font-weight: 500; }
+
+    /* Stats grid */
+    .w-stats {
         display: flex;
-        gap: 1.5rem;
-        margin-bottom: 3rem;
-        flex-wrap: wrap;
+        gap: 1rem;
         justify-content: center;
+        flex-wrap: wrap;
+        margin-bottom: 3.5rem;
         animation: fadeInUp 0.6s ease 0.4s both;
     }
-    .stat-pill {
-        background: rgba(255,255,255,0.03);
-        border: 1px solid rgba(255,255,255,0.08);
-        border-radius: 12px;
-        padding: 1rem 1.5rem;
-        text-align: center;
-        min-width: 100px;
-        transition: border-color 0.3s ease;
+    .w-stat {
+        background: rgba(255,255,255,0.025);
+        border: 1px solid rgba(255,255,255,0.07);
+        border-radius: 14px;
+        padding: 1.1rem 1.4rem;
+        min-width: 90px;
+        position: relative;
+        overflow: hidden;
+        transition: border-color 0.3s, transform 0.3s;
     }
-    .stat-pill:hover { border-color: rgba(29,158,117,0.4); }
-    .stat-pill-num {
+    .w-stat::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(135deg, rgba(29,158,117,0.06) 0%, transparent 60%);
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+    .w-stat:hover { border-color: rgba(29,158,117,0.35); transform: translateY(-3px); }
+    .w-stat:hover::after { opacity: 1; }
+    .w-stat-num {
         font-family: 'DM Serif Display', serif;
-        font-size: 1.8rem;
+        font-size: 1.9rem;
         color: #1D9E75;
         display: block;
         line-height: 1;
-        margin-bottom: 0.3rem;
+        margin-bottom: 0.4rem;
     }
-    .stat-pill-lbl {
-        font-size: 0.7rem;
-        color: #8A8880;
+    .w-stat-lbl {
+        font-size: 0.65rem;
+        color: rgba(138,136,128,0.8);
         text-transform: uppercase;
-        letter-spacing: 0.1em;
+        letter-spacing: 0.12em;
+        font-weight: 500;
     }
-    .welcome-btn-wrap {
-        animation: fadeInUp 0.6s ease 0.5s both;
-    }
-    .welcome-btn {
-        display: inline-block;
-        background: linear-gradient(135deg, #1D9E75 0%, #159060 100%);
+
+    /* Boton */
+    div[data-testid="stButton"] > button {
+        background: linear-gradient(135deg, #1D9E75 0%, #17876A 100%) !important;
         color: white !important;
-        border: none;
-        border-radius: 50px;
-        padding: 0.9rem 2.8rem;
-        font-size: 1rem;
-        font-weight: 600;
-        letter-spacing: 0.04em;
-        cursor: pointer;
-        text-decoration: none;
-        box-shadow: 0 4px 24px rgba(29,158,117,0.35);
-        transition: all 0.3s ease;
+        border: none !important;
+        border-radius: 100px !important;
+        padding: 0.85rem 2.5rem !important;
+        font-family: 'DM Sans', sans-serif !important;
+        font-size: 0.95rem !important;
+        font-weight: 600 !important;
+        letter-spacing: 0.05em !important;
+        box-shadow: 0 0 0 1px rgba(29,158,117,0.3), 0 8px 32px rgba(29,158,117,0.3) !important;
+        transition: all 0.3s ease !important;
+        animation: fadeInUp 0.6s ease 0.5s both !important;
     }
-    .welcome-btn:hover {
-        box-shadow: 0 6px 32px rgba(29,158,117,0.55);
-        transform: translateY(-2px);
+    div[data-testid="stButton"] > button:hover {
+        box-shadow: 0 0 0 1px rgba(29,158,117,0.5), 0 12px 40px rgba(29,158,117,0.45) !important;
+        transform: translateY(-2px) !important;
     }
-    .divider-line {
-        width: 60px;
-        height: 2px;
-        background: linear-gradient(90deg, transparent, #1D9E75, transparent);
-        margin: 0 auto 2rem;
-        animation: fadeInUp 0.6s ease 0.35s both;
+
+    /* Tags tecnicas */
+    .w-tags {
+        display: flex;
+        gap: 0.5rem;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin-top: 2rem;
+        animation: fadeInUp 0.6s ease 0.65s both;
     }
-    .footer-note {
-        margin-top: 3rem;
-        font-size: 0.72rem;
+    .w-tag {
+        font-size: 0.65rem;
         color: rgba(138,136,128,0.5);
-        letter-spacing: 0.06em;
-        animation: fadeInUp 0.6s ease 0.6s both;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        padding: 0.2rem 0.6rem;
+        border: 1px solid rgba(255,255,255,0.05);
+        border-radius: 4px;
     }
-    /* Ocultar sidebar en bienvenida */
-    [data-testid="stSidebar"] { display: none; }
-    [data-testid="stHeader"] { background: transparent; }
     </style>
 
-    <div class="welcome-outer">
-      <div class="welcome-badge">✦ Tesis de Maestría · Franco Yasnig</div>
-      <div class="welcome-h1">Sistema de Recomendación</div>
-      <div class="welcome-h2">Explicable</div>
-      <div class="divider-line"></div>
-      <div class="welcome-desc">
-        Un sistema híbrido de recomendación con explicabilidad XAI,
-        control de privacidad granular y compliance regulatorio operacionalizado
-        sobre el dataset Amazon Purchases 2018–2024.
+    <div class="w-page">
+      <div class="w-badge">
+        <span class="w-badge-dot"></span>
+        Tesis de Maestría &nbsp;·&nbsp; Franco Yasnig
       </div>
-      <div class="stats-row">
-        <div class="stat-pill">
-          <span class="stat-pill-num">5,027</span>
-          <span class="stat-pill-lbl">Usuarios</span>
+
+      <div class="w-title">Sistema de Recomendación</div>
+      <div class="w-title-accent">Explicable</div>
+      <div class="w-divider"></div>
+
+      <div class="w-desc">
+        Sistema híbrido con <strong>explicabilidad XAI</strong>,
+        control de privacidad granular y
+        <strong>compliance regulatorio</strong> operacionalizado
+        sobre Amazon Purchases 2018–2024.
+      </div>
+
+      <div class="w-stats">
+        <div class="w-stat">
+          <span class="w-stat-num">5,027</span>
+          <span class="w-stat-lbl">Usuarios</span>
         </div>
-        <div class="stat-pill">
-          <span class="stat-pill-num">939K</span>
-          <span class="stat-pill-lbl">Ítems</span>
+        <div class="w-stat">
+          <span class="w-stat-num">939K</span>
+          <span class="w-stat-lbl">Ítems</span>
         </div>
-        <div class="stat-pill">
-          <span class="stat-pill-num">19</span>
-          <span class="stat-pill-lbl">Hallazgos XAI</span>
+        <div class="w-stat">
+          <span class="w-stat-num">19</span>
+          <span class="w-stat-lbl">Hallazgos</span>
         </div>
-        <div class="stat-pill">
-          <span class="stat-pill-num">10</span>
-          <span class="stat-pill-lbl">Pantallas</span>
+        <div class="w-stat">
+          <span class="w-stat-num">10</span>
+          <span class="w-stat-lbl">Pantallas</span>
         </div>
-        <div class="stat-pill">
-          <span class="stat-pill-num">NDCG</span>
-          <span class="stat-pill-lbl">0.050</span>
+        <div class="w-stat">
+          <span class="w-stat-num">0.050</span>
+          <span class="w-stat-lbl">NDCG@10</span>
         </div>
       </div>
     </div>
     """, unsafe_allow_html=True)
 
-    col_btn = st.columns([1,2,1])[1]
+    col_btn = st.columns([1, 1.5, 1])[1]
     with col_btn:
-        if st.button("Explorar el sistema  →", use_container_width=True, type="primary"):
+        if st.button("Explorar el sistema  →", use_container_width=True):
             st.session_state.app_iniciada = True
             st.rerun()
 
     st.markdown("""
-    <div style="text-align:center;margin-top:-1rem">
-      <div class="footer-note">SHAP · LIME · GDPR · AI Act · Amazon Purchases 2018–2024</div>
+    <div class="w-tags">
+      <span class="w-tag">SHAP</span>
+      <span class="w-tag">LIME</span>
+      <span class="w-tag">GDPR</span>
+      <span class="w-tag">AI Act</span>
+      <span class="w-tag">XAI</span>
+      <span class="w-tag">Privacy-by-Design</span>
+      <span class="w-tag">AI Governance</span>
     </div>
     """, unsafe_allow_html=True)
     st.stop()
