@@ -172,7 +172,7 @@ if not st.session_state.app_iniciada:
         font-weight: 600;
         letter-spacing: 0.15em;
         text-transform: uppercase;
-        margin-bottom: 2.5rem;
+        margin-bottom: 1.2rem;
         animation: fadeInUp 0.5s ease both;
     }
     .w-badge-dot {
@@ -185,7 +185,7 @@ if not st.session_state.app_iniciada:
     /* Titulo */
     .w-title {
         font-family: 'DM Serif Display', serif;
-        font-size: clamp(2.8rem, 7vw, 5.5rem);
+        font-size: clamp(2rem, 5vw, 3.8rem);
         color: #ECE9E3;
         letter-spacing: -0.04em;
         line-height: 1;
@@ -194,7 +194,7 @@ if not st.session_state.app_iniciada:
     }
     .w-title-accent {
         font-family: 'DM Serif Display', serif;
-        font-size: clamp(2.8rem, 7vw, 5.5rem);
+        font-size: clamp(2rem, 5vw, 3.8rem);
         font-style: italic;
         letter-spacing: -0.04em;
         line-height: 1.05;
@@ -211,18 +211,18 @@ if not st.session_state.app_iniciada:
     .w-divider {
         width: 48px; height: 1px;
         background: linear-gradient(90deg, transparent, #1D9E75, transparent);
-        margin: 1.5rem auto 1.8rem;
+        margin: 0.8rem auto 1.2rem;
         animation: fadeInUp 0.6s ease 0.25s both;
     }
 
     /* Descripcion */
     .w-desc {
         font-family: 'DM Sans', sans-serif;
-        font-size: 1.05rem;
+        font-size: 0.92rem;
         color: rgba(180,178,169,0.85);
         line-height: 1.7;
         max-width: 480px;
-        margin: 0 auto 3rem;
+        margin: 0 auto 1.5rem;
         font-weight: 300;
         animation: fadeInUp 0.6s ease 0.3s both;
     }
@@ -234,14 +234,14 @@ if not st.session_state.app_iniciada:
         gap: 1rem;
         justify-content: center;
         flex-wrap: wrap;
-        margin-bottom: 3.5rem;
+        margin-bottom: 1.8rem;
         animation: fadeInUp 0.6s ease 0.4s both;
     }
     .w-stat {
         background: rgba(255,255,255,0.025);
         border: 1px solid rgba(255,255,255,0.07);
         border-radius: 14px;
-        padding: 1.1rem 1.4rem;
+        padding: 0.75rem 1.1rem;
         min-width: 90px;
         position: relative;
         overflow: hidden;
@@ -259,7 +259,7 @@ if not st.session_state.app_iniciada:
     .w-stat:hover::after { opacity: 1; }
     .w-stat-num {
         font-family: 'DM Serif Display', serif;
-        font-size: 1.9rem;
+        font-size: 1.5rem;
         color: #1D9E75;
         display: block;
         line-height: 1;
@@ -299,7 +299,7 @@ if not st.session_state.app_iniciada:
         gap: 0.5rem;
         justify-content: center;
         flex-wrap: wrap;
-        margin-top: 2rem;
+        margin-top: 1rem;
         animation: fadeInUp 0.6s ease 0.65s both;
     }
     .w-tag {
