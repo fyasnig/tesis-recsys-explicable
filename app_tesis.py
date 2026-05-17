@@ -112,6 +112,48 @@ hr{border-color:#2A2F45;}
   letter-spacing: 0.08em;
 }
 
+
+/* Modo Defensa — oculta captions y texto técnico largo */
+.modo-defensa .stCaption,
+.modo-defensa [data-testid="stCaptionContainer"],
+.modo-defensa .element-container:has(.stMarkdown p:not(.keep-visible)) {
+    display: none !important;
+}
+.defensa-badge {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    background: rgba(239,159,39,0.12);
+    border: 1px solid rgba(239,159,39,0.4);
+    color: #EF9F27; border-radius: 6px;
+    padding: 0.25rem 0.65rem; font-size: 0.72rem;
+    font-weight: 600; letter-spacing: 0.08em;
+    margin-bottom: 0.5rem;
+}
+/* Tooltip */
+.kpi-tooltip {
+    position: relative; display: inline-block; cursor: help;
+}
+.kpi-tooltip .tt-text {
+    visibility: hidden; opacity: 0;
+    background: #1E2130; color: #B4B2A9;
+    border: 1px solid #2A2F45;
+    border-radius: 8px; padding: 0.5rem 0.75rem;
+    font-size: 0.75rem; line-height: 1.5;
+    width: 220px; text-align: left;
+    position: absolute; z-index: 999;
+    bottom: 125%; left: 50%; transform: translateX(-50%);
+    transition: opacity 0.2s ease;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+}
+.kpi-tooltip:hover .tt-text {
+    visibility: visible; opacity: 1;
+}
+.tt-icon {
+    display: inline-block;
+    color: rgba(138,136,128,0.5);
+    font-size: 0.7rem; margin-left: 3px;
+    vertical-align: super; cursor: help;
+}
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -418,6 +460,16 @@ with st.sidebar:
         "⚖️  Gobernanza Regulatoria",
     ], label_visibility="collapsed")
 
+    st.write("")
+    modo_defensa = st.toggle("🎓 Modo Defensa", value=False,
+        help="Oculta los textos técnicos largos. Ideal para presentar al tribunal.")
+    if modo_defensa:
+        st.markdown('<div class="defensa-badge">🎓 MODO DEFENSA ACTIVO</div>', unsafe_allow_html=True)
+        st.markdown("""
+        <script>
+        document.querySelector(".main").classList.add("modo-defensa");
+        </script>
+        """, unsafe_allow_html=True)
     st.markdown("""<hr>
     <div style="font-size:0.7rem;color:#8A8880;line-height:1.8">
       <b style="color:#E8E6E0">Dataset:</b> Amazon Purchases<br>
@@ -431,6 +483,22 @@ with st.sidebar:
 # ══════════════════════════════════════════════════════════
 # P1 — DASHBOARD DE USUARIO
 # ══════════════════════════════════════════════════════════
+
+def kpi_tooltip(value, label, tooltip_text, color=None):
+    """KPI box con tooltip al hacer hover sobre el ícono ⓘ"""
+    color_style = f"color:{color};" if color else ""
+    return f'''
+    <div class="kpi-box">
+      <div class="kpi-value" style="{color_style}">{value}</div>
+      <div class="kpi-label">
+        {label}
+        <span class="kpi-tooltip">
+          <span class="tt-icon">ⓘ</span>
+          <span class="tt-text">{tooltip_text}</span>
+        </span>
+      </div>
+    </div>'''
+
 if "Dashboard" in pagina:
     # Sonido de bienvenida — se ejecuta una sola vez al entrar al dashboard
     if 'sonido_reproducido' not in st.session_state:
@@ -555,6 +623,42 @@ if "Dashboard" in pagina:
 
     # ── RECOMENDACIONES + GRÁFICOS ────────────────────────
     st.markdown('<hr style="border-color:#2A2F45;margin:0.5rem 0 0.75rem">', unsafe_allow_html=True)
+    # Contador animado — JS que anima los números de los KPIs
+    st.markdown("""
+    <script>
+    (function() {
+      function animateValue(el, start, end, duration) {
+        if (!el) return;
+        const isFloat = String(end).includes(".");
+        const isMoney = el.innerText.includes("$");
+        const startTime = performance.now();
+        function update(now) {
+          const elapsed = now - startTime;
+          const progress = Math.min(elapsed / duration, 1);
+          const ease = 1 - Math.pow(1 - progress, 3);
+          const current = start + (end - start) * ease;
+          const formatted = isFloat
+            ? current.toFixed(2)
+            : Math.floor(current).toLocaleString();
+          el.innerText = isMoney ? "$" + formatted : formatted;
+          if (progress < 1) requestAnimationFrame(update);
+        }
+        requestAnimationFrame(update);
+      }
+      // Animar todos los kpi-value al cargar
+      setTimeout(function() {
+        document.querySelectorAll(".kpi-value").forEach(function(el) {
+          const raw = el.innerText.replace(/[$,]/g, "");
+          const num = parseFloat(raw);
+          if (!isNaN(num) && num > 0) {
+            animateValue(el, 0, num, 800);
+          }
+        });
+      }, 100);
+    })();
+    </script>
+    """, unsafe_allow_html=True)
+
     st.caption("📊 **Métricas del sistema para este usuario.** El score máximo es 1.00 cuando el ítem tiene co-compra directa muy fuerte. Las razones promedio indican qué tan explicables son las recomendaciones: más razones = más contexto visible para el usuario.")
     k1,k2,k3,k4 = st.columns(4)
     ms = ur['score_display'].max() if 'score_display' in ur.columns else 0
