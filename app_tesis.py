@@ -45,8 +45,104 @@ hr{border-color:#2A2F45;}
 .item-stat{font-size:0.72rem;color:#8A8880;margin-top:0.35rem;}
 .popularity-bar{background:#2A2F45;border-radius:3px;height:5px;margin-top:4px;}
 .popularity-fill{height:5px;border-radius:3px;}
+
+/* Animaciones */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+@keyframes pulse-green {
+  0%, 100% { text-shadow: 0 0 8px rgba(29,158,117,0.4); }
+  50%       { text-shadow: 0 0 20px rgba(29,158,117,0.9); }
+}
+@keyframes countUp {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+.fade-in-up { animation: fadeInUp 0.6s ease forwards; }
+.shimmer-text {
+  background: linear-gradient(90deg, #1D9E75, #E8E6E0, #1D9E75);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 3s linear infinite;
+}
+.pulse-green { animation: pulse-green 2s ease-in-out infinite; }
+.welcome-card {
+  background: linear-gradient(135deg, #1E2130 0%, #181C28 100%);
+  border: 1px solid #1D9E75;
+  border-radius: 16px;
+  padding: 2.5rem 3rem;
+  text-align: center;
+  animation: fadeInUp 0.8s ease forwards;
+}
+.welcome-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 3rem;
+  color: #E8E6E0;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+.welcome-sub {
+  font-size: 1rem;
+  color: #8A8880;
+  margin: 0.5rem 0 2rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.stat-welcome {
+  display: inline-block;
+  margin: 0.5rem 1rem;
+  text-align: center;
+}
+.stat-num {
+  font-family: 'DM Serif Display', serif;
+  font-size: 2rem;
+  color: #1D9E75;
+  display: block;
+}
+.stat-lbl {
+  font-size: 0.75rem;
+  color: #8A8880;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
 </style>
 """, unsafe_allow_html=True)
+
+# ── Pantalla de bienvenida ────────────────────────────────
+if 'app_iniciada' not in st.session_state:
+    st.session_state.app_iniciada = False
+
+if not st.session_state.app_iniciada:
+    st.markdown("""
+    <div class="welcome-card">
+      <div class="welcome-title">Sistema de Recomendación</div>
+      <div class="welcome-title shimmer-text">Explicable</div>
+      <div class="welcome-sub">Tesis de Maestría · Franco Yasnig · Amazon Purchases 2018–2024</div>
+      <div style="margin: 1.5rem 0 2rem">
+        <div class="stat-welcome"><span class="stat-num">5,027</span><span class="stat-lbl">Usuarios</span></div>
+        <div class="stat-welcome"><span class="stat-num">939K</span><span class="stat-lbl">Ítems</span></div>
+        <div class="stat-welcome"><span class="stat-num">19</span><span class="stat-lbl">Hallazgos XAI</span></div>
+        <div class="stat-welcome"><span class="stat-num">10</span><span class="stat-lbl">Pantallas</span></div>
+        <div class="stat-welcome"><span class="stat-num pulse-green">NDCG=0.050</span><span class="stat-lbl">Métrica offline</span></div>
+      </div>
+    </div>
+    """, unsafe_allow_html=True)
+    st.write("")
+    col_btn = st.columns([1,2,1])[1]
+    with col_btn:
+        if st.button("🚀  Explorar el sistema", use_container_width=True, type="primary"):
+            st.session_state.app_iniciada = True
+            st.rerun()
+    st.stop()
+
+
 
 # ── HELPERS ───────────────────────────────────────────────
 def cnt(x):
@@ -121,7 +217,7 @@ with st.sidebar:
     st.markdown("""
     <div style="padding:1rem 0 0.5rem">
       <div style="font-family:'DM Serif Display',serif;font-size:1.15rem;color:#E8E6E0;line-height:1.25">
-        Sistema de<br>Recomendación<br><span style="color:#1D9E75">Explicable</span></div>
+        Sistema de<br>Recomendación<br><span class="shimmer-text" style="font-size:1.15rem">Explicable</span></div>
       <div style="font-size:0.68rem;color:#8A8880;margin-top:0.4rem;text-transform:uppercase;letter-spacing:0.08em">
         Tesis de Maestría · Franco Yasnig</div>
     </div><hr>""", unsafe_allow_html=True)
@@ -133,10 +229,10 @@ with st.sidebar:
         "🧪  Experimento & Hallazgos",
         "⚖️  Comparar Usuarios",
         "🔎  Buscador de Ítems",
-        "📈  Hallazgos 14·15·16",
-        "🎯  Hallazgos 17·18",
-        "🔮  Hallazgos 19",
-        "⚖️  Legal-by-Design",
+        "📈  Equidad & Cobertura",
+        "🎯  Diversidad & Coherencia XAI",
+        "🔮  Explicación Accionable",
+        "⚖️  Gobernanza Regulatoria",
     ], label_visibility="collapsed")
 
     st.markdown("""<hr>
@@ -209,20 +305,20 @@ if "Dashboard" in pagina:
 
     col_p1, col_p2, col_p3, col_p4 = st.columns(4)
     treated_lbl = " 🧪" if eg == 'treated' else ""
-    col_p1.markdown(f'<div class="kpi-box"><div style="margin-bottom:0.3rem">{badge(pl)}</div><div class="kpi-label">Privacidad{treated_lbl}</div></div>', unsafe_allow_html=True)
-    col_p2.markdown(f'<div class="kpi-box"><div class="kpi-value" style="font-size:1.6rem">{fmt_num(n_purch)}</div><div class="kpi-label">Productos comprados</div></div>', unsafe_allow_html=True)
-    col_p3.markdown(f'<div class="kpi-box"><div class="kpi-value" style="font-size:1.6rem">{fmt_num(total_spend,"$")}</div><div class="kpi-label">Gasto total</div></div>', unsafe_allow_html=True)
-    col_p4.markdown(f'<div class="kpi-box"><div class="kpi-value" style="font-size:1.6rem">{fmt_num(avg_price,"$","",2)}</div><div class="kpi-label">Ticket promedio</div></div>', unsafe_allow_html=True)
+    col_p1.markdown(f'<div class="kpi-box fade-in-up"><div style="margin-bottom:0.3rem">{badge(pl)}</div><div class="kpi-label">Privacidad{treated_lbl}</div></div>', unsafe_allow_html=True)
+    col_p2.markdown(f'<div class="kpi-box fade-in-up"><div class="kpi-value" style="font-size:1.6rem">{fmt_num(n_purch)}</div><div class="kpi-label">Productos comprados</div></div>', unsafe_allow_html=True)
+    col_p3.markdown(f'<div class="kpi-box fade-in-up"><div class="kpi-value" style="font-size:1.6rem">{fmt_num(total_spend,"$")}</div><div class="kpi-label">Gasto total</div></div>', unsafe_allow_html=True)
+    col_p4.markdown(f'<div class="kpi-box fade-in-up"><div class="kpi-value" style="font-size:1.6rem">{fmt_num(avg_price,"$","",2)}</div><div class="kpi-label">Ticket promedio</div></div>', unsafe_allow_html=True)
 
     # Segunda fila de KPIs
     col_q1, col_q2, col_q3, col_q4 = st.columns(4)
-    col_q1.markdown(f'<div class="kpi-box"><div class="kpi-value" style="font-size:1.6rem">{fmt_num(n_orders)}</div><div class="kpi-label">Órdenes únicas</div></div>', unsafe_allow_html=True)
+    col_q1.markdown(f'<div class="kpi-box fade-in-up"><div class="kpi-value" style="font-size:1.6rem">{fmt_num(n_orders)}</div><div class="kpi-label">Órdenes únicas</div></div>', unsafe_allow_html=True)
     recency_fmt = f"{int(float(recency))} días" if recency != '—' else '—'
-    col_q2.markdown(f'<div class="kpi-box"><div class="kpi-value" style="font-size:1.4rem">{recency_fmt}</div><div class="kpi-label">Última compra</div></div>', unsafe_allow_html=True)
+    col_q2.markdown(f'<div class="kpi-box fade-in-up"><div class="kpi-value" style="font-size:1.4rem">{recency_fmt}</div><div class="kpi-label">Última compra</div></div>', unsafe_allow_html=True)
     loyal_txt = "✅ Sí" if str(brand_loyal) in ['True','1','1.0'] else "🔄 No"
-    col_q3.markdown(f'<div class="kpi-box"><div class="kpi-value" style="font-size:1.4rem">{loyal_txt}</div><div class="kpi-label">Leal a marca</div></div>', unsafe_allow_html=True)
+    col_q3.markdown(f'<div class="kpi-box fade-in-up"><div class="kpi-value" style="font-size:1.4rem">{loyal_txt}</div><div class="kpi-label">Leal a marca</div></div>', unsafe_allow_html=True)
     spec_txt = "✅ Sí" if str(cat_spec) in ['True','1','1.0'] else "🔄 No"
-    col_q4.markdown(f'<div class="kpi-box"><div class="kpi-value" style="font-size:1.4rem">{spec_txt}</div><div class="kpi-label">Especialista categoría</div></div>', unsafe_allow_html=True)
+    col_q4.markdown(f'<div class="kpi-box fade-in-up"><div class="kpi-value" style="font-size:1.4rem">{spec_txt}</div><div class="kpi-label">Especialista categoría</div></div>', unsafe_allow_html=True)
 
     # Chips: categorías y marca
     cat_emoji_map = {'GIFT_CARD':'🎁','ABIS_BOOK':'📚','PET_FOOD':'🐾',
@@ -253,7 +349,7 @@ if "Dashboard" in pagina:
     ms = ur['score_display'].max() if 'score_display' in ur.columns else 0
     for col,val,lbl in [(k1,len(ur),"Recomendaciones"),(k2,f"{ur['nr'].mean():.1f}","Razones promedio"),
                         (k3,f"{(ur['nr']>=1).mean():.0%}","Con ≥1 razón"),(k4,f"{ms:.2f}","Score máximo")]:
-        col.markdown(f'<div class="kpi-box"><div class="kpi-value">{val}</div><div class="kpi-label">{lbl}</div></div>', unsafe_allow_html=True)
+        col.markdown(f'<div class="kpi-box fade-in-up"><div class="kpi-value">{val}</div><div class="kpi-label">{lbl}</div></div>', unsafe_allow_html=True)
 
     st.write("")
     cr, cc = st.columns([3,2])
@@ -480,9 +576,9 @@ elif "Simulador" in pagina:
         dc = "#1D9E75" if d>=0 else "#D85A30"
 
         m1,m2,m3 = st.columns(3)
-        m1.markdown(f'<div class="kpi-box"><div class="kpi-value">{ao:.1f}</div><div class="kpi-label">Razones original</div></div>', unsafe_allow_html=True)
-        m2.markdown(f'<div class="kpi-box"><div class="kpi-value" style="color:{dc}">{as_:.1f}</div><div class="kpi-label">Razones simulado</div></div>', unsafe_allow_html=True)
-        m3.markdown(f'<div class="kpi-box"><div class="kpi-value" style="color:{dc}">{d:+.1f}</div><div class="kpi-label">Diferencia</div></div>', unsafe_allow_html=True)
+        m1.markdown(f'<div class="kpi-box fade-in-up"><div class="kpi-value">{ao:.1f}</div><div class="kpi-label">Razones original</div></div>', unsafe_allow_html=True)
+        m2.markdown(f'<div class="kpi-box fade-in-up"><div class="kpi-value" style="color:{dc}">{as_:.1f}</div><div class="kpi-label">Razones simulado</div></div>', unsafe_allow_html=True)
+        m3.markdown(f'<div class="kpi-box fade-in-up"><div class="kpi-value" style="color:{dc}">{d:+.1f}</div><div class="kpi-label">Diferencia</div></div>', unsafe_allow_html=True)
 
         st.markdown("**Recomendaciones con el perfil seleccionado**")
         for i,(_, row) in enumerate(ur2.iterrows(), 1):
@@ -673,9 +769,9 @@ elif "Experimento" in pagina:
         st.plotly_chart(fe, use_container_width=True)
 
         e1,e2,e3 = st.columns(3)
-        e1.markdown('<div class="kpi-box"><div class="kpi-value" style="color:#EF9F27">+0.04</div><div class="kpi-label">Efecto del consentimiento</div></div>', unsafe_allow_html=True)
-        e2.markdown('<div class="kpi-box"><div class="kpi-value">112/375</div><div class="kpi-label">Usuarios tratados</div></div>', unsafe_allow_html=True)
-        e3.markdown('<div class="kpi-box"><div class="kpi-value" style="color:#1D9E75">2.55</div><div class="kpi-label">Avg razones global</div></div>', unsafe_allow_html=True)
+        e1.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value" style="color:#EF9F27">+0.04</div><div class="kpi-label">Efecto del consentimiento</div></div>', unsafe_allow_html=True)
+        e2.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">112/375</div><div class="kpi-label">Usuarios tratados</div></div>', unsafe_allow_html=True)
+        e3.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value" style="color:#1D9E75">2.55</div><div class="kpi-label">Avg razones global</div></div>', unsafe_allow_html=True)
         st.write("")
         st.caption("El efecto del consentimiento es pequeño (+0.04) porque las señales de ítem compensan la falta de historial — valida el diseño privacy-by-default.")
 
@@ -770,7 +866,7 @@ elif "Comparar" in pagina:
                 (k3, fm(pg(pr,'avg_ticket'),"$","",2), "Ticket prom."),
                 (k4, fm(pg(pr,'recency_days'),"","d"), "Última compra"),
             ]:
-                col_k.markdown(f'<div class="kpi-box"><div class="kpi-value" style="font-size:1.3rem">{val}</div><div class="kpi-label">{lbl}</div></div>', unsafe_allow_html=True)
+                col_k.markdown(f'<div class="kpi-box fade-in-up"><div class="kpi-value" style="font-size:1.3rem">{val}</div><div class="kpi-label">{lbl}</div></div>', unsafe_allow_html=True)
             chips = ''
             for cc, qc in [('category_top1','category_top1_qty'),('category_top2','category_top2_qty')]:
                 cv = pg(pr,cc); qv = pg(pr,qc)
@@ -888,14 +984,14 @@ elif "Buscador" in pagina:
                     pct_rec = n_rec / recs['Survey ResponseID'].nunique() * 100
                     avg_sc  = item_recs['score_display'].mean() if 'score_display' in item_recs.columns else 0
                     avg_nr  = item_recs['nr'].mean()
-                    k1.markdown(f'<div class="kpi-box"><div class="kpi-value">{n_rec}</div><div class="kpi-label">Usuarios que lo reciben</div></div>', unsafe_allow_html=True)
-                    k2.markdown(f'<div class="kpi-box"><div class="kpi-value">{pct_rec:.1f}%</div><div class="kpi-label">% del total</div></div>', unsafe_allow_html=True)
-                    k3.markdown(f'<div class="kpi-box"><div class="kpi-value">{avg_sc:.3f}</div><div class="kpi-label">Score promedio</div></div>', unsafe_allow_html=True)
-                    k4.markdown(f'<div class="kpi-box"><div class="kpi-value">{avg_nr:.1f}</div><div class="kpi-label">Razones promedio</div></div>', unsafe_allow_html=True)
+                    k1.markdown(f'<div class="kpi-box fade-in-up"><div class="kpi-value">{n_rec}</div><div class="kpi-label">Usuarios que lo reciben</div></div>', unsafe_allow_html=True)
+                    k2.markdown(f'<div class="kpi-box fade-in-up"><div class="kpi-value">{pct_rec:.1f}%</div><div class="kpi-label">% del total</div></div>', unsafe_allow_html=True)
+                    k3.markdown(f'<div class="kpi-box fade-in-up"><div class="kpi-value">{avg_sc:.3f}</div><div class="kpi-label">Score promedio</div></div>', unsafe_allow_html=True)
+                    k4.markdown(f'<div class="kpi-box fade-in-up"><div class="kpi-value">{avg_nr:.1f}</div><div class="kpi-label">Razones promedio</div></div>', unsafe_allow_html=True)
                     if cat_row is not None:
                         rr = cat_row['repeat_buyer_rate'] if 'repeat_buyer_rate' in cat_row.index else None
                         rr_str = f"{float(rr):.1%}" if rr is not None and pd.notna(rr) else '—'
-                        k5.markdown(f'<div class="kpi-box"><div class="kpi-value">{rr_str}</div><div class="kpi-label">Compradores recurrentes</div></div>', unsafe_allow_html=True)
+                        k5.markdown(f'<div class="kpi-box fade-in-up"><div class="kpi-value">{rr_str}</div><div class="kpi-label">Compradores recurrentes</div></div>', unsafe_allow_html=True)
 
                     col_d, col_r = st.columns(2)
                     with col_d:
@@ -943,7 +1039,7 @@ elif "Buscador" in pagina:
 # ══════════════════════════════════════════════════════════
 # P7 — HALLAZGOS 14·15·16
 # ══════════════════════════════════════════════════════════
-elif "Hallazgos 14" in pagina:
+elif "Equidad" in pagina or "Hallazgos 14" in pagina:
     st.markdown('<div class="main-header">Hallazgos 14 · 15 · 16</div>', unsafe_allow_html=True)
     st.markdown('<div class="main-sub">HTE · Fairness del catálogo · Cobertura del sistema</div>', unsafe_allow_html=True)
     st.write("")
@@ -1050,10 +1146,10 @@ elif "Hallazgos 14" in pagina:
             sin_df2 = cov_df[cov_df['tiene_recs']==False]
             k1,k2,k3,k4 = st.columns(4)
             dp = (con_df2['total_products'].mean()/max(sin_df2['total_products'].mean(),1)-1)*100 if 'total_products' in cov_df.columns else 0
-            k1.markdown(f'<div class="kpi-box"><div class="kpi-value">{len(con_df2):,}</div><div class="kpi-label">Con cobertura (64%)</div></div>', unsafe_allow_html=True)
-            k2.markdown(f'<div class="kpi-box"><div class="kpi-value" style="color:#D85A30">{len(sin_df2):,}</div><div class="kpi-label">Sin cobertura (36%)</div></div>', unsafe_allow_html=True)
-            k3.markdown(f'<div class="kpi-box"><div class="kpi-value">+{dp:.0f}%</div><div class="kpi-label">Más productos (con vs sin)</div></div>', unsafe_allow_html=True)
-            k4.markdown(f'<div class="kpi-box"><div class="kpi-value" style="color:#EF9F27">23.9%</div><div class="kpi-label">Sin cobertura = cold-start</div></div>', unsafe_allow_html=True)
+            k1.markdown(f'<div class="kpi-box fade-in-up"><div class="kpi-value">{len(con_df2):,}</div><div class="kpi-label">Con cobertura (64%)</div></div>', unsafe_allow_html=True)
+            k2.markdown(f'<div class="kpi-box fade-in-up"><div class="kpi-value" style="color:#D85A30">{len(sin_df2):,}</div><div class="kpi-label">Sin cobertura (36%)</div></div>', unsafe_allow_html=True)
+            k3.markdown(f'<div class="kpi-box fade-in-up"><div class="kpi-value">+{dp:.0f}%</div><div class="kpi-label">Más productos (con vs sin)</div></div>', unsafe_allow_html=True)
+            k4.markdown(f'<div class="kpi-box fade-in-up"><div class="kpi-value" style="color:#EF9F27">23.9%</div><div class="kpi-label">Sin cobertura = cold-start</div></div>', unsafe_allow_html=True)
             st.write("")
             metrics = [c for c in ['total_products','total_spent','num_orders','category_diversity'] if c in cov_df.columns]
             labels  = ['Productos comprados','Gasto total ($)','Órdenes únicas','Div. categorías'][:len(metrics)]
@@ -1072,7 +1168,7 @@ elif "Hallazgos 14" in pagina:
             st.plotly_chart(fig_cv, use_container_width=True)
             st.caption("Diferencias todas significativas (p<0.001) excepto ticket promedio (p=0.26). El sistema no discrimina por capacidad de pago — discrimina por volumen y diversidad de compras. El cold-start extremo explica solo el 23.9%: el 76% restante son usuarios especializados en nichos con grafos de co-compra poco densos.")
 
-elif "Hallazgos 14" in pagina:
+elif "Equidad" in pagina or "Hallazgos 14" in pagina:
     st.markdown('<div class="main-header">Hallazgos 14 · 15 · 16</div>', unsafe_allow_html=True)
     st.markdown('<div class="main-sub">HTE · Fairness del catálogo · Cobertura del sistema</div>', unsafe_allow_html=True)
     st.write("")
@@ -1142,10 +1238,10 @@ elif "Hallazgos 14" in pagina:
             con_df2 = cov_df[cov_df["tiene_recs"]==True]
             sin_df2 = cov_df[cov_df["tiene_recs"]==False]
             k1,k2,k3,k4 = st.columns(4)
-            k1.markdown('<div class="kpi-box"><div class="kpi-value">' + str(len(con_df2)) + '</div><div class="kpi-label">Con cobertura (64%)</div></div>', unsafe_allow_html=True)
-            k2.markdown('<div class="kpi-box"><div class="kpi-value" style="color:#D85A30">' + str(len(sin_df2)) + '</div><div class="kpi-label">Sin cobertura (36%)</div></div>', unsafe_allow_html=True)
-            k3.markdown('<div class="kpi-box"><div class="kpi-value">+226%</div><div class="kpi-label">Más productos</div></div>', unsafe_allow_html=True)
-            k4.markdown('<div class="kpi-box"><div class="kpi-value" style="color:#EF9F27">23.9%</div><div class="kpi-label">Cold-start</div></div>', unsafe_allow_html=True)
+            k1.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">' + str(len(con_df2)) + '</div><div class="kpi-label">Con cobertura (64%)</div></div>', unsafe_allow_html=True)
+            k2.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value" style="color:#D85A30">' + str(len(sin_df2)) + '</div><div class="kpi-label">Sin cobertura (36%)</div></div>', unsafe_allow_html=True)
+            k3.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">+226%</div><div class="kpi-label">Más productos</div></div>', unsafe_allow_html=True)
+            k4.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value" style="color:#EF9F27">23.9%</div><div class="kpi-label">Cold-start</div></div>', unsafe_allow_html=True)
             st.write("")
             metrics = [c for c in ["total_products","total_spent","num_orders","category_diversity"] if c in cov_df.columns]
             labels = ["Productos","Gasto ($)","Ordenes","Div. cat."][:len(metrics)]
@@ -1158,7 +1254,7 @@ elif "Hallazgos 14" in pagina:
             st.plotly_chart(fig_cv, use_container_width=True)
             st.caption("Diferencias significativas (p<0.001) excepto ticket promedio. El sistema discrimina por volumen, no por capacidad de pago.")
 
-elif "Hallazgos 17" in pagina:
+elif "Diversidad" in pagina or "Hallazgos 17" in pagina:
     st.markdown('<div class="main-header">Hallazgos 17 · 18</div>', unsafe_allow_html=True)
     st.markdown('<div class="main-sub">Diversidad · Razones XAI por categoría</div>', unsafe_allow_html=True)
     st.write("")
@@ -1170,10 +1266,10 @@ elif "Hallazgos 17" in pagina:
             st.info("Corré el bloque ILD para generar ild_analisis.csv.")
         else:
             k1,k2,k3,k4 = st.columns(4)
-            k1.markdown('<div class="kpi-box"><div class="kpi-value">' + f'{ild_df["ild_category"].mean():.1f}' + '</div><div class="kpi-label">ILD media</div></div>', unsafe_allow_html=True)
-            k2.markdown('<div class="kpi-box"><div class="kpi-value">' + f'{ild_df["ild_category"].median():.0f}' + '</div><div class="kpi-label">ILD mediana</div></div>', unsafe_allow_html=True)
-            k3.markdown('<div class="kpi-box"><div class="kpi-value" style="color:#D85A30">' + f'{(ild_df["ild_category"]==1).mean():.1%}' + '</div><div class="kpi-label">Mono-categoría</div></div>', unsafe_allow_html=True)
-            k4.markdown('<div class="kpi-box"><div class="kpi-value" style="color:#1D9E75">' + f'{(ild_df["ild_category"]>=5).mean():.1%}' + '</div><div class="kpi-label">Muy diversos</div></div>', unsafe_allow_html=True)
+            k1.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">' + f'{ild_df["ild_category"].mean():.1f}' + '</div><div class="kpi-label">ILD media</div></div>', unsafe_allow_html=True)
+            k2.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">' + f'{ild_df["ild_category"].median():.0f}' + '</div><div class="kpi-label">ILD mediana</div></div>', unsafe_allow_html=True)
+            k3.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value" style="color:#D85A30">' + f'{(ild_df["ild_category"]==1).mean():.1%}' + '</div><div class="kpi-label">Mono-categoría</div></div>', unsafe_allow_html=True)
+            k4.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value" style="color:#1D9E75">' + f'{(ild_df["ild_category"]>=5).mean():.1%}' + '</div><div class="kpi-label">Muy diversos</div></div>', unsafe_allow_html=True)
             col_a, col_b = st.columns(2)
             with col_a:
                 ild_hist = ild_df["ild_category"].value_counts().sort_index()
@@ -1222,7 +1318,7 @@ elif "Hallazgos 17" in pagina:
                                  yaxis=dict(gridcolor="rgba(0,0,0,0)"))
             st.plotly_chart(fig_st, use_container_width=True)
 
-elif "Hallazgos 19" in pagina:
+elif "Accionable" in pagina or "Hallazgos 19" in pagina:
     st.markdown('<div class="main-header">Hallazgo 19 - Contrafactual</div>', unsafe_allow_html=True)
     st.markdown('<div class="main-sub">Delta minimo para entrar al Top-5 - GDPR art. 22</div>', unsafe_allow_html=True)
     st.write("")
@@ -1235,10 +1331,10 @@ elif "Hallazgos 19" in pagina:
         v2 = f'{cf_df["delta_s1_needed"].median():.4f}'
         v3 = f'{cf_df["factible_s1"].mean():.1%}'
         v4 = f'{(cf_df["gap_score"] < 0.05).mean():.1%}'
-        k1.markdown('<div class="kpi-box"><div class="kpi-value">'+v1+'</div><div class="kpi-label">Gap mediano</div></div>', unsafe_allow_html=True)
-        k2.markdown('<div class="kpi-box"><div class="kpi-value">'+v2+'</div><div class="kpi-label">Delta S1 mediano</div></div>', unsafe_allow_html=True)
-        k3.markdown('<div class="kpi-box"><div class="kpi-value" style="color:#1D9E75">'+v3+'</div><div class="kpi-label">Casos factibles</div></div>', unsafe_allow_html=True)
-        k4.markdown('<div class="kpi-box"><div class="kpi-value" style="color:#EF9F27">'+v4+'</div><div class="kpi-label">Gap muy bajo</div></div>', unsafe_allow_html=True)
+        k1.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">'+v1+'</div><div class="kpi-label">Gap mediano</div></div>', unsafe_allow_html=True)
+        k2.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">'+v2+'</div><div class="kpi-label">Delta S1 mediano</div></div>', unsafe_allow_html=True)
+        k3.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value" style="color:#1D9E75">'+v3+'</div><div class="kpi-label">Casos factibles</div></div>', unsafe_allow_html=True)
+        k4.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value" style="color:#EF9F27">'+v4+'</div><div class="kpi-label">Gap muy bajo</div></div>', unsafe_allow_html=True)
         st.write("")
         col1, col2 = st.columns(2)
         with col1:
@@ -1282,7 +1378,7 @@ elif "Hallazgos 19" in pagina:
         with col_g2:
             st.info("Neutral a privacidad: No privada d=0.065, Moderada d=0.069, Sensible d=0.061.")
 
-elif "Legal-by-Design" in pagina:
+elif "Gobernanza" in pagina or "Legal-by-Design" in pagina:
     st.markdown('<div class="main-header">Legal-by-Design Matrix</div>', unsafe_allow_html=True)
     st.markdown('<div class="main-sub">Como cada principio regulatorio se implementa en el sistema</div>', unsafe_allow_html=True)
     st.write("")
@@ -1397,10 +1493,10 @@ elif "Legal-by-Design" in pagina:
         )
         st.write("")
         col_s1, col_s2, col_s3, col_s4 = st.columns(4)
-        col_s1.markdown('<div class="kpi-box"><div class="kpi-value">8</div><div class="kpi-label">Principios implementados</div></div>', unsafe_allow_html=True)
-        col_s2.markdown('<div class="kpi-box"><div class="kpi-value">19</div><div class="kpi-label">Hallazgos como evidencia</div></div>', unsafe_allow_html=True)
-        col_s3.markdown('<div class="kpi-box"><div class="kpi-value">2</div><div class="kpi-label">Marcos regulatorios (GDPR + AI Act)</div></div>', unsafe_allow_html=True)
-        col_s4.markdown('<div class="kpi-box"><div class="kpi-value">9</div><div class="kpi-label">Pantallas de la app como evidencia</div></div>', unsafe_allow_html=True)
+        col_s1.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">8</div><div class="kpi-label">Principios implementados</div></div>', unsafe_allow_html=True)
+        col_s2.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">19</div><div class="kpi-label">Hallazgos como evidencia</div></div>', unsafe_allow_html=True)
+        col_s3.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">2</div><div class="kpi-label">Marcos regulatorios (GDPR + AI Act)</div></div>', unsafe_allow_html=True)
+        col_s4.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">9</div><div class="kpi-label">Pantallas de la app como evidencia</div></div>', unsafe_allow_html=True)
         st.write("")
         st.markdown("""
         <div class="rec-card" style="border-color:#1D9E75">
@@ -1415,7 +1511,7 @@ elif "Legal-by-Design" in pagina:
         </div>
         """, unsafe_allow_html=True)
 
-elif "Legal-by-Design" in pagina:
+elif "Gobernanza" in pagina or "Legal-by-Design" in pagina:
     st.markdown('<div class="main-header">Legal-by-Design Matrix</div>', unsafe_allow_html=True)
     st.markdown('<div class="main-sub">Como cada principio regulatorio se implementa en el sistema</div>', unsafe_allow_html=True)
     st.write("")
@@ -1530,10 +1626,10 @@ elif "Legal-by-Design" in pagina:
         )
         st.write("")
         col_s1, col_s2, col_s3, col_s4 = st.columns(4)
-        col_s1.markdown('<div class="kpi-box"><div class="kpi-value">8</div><div class="kpi-label">Principios implementados</div></div>', unsafe_allow_html=True)
-        col_s2.markdown('<div class="kpi-box"><div class="kpi-value">19</div><div class="kpi-label">Hallazgos como evidencia</div></div>', unsafe_allow_html=True)
-        col_s3.markdown('<div class="kpi-box"><div class="kpi-value">2</div><div class="kpi-label">Marcos regulatorios (GDPR + AI Act)</div></div>', unsafe_allow_html=True)
-        col_s4.markdown('<div class="kpi-box"><div class="kpi-value">9</div><div class="kpi-label">Pantallas de la app como evidencia</div></div>', unsafe_allow_html=True)
+        col_s1.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">8</div><div class="kpi-label">Principios implementados</div></div>', unsafe_allow_html=True)
+        col_s2.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">19</div><div class="kpi-label">Hallazgos como evidencia</div></div>', unsafe_allow_html=True)
+        col_s3.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">2</div><div class="kpi-label">Marcos regulatorios (GDPR + AI Act)</div></div>', unsafe_allow_html=True)
+        col_s4.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">9</div><div class="kpi-label">Pantallas de la app como evidencia</div></div>', unsafe_allow_html=True)
         st.write("")
         st.markdown("""
         <div class="rec-card" style="border-color:#1D9E75">
@@ -1548,7 +1644,7 @@ elif "Legal-by-Design" in pagina:
         </div>
         """, unsafe_allow_html=True)
 
-elif "Legal-by-Design" in pagina:
+elif "Gobernanza" in pagina or "Legal-by-Design" in pagina:
     st.markdown('<div class="main-header">Legal-by-Design Matrix</div>', unsafe_allow_html=True)
     st.markdown('<div class="main-sub">Como cada principio regulatorio se implementa en el sistema</div>', unsafe_allow_html=True)
     st.write("")
@@ -1663,10 +1759,10 @@ elif "Legal-by-Design" in pagina:
         )
         st.write("")
         col_s1, col_s2, col_s3, col_s4 = st.columns(4)
-        col_s1.markdown('<div class="kpi-box"><div class="kpi-value">8</div><div class="kpi-label">Principios implementados</div></div>', unsafe_allow_html=True)
-        col_s2.markdown('<div class="kpi-box"><div class="kpi-value">19</div><div class="kpi-label">Hallazgos como evidencia</div></div>', unsafe_allow_html=True)
-        col_s3.markdown('<div class="kpi-box"><div class="kpi-value">2</div><div class="kpi-label">Marcos regulatorios (GDPR + AI Act)</div></div>', unsafe_allow_html=True)
-        col_s4.markdown('<div class="kpi-box"><div class="kpi-value">9</div><div class="kpi-label">Pantallas de la app como evidencia</div></div>', unsafe_allow_html=True)
+        col_s1.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">8</div><div class="kpi-label">Principios implementados</div></div>', unsafe_allow_html=True)
+        col_s2.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">19</div><div class="kpi-label">Hallazgos como evidencia</div></div>', unsafe_allow_html=True)
+        col_s3.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">2</div><div class="kpi-label">Marcos regulatorios (GDPR + AI Act)</div></div>', unsafe_allow_html=True)
+        col_s4.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">9</div><div class="kpi-label">Pantallas de la app como evidencia</div></div>', unsafe_allow_html=True)
         st.write("")
         st.markdown("""
         <div class="rec-card" style="border-color:#1D9E75">
@@ -1681,7 +1777,7 @@ elif "Legal-by-Design" in pagina:
         </div>
         """, unsafe_allow_html=True)
 
-elif "Legal-by-Design" in pagina:
+elif "Gobernanza" in pagina or "Legal-by-Design" in pagina:
     st.markdown('<div class="main-header">Legal-by-Design Matrix</div>', unsafe_allow_html=True)
     st.markdown('<div class="main-sub">Como cada principio regulatorio se implementa en el sistema</div>', unsafe_allow_html=True)
     st.write("")
@@ -1796,10 +1892,10 @@ elif "Legal-by-Design" in pagina:
         )
         st.write("")
         col_s1, col_s2, col_s3, col_s4 = st.columns(4)
-        col_s1.markdown('<div class="kpi-box"><div class="kpi-value">8</div><div class="kpi-label">Principios implementados</div></div>', unsafe_allow_html=True)
-        col_s2.markdown('<div class="kpi-box"><div class="kpi-value">19</div><div class="kpi-label">Hallazgos como evidencia</div></div>', unsafe_allow_html=True)
-        col_s3.markdown('<div class="kpi-box"><div class="kpi-value">2</div><div class="kpi-label">Marcos regulatorios (GDPR + AI Act)</div></div>', unsafe_allow_html=True)
-        col_s4.markdown('<div class="kpi-box"><div class="kpi-value">9</div><div class="kpi-label">Pantallas de la app como evidencia</div></div>', unsafe_allow_html=True)
+        col_s1.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">8</div><div class="kpi-label">Principios implementados</div></div>', unsafe_allow_html=True)
+        col_s2.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">19</div><div class="kpi-label">Hallazgos como evidencia</div></div>', unsafe_allow_html=True)
+        col_s3.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">2</div><div class="kpi-label">Marcos regulatorios (GDPR + AI Act)</div></div>', unsafe_allow_html=True)
+        col_s4.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">9</div><div class="kpi-label">Pantallas de la app como evidencia</div></div>', unsafe_allow_html=True)
         st.write("")
         st.markdown("""
         <div class="rec-card" style="border-color:#1D9E75">
@@ -1814,7 +1910,7 @@ elif "Legal-by-Design" in pagina:
         </div>
         """, unsafe_allow_html=True)
 
-elif "Legal-by-Design" in pagina:
+elif "Gobernanza" in pagina or "Legal-by-Design" in pagina:
     st.markdown('<div class="main-header">Legal-by-Design Matrix</div>', unsafe_allow_html=True)
     st.markdown('<div class="main-sub">Como cada principio regulatorio se implementa en el sistema</div>', unsafe_allow_html=True)
     st.write("")
@@ -1929,10 +2025,10 @@ elif "Legal-by-Design" in pagina:
         )
         st.write("")
         col_s1, col_s2, col_s3, col_s4 = st.columns(4)
-        col_s1.markdown('<div class="kpi-box"><div class="kpi-value">8</div><div class="kpi-label">Principios implementados</div></div>', unsafe_allow_html=True)
-        col_s2.markdown('<div class="kpi-box"><div class="kpi-value">19</div><div class="kpi-label">Hallazgos como evidencia</div></div>', unsafe_allow_html=True)
-        col_s3.markdown('<div class="kpi-box"><div class="kpi-value">2</div><div class="kpi-label">Marcos regulatorios (GDPR + AI Act)</div></div>', unsafe_allow_html=True)
-        col_s4.markdown('<div class="kpi-box"><div class="kpi-value">9</div><div class="kpi-label">Pantallas de la app como evidencia</div></div>', unsafe_allow_html=True)
+        col_s1.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">8</div><div class="kpi-label">Principios implementados</div></div>', unsafe_allow_html=True)
+        col_s2.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">19</div><div class="kpi-label">Hallazgos como evidencia</div></div>', unsafe_allow_html=True)
+        col_s3.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">2</div><div class="kpi-label">Marcos regulatorios (GDPR + AI Act)</div></div>', unsafe_allow_html=True)
+        col_s4.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">9</div><div class="kpi-label">Pantallas de la app como evidencia</div></div>', unsafe_allow_html=True)
         st.write("")
         st.markdown("""
         <div class="rec-card" style="border-color:#1D9E75">
@@ -1947,7 +2043,7 @@ elif "Legal-by-Design" in pagina:
         </div>
         """, unsafe_allow_html=True)
 
-elif "Legal-by-Design" in pagina:
+elif "Gobernanza" in pagina or "Legal-by-Design" in pagina:
     st.markdown('<div class="main-header">Legal-by-Design Matrix</div>', unsafe_allow_html=True)
     st.markdown('<div class="main-sub">Como cada principio regulatorio se implementa en el sistema</div>', unsafe_allow_html=True)
     st.write("")
@@ -2062,10 +2158,10 @@ elif "Legal-by-Design" in pagina:
         )
         st.write("")
         col_s1, col_s2, col_s3, col_s4 = st.columns(4)
-        col_s1.markdown('<div class="kpi-box"><div class="kpi-value">8</div><div class="kpi-label">Principios implementados</div></div>', unsafe_allow_html=True)
-        col_s2.markdown('<div class="kpi-box"><div class="kpi-value">19</div><div class="kpi-label">Hallazgos como evidencia</div></div>', unsafe_allow_html=True)
-        col_s3.markdown('<div class="kpi-box"><div class="kpi-value">2</div><div class="kpi-label">Marcos regulatorios (GDPR + AI Act)</div></div>', unsafe_allow_html=True)
-        col_s4.markdown('<div class="kpi-box"><div class="kpi-value">9</div><div class="kpi-label">Pantallas de la app como evidencia</div></div>', unsafe_allow_html=True)
+        col_s1.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">8</div><div class="kpi-label">Principios implementados</div></div>', unsafe_allow_html=True)
+        col_s2.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">19</div><div class="kpi-label">Hallazgos como evidencia</div></div>', unsafe_allow_html=True)
+        col_s3.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">2</div><div class="kpi-label">Marcos regulatorios (GDPR + AI Act)</div></div>', unsafe_allow_html=True)
+        col_s4.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">9</div><div class="kpi-label">Pantallas de la app como evidencia</div></div>', unsafe_allow_html=True)
         st.write("")
         st.markdown("""
         <div class="rec-card" style="border-color:#1D9E75">
@@ -2080,7 +2176,7 @@ elif "Legal-by-Design" in pagina:
         </div>
         """, unsafe_allow_html=True)
 
-elif "Legal-by-Design" in pagina:
+elif "Gobernanza" in pagina or "Legal-by-Design" in pagina:
     st.markdown('<div class="main-header">Legal-by-Design Matrix</div>', unsafe_allow_html=True)
     st.markdown('<div class="main-sub">Como cada principio regulatorio se implementa en el sistema</div>', unsafe_allow_html=True)
     st.write("")
@@ -2195,10 +2291,10 @@ elif "Legal-by-Design" in pagina:
         )
         st.write("")
         col_s1, col_s2, col_s3, col_s4 = st.columns(4)
-        col_s1.markdown('<div class="kpi-box"><div class="kpi-value">8</div><div class="kpi-label">Principios implementados</div></div>', unsafe_allow_html=True)
-        col_s2.markdown('<div class="kpi-box"><div class="kpi-value">19</div><div class="kpi-label">Hallazgos como evidencia</div></div>', unsafe_allow_html=True)
-        col_s3.markdown('<div class="kpi-box"><div class="kpi-value">2</div><div class="kpi-label">Marcos regulatorios (GDPR + AI Act)</div></div>', unsafe_allow_html=True)
-        col_s4.markdown('<div class="kpi-box"><div class="kpi-value">9</div><div class="kpi-label">Pantallas de la app como evidencia</div></div>', unsafe_allow_html=True)
+        col_s1.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">8</div><div class="kpi-label">Principios implementados</div></div>', unsafe_allow_html=True)
+        col_s2.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">19</div><div class="kpi-label">Hallazgos como evidencia</div></div>', unsafe_allow_html=True)
+        col_s3.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">2</div><div class="kpi-label">Marcos regulatorios (GDPR + AI Act)</div></div>', unsafe_allow_html=True)
+        col_s4.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">9</div><div class="kpi-label">Pantallas de la app como evidencia</div></div>', unsafe_allow_html=True)
         st.write("")
         st.markdown("""
         <div class="rec-card" style="border-color:#1D9E75">
@@ -2213,7 +2309,7 @@ elif "Legal-by-Design" in pagina:
         </div>
         """, unsafe_allow_html=True)
 
-elif "Legal-by-Design" in pagina:
+elif "Gobernanza" in pagina or "Legal-by-Design" in pagina:
     st.markdown('<div class="main-header">Legal-by-Design Matrix</div>', unsafe_allow_html=True)
     st.markdown('<div class="main-sub">Como cada principio regulatorio se implementa en el sistema</div>', unsafe_allow_html=True)
     st.write("")
@@ -2328,10 +2424,10 @@ elif "Legal-by-Design" in pagina:
         )
         st.write("")
         col_s1, col_s2, col_s3, col_s4 = st.columns(4)
-        col_s1.markdown('<div class="kpi-box"><div class="kpi-value">8</div><div class="kpi-label">Principios implementados</div></div>', unsafe_allow_html=True)
-        col_s2.markdown('<div class="kpi-box"><div class="kpi-value">19</div><div class="kpi-label">Hallazgos como evidencia</div></div>', unsafe_allow_html=True)
-        col_s3.markdown('<div class="kpi-box"><div class="kpi-value">2</div><div class="kpi-label">Marcos regulatorios (GDPR + AI Act)</div></div>', unsafe_allow_html=True)
-        col_s4.markdown('<div class="kpi-box"><div class="kpi-value">9</div><div class="kpi-label">Pantallas de la app como evidencia</div></div>', unsafe_allow_html=True)
+        col_s1.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">8</div><div class="kpi-label">Principios implementados</div></div>', unsafe_allow_html=True)
+        col_s2.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">19</div><div class="kpi-label">Hallazgos como evidencia</div></div>', unsafe_allow_html=True)
+        col_s3.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">2</div><div class="kpi-label">Marcos regulatorios (GDPR + AI Act)</div></div>', unsafe_allow_html=True)
+        col_s4.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">9</div><div class="kpi-label">Pantallas de la app como evidencia</div></div>', unsafe_allow_html=True)
         st.write("")
         st.markdown("""
         <div class="rec-card" style="border-color:#1D9E75">
@@ -2346,7 +2442,7 @@ elif "Legal-by-Design" in pagina:
         </div>
         """, unsafe_allow_html=True)
 
-elif "Legal-by-Design" in pagina:
+elif "Gobernanza" in pagina or "Legal-by-Design" in pagina:
     st.markdown('<div class="main-header">Legal-by-Design Matrix</div>', unsafe_allow_html=True)
     st.markdown('<div class="main-sub">Como cada principio regulatorio se implementa en el sistema</div>', unsafe_allow_html=True)
     st.write("")
@@ -2461,10 +2557,10 @@ elif "Legal-by-Design" in pagina:
         )
         st.write("")
         col_s1, col_s2, col_s3, col_s4 = st.columns(4)
-        col_s1.markdown('<div class="kpi-box"><div class="kpi-value">8</div><div class="kpi-label">Principios implementados</div></div>', unsafe_allow_html=True)
-        col_s2.markdown('<div class="kpi-box"><div class="kpi-value">19</div><div class="kpi-label">Hallazgos como evidencia</div></div>', unsafe_allow_html=True)
-        col_s3.markdown('<div class="kpi-box"><div class="kpi-value">2</div><div class="kpi-label">Marcos regulatorios (GDPR + AI Act)</div></div>', unsafe_allow_html=True)
-        col_s4.markdown('<div class="kpi-box"><div class="kpi-value">9</div><div class="kpi-label">Pantallas de la app como evidencia</div></div>', unsafe_allow_html=True)
+        col_s1.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">8</div><div class="kpi-label">Principios implementados</div></div>', unsafe_allow_html=True)
+        col_s2.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">19</div><div class="kpi-label">Hallazgos como evidencia</div></div>', unsafe_allow_html=True)
+        col_s3.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">2</div><div class="kpi-label">Marcos regulatorios (GDPR + AI Act)</div></div>', unsafe_allow_html=True)
+        col_s4.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">9</div><div class="kpi-label">Pantallas de la app como evidencia</div></div>', unsafe_allow_html=True)
         st.write("")
         st.markdown("""
         <div class="rec-card" style="border-color:#1D9E75">
@@ -2479,7 +2575,7 @@ elif "Legal-by-Design" in pagina:
         </div>
         """, unsafe_allow_html=True)
 
-elif "Legal-by-Design" in pagina:
+elif "Gobernanza" in pagina or "Legal-by-Design" in pagina:
     st.markdown('<div class="main-header">Legal-by-Design Matrix</div>', unsafe_allow_html=True)
     st.markdown('<div class="main-sub">Como cada principio regulatorio se implementa en el sistema</div>', unsafe_allow_html=True)
     st.write("")
@@ -2594,10 +2690,10 @@ elif "Legal-by-Design" in pagina:
         )
         st.write("")
         col_s1, col_s2, col_s3, col_s4 = st.columns(4)
-        col_s1.markdown('<div class="kpi-box"><div class="kpi-value">8</div><div class="kpi-label">Principios implementados</div></div>', unsafe_allow_html=True)
-        col_s2.markdown('<div class="kpi-box"><div class="kpi-value">19</div><div class="kpi-label">Hallazgos como evidencia</div></div>', unsafe_allow_html=True)
-        col_s3.markdown('<div class="kpi-box"><div class="kpi-value">2</div><div class="kpi-label">Marcos regulatorios (GDPR + AI Act)</div></div>', unsafe_allow_html=True)
-        col_s4.markdown('<div class="kpi-box"><div class="kpi-value">9</div><div class="kpi-label">Pantallas de la app como evidencia</div></div>', unsafe_allow_html=True)
+        col_s1.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">8</div><div class="kpi-label">Principios implementados</div></div>', unsafe_allow_html=True)
+        col_s2.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">19</div><div class="kpi-label">Hallazgos como evidencia</div></div>', unsafe_allow_html=True)
+        col_s3.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">2</div><div class="kpi-label">Marcos regulatorios (GDPR + AI Act)</div></div>', unsafe_allow_html=True)
+        col_s4.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">9</div><div class="kpi-label">Pantallas de la app como evidencia</div></div>', unsafe_allow_html=True)
         st.write("")
         st.markdown("""
         <div class="rec-card" style="border-color:#1D9E75">
@@ -2612,7 +2708,7 @@ elif "Legal-by-Design" in pagina:
         </div>
         """, unsafe_allow_html=True)
 
-elif "Legal-by-Design" in pagina:
+elif "Gobernanza" in pagina or "Legal-by-Design" in pagina:
     st.markdown('<div class="main-header">Legal-by-Design Matrix</div>', unsafe_allow_html=True)
     st.markdown('<div class="main-sub">Como cada principio regulatorio se implementa en el sistema</div>', unsafe_allow_html=True)
     st.write("")
@@ -2727,10 +2823,10 @@ elif "Legal-by-Design" in pagina:
         )
         st.write("")
         col_s1, col_s2, col_s3, col_s4 = st.columns(4)
-        col_s1.markdown('<div class="kpi-box"><div class="kpi-value">8</div><div class="kpi-label">Principios implementados</div></div>', unsafe_allow_html=True)
-        col_s2.markdown('<div class="kpi-box"><div class="kpi-value">19</div><div class="kpi-label">Hallazgos como evidencia</div></div>', unsafe_allow_html=True)
-        col_s3.markdown('<div class="kpi-box"><div class="kpi-value">2</div><div class="kpi-label">Marcos regulatorios (GDPR + AI Act)</div></div>', unsafe_allow_html=True)
-        col_s4.markdown('<div class="kpi-box"><div class="kpi-value">9</div><div class="kpi-label">Pantallas de la app como evidencia</div></div>', unsafe_allow_html=True)
+        col_s1.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">8</div><div class="kpi-label">Principios implementados</div></div>', unsafe_allow_html=True)
+        col_s2.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">19</div><div class="kpi-label">Hallazgos como evidencia</div></div>', unsafe_allow_html=True)
+        col_s3.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">2</div><div class="kpi-label">Marcos regulatorios (GDPR + AI Act)</div></div>', unsafe_allow_html=True)
+        col_s4.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">9</div><div class="kpi-label">Pantallas de la app como evidencia</div></div>', unsafe_allow_html=True)
         st.write("")
         st.markdown("""
         <div class="rec-card" style="border-color:#1D9E75">
@@ -2745,7 +2841,7 @@ elif "Legal-by-Design" in pagina:
         </div>
         """, unsafe_allow_html=True)
 
-elif "Legal-by-Design" in pagina:
+elif "Gobernanza" in pagina or "Legal-by-Design" in pagina:
     st.markdown('<div class="main-header">Legal-by-Design Matrix</div>', unsafe_allow_html=True)
     st.markdown('<div class="main-sub">Como cada principio regulatorio se implementa en el sistema</div>', unsafe_allow_html=True)
     st.write("")
@@ -2860,10 +2956,10 @@ elif "Legal-by-Design" in pagina:
         )
         st.write("")
         col_s1, col_s2, col_s3, col_s4 = st.columns(4)
-        col_s1.markdown('<div class="kpi-box"><div class="kpi-value">8</div><div class="kpi-label">Principios implementados</div></div>', unsafe_allow_html=True)
-        col_s2.markdown('<div class="kpi-box"><div class="kpi-value">19</div><div class="kpi-label">Hallazgos como evidencia</div></div>', unsafe_allow_html=True)
-        col_s3.markdown('<div class="kpi-box"><div class="kpi-value">2</div><div class="kpi-label">Marcos regulatorios (GDPR + AI Act)</div></div>', unsafe_allow_html=True)
-        col_s4.markdown('<div class="kpi-box"><div class="kpi-value">9</div><div class="kpi-label">Pantallas de la app como evidencia</div></div>', unsafe_allow_html=True)
+        col_s1.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">8</div><div class="kpi-label">Principios implementados</div></div>', unsafe_allow_html=True)
+        col_s2.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">19</div><div class="kpi-label">Hallazgos como evidencia</div></div>', unsafe_allow_html=True)
+        col_s3.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">2</div><div class="kpi-label">Marcos regulatorios (GDPR + AI Act)</div></div>', unsafe_allow_html=True)
+        col_s4.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">9</div><div class="kpi-label">Pantallas de la app como evidencia</div></div>', unsafe_allow_html=True)
         st.write("")
         st.markdown("""
         <div class="rec-card" style="border-color:#1D9E75">
@@ -2878,7 +2974,7 @@ elif "Legal-by-Design" in pagina:
         </div>
         """, unsafe_allow_html=True)
 
-elif "Legal-by-Design" in pagina:
+elif "Gobernanza" in pagina or "Legal-by-Design" in pagina:
     st.markdown('<div class="main-header">Legal-by-Design Matrix</div>', unsafe_allow_html=True)
     st.markdown('<div class="main-sub">Como cada principio regulatorio se implementa en el sistema</div>', unsafe_allow_html=True)
     st.write("")
@@ -2993,10 +3089,10 @@ elif "Legal-by-Design" in pagina:
         )
         st.write("")
         col_s1, col_s2, col_s3, col_s4 = st.columns(4)
-        col_s1.markdown('<div class="kpi-box"><div class="kpi-value">8</div><div class="kpi-label">Principios implementados</div></div>', unsafe_allow_html=True)
-        col_s2.markdown('<div class="kpi-box"><div class="kpi-value">19</div><div class="kpi-label">Hallazgos como evidencia</div></div>', unsafe_allow_html=True)
-        col_s3.markdown('<div class="kpi-box"><div class="kpi-value">2</div><div class="kpi-label">Marcos regulatorios (GDPR + AI Act)</div></div>', unsafe_allow_html=True)
-        col_s4.markdown('<div class="kpi-box"><div class="kpi-value">9</div><div class="kpi-label">Pantallas de la app como evidencia</div></div>', unsafe_allow_html=True)
+        col_s1.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">8</div><div class="kpi-label">Principios implementados</div></div>', unsafe_allow_html=True)
+        col_s2.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">19</div><div class="kpi-label">Hallazgos como evidencia</div></div>', unsafe_allow_html=True)
+        col_s3.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">2</div><div class="kpi-label">Marcos regulatorios (GDPR + AI Act)</div></div>', unsafe_allow_html=True)
+        col_s4.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">9</div><div class="kpi-label">Pantallas de la app como evidencia</div></div>', unsafe_allow_html=True)
         st.write("")
         st.markdown("""
         <div class="rec-card" style="border-color:#1D9E75">
@@ -3011,7 +3107,7 @@ elif "Legal-by-Design" in pagina:
         </div>
         """, unsafe_allow_html=True)
 
-elif "Legal-by-Design" in pagina:
+elif "Gobernanza" in pagina or "Legal-by-Design" in pagina:
     st.markdown('<div class="main-header">Legal-by-Design Matrix</div>', unsafe_allow_html=True)
     st.markdown('<div class="main-sub">Como cada principio regulatorio se implementa en el sistema</div>', unsafe_allow_html=True)
     st.write("")
@@ -3126,10 +3222,10 @@ elif "Legal-by-Design" in pagina:
         )
         st.write("")
         col_s1, col_s2, col_s3, col_s4 = st.columns(4)
-        col_s1.markdown('<div class="kpi-box"><div class="kpi-value">8</div><div class="kpi-label">Principios implementados</div></div>', unsafe_allow_html=True)
-        col_s2.markdown('<div class="kpi-box"><div class="kpi-value">19</div><div class="kpi-label">Hallazgos como evidencia</div></div>', unsafe_allow_html=True)
-        col_s3.markdown('<div class="kpi-box"><div class="kpi-value">2</div><div class="kpi-label">Marcos regulatorios (GDPR + AI Act)</div></div>', unsafe_allow_html=True)
-        col_s4.markdown('<div class="kpi-box"><div class="kpi-value">9</div><div class="kpi-label">Pantallas de la app como evidencia</div></div>', unsafe_allow_html=True)
+        col_s1.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">8</div><div class="kpi-label">Principios implementados</div></div>', unsafe_allow_html=True)
+        col_s2.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">19</div><div class="kpi-label">Hallazgos como evidencia</div></div>', unsafe_allow_html=True)
+        col_s3.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">2</div><div class="kpi-label">Marcos regulatorios (GDPR + AI Act)</div></div>', unsafe_allow_html=True)
+        col_s4.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">9</div><div class="kpi-label">Pantallas de la app como evidencia</div></div>', unsafe_allow_html=True)
         st.write("")
         st.markdown("""
         <div class="rec-card" style="border-color:#1D9E75">
@@ -3144,7 +3240,7 @@ elif "Legal-by-Design" in pagina:
         </div>
         """, unsafe_allow_html=True)
 
-elif "Legal-by-Design" in pagina:
+elif "Gobernanza" in pagina or "Legal-by-Design" in pagina:
     st.markdown('<div class="main-header">Legal-by-Design Matrix</div>', unsafe_allow_html=True)
     st.markdown('<div class="main-sub">Como cada principio regulatorio se implementa en el sistema</div>', unsafe_allow_html=True)
     st.write("")
@@ -3259,10 +3355,10 @@ elif "Legal-by-Design" in pagina:
         )
         st.write("")
         col_s1, col_s2, col_s3, col_s4 = st.columns(4)
-        col_s1.markdown('<div class="kpi-box"><div class="kpi-value">8</div><div class="kpi-label">Principios implementados</div></div>', unsafe_allow_html=True)
-        col_s2.markdown('<div class="kpi-box"><div class="kpi-value">19</div><div class="kpi-label">Hallazgos como evidencia</div></div>', unsafe_allow_html=True)
-        col_s3.markdown('<div class="kpi-box"><div class="kpi-value">2</div><div class="kpi-label">Marcos regulatorios (GDPR + AI Act)</div></div>', unsafe_allow_html=True)
-        col_s4.markdown('<div class="kpi-box"><div class="kpi-value">9</div><div class="kpi-label">Pantallas de la app como evidencia</div></div>', unsafe_allow_html=True)
+        col_s1.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">8</div><div class="kpi-label">Principios implementados</div></div>', unsafe_allow_html=True)
+        col_s2.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">19</div><div class="kpi-label">Hallazgos como evidencia</div></div>', unsafe_allow_html=True)
+        col_s3.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">2</div><div class="kpi-label">Marcos regulatorios (GDPR + AI Act)</div></div>', unsafe_allow_html=True)
+        col_s4.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">9</div><div class="kpi-label">Pantallas de la app como evidencia</div></div>', unsafe_allow_html=True)
         st.write("")
         st.markdown("""
         <div class="rec-card" style="border-color:#1D9E75">
