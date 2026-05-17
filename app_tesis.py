@@ -743,7 +743,7 @@ elif "Experimento" in pagina:
     st.write("")
     st.info("🧪 **Qué muestra esta pantalla:** Contiene el experimento causal de consentimiento y el resumen de los 13 hallazgos del análisis XAI. El experimento responde: ¿habilitar el historial de compras en las explicaciones mejora la explicabilidad? La tabla maestra consolida todos los resultados del estudio en un solo lugar.")
 
-    te, th = st.tabs(["🧪 Experimento de Consentimiento","📋 Tabla Maestra XAI"])
+    te, th, tf = st.tabs(["🧪 Experimento de Consentimiento","📋 Tabla Maestra XAI","⚠️ Casos de Fallo"])
 
     with te:
         st.caption("**Cómo leer este gráfico:** El eje Y muestra el promedio de razones visibles por recomendación (máximo posible: 3). Los cuatro grupos permiten comparar: el grupo Control es el baseline (sin historial), el grupo Tratado recibió el historial habilitado, y los grupos No_privada y Privada_sensible son referencias de los extremos del sistema. Si el tratamiento funciona, el grupo Tratado debería tener más razones que el Control.")
@@ -805,6 +805,83 @@ elif "Experimento" in pagina:
                       </div>
                     </div>""", unsafe_allow_html=True)
                 st.markdown("")
+
+    with tf:
+        st.markdown("**Casos donde el sistema falla — analisis critico**")
+        st.caption("La ciencia rigurosa documenta tanto los exitos como los fallos. Esta seccion muestra explicitamente las limitaciones estructurales del sistema — no para disculparnos, sino para demostrar rigor cientifico y honestidad metodologica.")
+        st.write("")
+
+        fc1, fc2 = st.tabs(["Cold-start extremo","Sesgo de popularidad"])
+
+        with fc1:
+            st.markdown("**Usuarios sin recomendaciones — el 36% que el sistema no puede servir**")
+            st.error("1,810 usuarios (36%) no reciben ninguna recomendacion. Cold-start extremo explica solo el 23.9% — el 76% restante son usuarios de nicho con grafos de co-compra poco densos.")
+            if cov_df is not None:
+                con_df_f = cov_df[cov_df["tiene_recs"]==True]
+                sin_df_f = cov_df[cov_df["tiene_recs"]==False]
+                col_f1, col_f2 = st.columns(2)
+                with col_f1:
+                    st.markdown("**Perfil tipico de usuario SIN cobertura**")
+                    metr = [c for c in ["total_products","total_spent","num_orders","category_diversity"] if c in cov_df.columns]
+                    labs = ["Productos comprados","Gasto total ($)","Ordenes unicas","Div. categorias"][:len(metr)]
+                    for m, l in zip(metr, labs):
+                        v_sin = sin_df_f[m].mean()
+                        v_con = con_df_f[m].mean()
+                        pct = (v_con - v_sin) / max(v_sin, 1) * 100
+                        st.metric(l, f"{v_sin:.0f}", delta=f"{pct:+.0f}% vs cubiertos", delta_color="inverse")
+                with col_f2:
+                    st.markdown("**Por que falla el sistema para estos usuarios**")
+                    st.markdown("""
+El sistema usa un grafo de co-compra para generar candidatos.
+Si un usuario compra en categorias de nicho (libros especificos,
+suplementos nutricionales poco comunes), el grafo no tiene
+suficientes aristas para generar recomendaciones.
+
+**No es un fallo de privacidad** — el ticket promedio no es
+significativamente distinto (p=0.26). Es un fallo de densidad
+del grafo en dominios especializados.
+
+**Trabajo futuro:** embeddings de contenido (descripciones de
+productos) para usuarios sin vecinos en el grafo.
+                    """)
+            else:
+                st.info("Carga cobertura_sistema.csv para ver el analisis de failure cases.")
+
+        with fc2:
+            st.markdown("**Items muy recomendados con bajo hit rate**")
+            st.error("Los items mas recomendados tienen PEOR hit rate (rho=-0.233). El Amazon eGift Card llega al 27.7% de usuarios pero tiene hit rate de solo 37.1%.")
+            if fair_df is not None:
+                col_f3, col_f4 = st.columns(2)
+                with col_f3:
+                    st.markdown("**Top 5 items mas recomendados con su hit rate**")
+                    top5_fail = fair_df.sort_values("n_usuarios_rec", ascending=False).head(5)
+                    show_f = [c for c in ["title","n_usuarios_rec","pct_usuarios","hit_rate"] if c in top5_fail.columns]
+                    top5_s = top5_fail[show_f].copy()
+                    if "title" in top5_s.columns:
+                        top5_s["title"] = top5_s["title"].str[:35]
+                    if "pct_usuarios" in top5_s.columns:
+                        top5_s["pct_usuarios"] = top5_s["pct_usuarios"].map("{:.1f}%".format)
+                    if "hit_rate" in top5_s.columns:
+                        top5_s["hit_rate"] = top5_s["hit_rate"].map("{:.1%}".format)
+                    st.dataframe(top5_s, hide_index=True, use_container_width=True)
+                with col_f4:
+                    st.markdown("**Por que ocurre este sesgo**")
+                    st.markdown("""
+El grafo de co-compra es denso en productos populares
+(gift cards, consolas digitales). Eso hace que el sistema
+los recomiende a muchos usuarios — pero esos items son
+genericos y no especialmente relevantes para cada usuario.
+
+**Mitigacion parcial:** el MMR (Maximal Marginal Relevance)
+penaliza items que ya aparecen frecuentemente en el ranking.
+Pero el efecto persiste (rho=-0.233) porque el sesgo viene
+de la estructura del grafo, no del ranking final.
+
+**Implicacion regulatoria:** este sesgo es documentable
+y auditable — exactamente lo que pide el AI Act art. 10.
+                    """)
+            else:
+                st.info("Carga fairness_catalogo.csv para ver el analisis de failure cases.")
 
 # ══════════════════════════════════════════════════════════
 # P5 — COMPARAR USUARIOS
@@ -1448,7 +1525,281 @@ elif "Gobernanza" in pagina or "Legal-by-Design" in pagina:
     df_matrix = pd.DataFrame(matrix_data)
 
     # Tabs por marco regulatorio
-    tab_gdpr, tab_ai, tab_all = st.tabs(["GDPR","AI Act","Matriz completa"])
+    tab_gdpr, tab_ai, tab_all, tab_risk, tab_card = st.tabs(["GDPR","AI Act","Matriz completa","Panel de Riesgo","Model Card"])
+
+    with tab_gdpr:
+        st.markdown("**Implementacion de principios GDPR en el sistema**")
+        st.caption("Cada fila muestra como un articulo del GDPR se traduce en una decision de arquitectura o interfaz concreta, con evidencia empirica de los hallazgos.")
+        gdpr_items = ["Transparencia","Consentimiento granular","Minimizacion de datos","Explicacion accionable","Trazabilidad y auditabilidad","Supervision humana"]
+        df_gdpr = df_matrix[df_matrix["Principio"].isin(gdpr_items)].copy()
+        for _, row in df_gdpr.iterrows():
+            with st.expander(f"**{row['Principio']}** — {row['Marco']}"):
+                col_a, col_b = st.columns(2)
+                with col_a:
+                    st.markdown("**Riesgo mitigado**")
+                    st.warning(row["Riesgo mitigado"])
+                    st.markdown("**Implementacion tecnica**")
+                    st.info(row["Implementacion tecnica"])
+                with col_b:
+                    st.markdown("**Evidencia empirica**")
+                    st.success(row["Evidencia empirica"])
+
+    with tab_ai:
+        st.markdown("**Implementacion de principios del AI Act en el sistema**")
+        st.caption("El AI Act (2024) clasifica los sistemas de recomendacion como IA de alto riesgo en contextos criticos. Esta matriz muestra como el sistema anticipa sus requisitos.")
+        ai_items = ["Transparencia","Minimizacion de datos","No discriminacion / Fairness","Trazabilidad y auditabilidad","Supervision humana","Robustez y precision"]
+        df_ai = df_matrix[df_matrix["Principio"].isin(ai_items)].copy()
+        for _, row in df_ai.iterrows():
+            with st.expander(f"**{row['Principio']}** — {row['Marco']}"):
+                col_a, col_b = st.columns(2)
+                with col_a:
+                    st.markdown("**Riesgo mitigado**")
+                    st.warning(row["Riesgo mitigado"])
+                    st.markdown("**Implementacion tecnica**")
+                    st.info(row["Implementacion tecnica"])
+                with col_b:
+                    st.markdown("**Evidencia empirica**")
+                    st.success(row["Evidencia empirica"])
+
+    with tab_all:
+        st.markdown("**Matriz completa — 8 principios regulatorios**")
+        st.caption("Vision consolidada de todos los principios implementados. Cada fila puede usarse como referencia para el capitulo de metodologia y discusion de la tesis.")
+        st.dataframe(
+            df_matrix[["Principio","Marco","Implementacion tecnica","Evidencia empirica"]],
+            hide_index=True, use_container_width=True
+        )
+        st.write("")
+        col_s1, col_s2, col_s3, col_s4 = st.columns(4)
+        col_s1.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">8</div><div class="kpi-label">Principios implementados</div></div>', unsafe_allow_html=True)
+        col_s2.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">19</div><div class="kpi-label">Hallazgos como evidencia</div></div>', unsafe_allow_html=True)
+        col_s3.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">2</div><div class="kpi-label">Marcos regulatorios (GDPR + AI Act)</div></div>', unsafe_allow_html=True)
+        col_s4.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">9</div><div class="kpi-label">Pantallas de la app como evidencia</div></div>', unsafe_allow_html=True)
+        st.write("")
+        st.markdown("""
+        <div class="rec-card" style="border-color:#1D9E75">
+          <div style="font-size:0.85rem;font-weight:600;color:#E8E6E0;margin-bottom:6px">Contribucion diferencial de esta tesis</div>
+          <div style="font-size:0.82rem;color:#8A8880;line-height:1.7">
+            La mayoria de la literatura describe principios regulatorios pero no los implementa en sistemas reales.<br>
+            Esta tesis demuestra que <b style="color:#1D9E75">regulacion y ML no son mundos separados</b>: cada principio del GDPR y el AI Act
+            tiene un correlato tecnico concreto, medible empiricamente con los 19 hallazgos del estudio.<br><br>
+            Referentes mas cercanos: Wachter et al. (contrafactual), IBM FactSheets, NIST AI RMF.<br>
+            Diferencial: sistema experimental completo con evaluacion empirica integrada.
+          </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    with tab_risk:
+        st.markdown("**Panel de riesgo regulatorio del sistema**")
+        st.caption("Semaforo de compliance basado en evidencia empirica de los 19 hallazgos. Verde = implementado con evidencia. Amarillo = mitigado parcialmente. Rojo = limitacion estructural sin solucion completa.")
+        st.write("")
+
+        riesgos = [
+            {"icono":"🟢","riesgo":"Transparencia XAI","estado":"Implementado","evidencia":"SHAP-LIME rho=1.00. 100% recomendaciones con razon visible. Co-compra SHAP=64.8%.","mitigacion":"SHAP + LIME generan razones locales por recomendacion. Pills verdes en cada producto.","impacto":"Alto"},
+            {"icono":"🟢","riesgo":"Trazabilidad y auditabilidad","estado":"Implementado","evidencia":"explain_type registra senal dominante. 19 hallazgos documentados en CSV auditable.","mitigacion":"Pipeline reproducible en Colab. xai_master_findings_table.csv como registro formal.","impacto":"Alto"},
+            {"icono":"🟢","riesgo":"Robustez de senales XAI","estado":"Implementado","evidencia":"Senales independientes: |rho|<0.09 en 9/10 pares. Calibracion perfecta rho=1.00.","mitigacion":"5 senales complementarias sin redundancia. Modelo hibrido ALS + BPR + co-compra.","impacto":"Alto"},
+            {"icono":"🟢","riesgo":"Neutralidad ante privacidad","estado":"Implementado","evidencia":"ANOVA ILD p=0.16 (no significativo). Variacion SHAP entre grupos = 0.9%.","mitigacion":"privacy_level con 3 niveles. Señales excluidas segun configuracion del usuario.","impacto":"Alto"},
+            {"icono":"🟢","riesgo":"Consentimiento granular","estado":"Implementado","evidencia":"HTE experimento: +0.04 razones promedio en grupo tratado (p<0.001 en historial rico).","mitigacion":"share_history configurable. Experimento de consentimiento aleatorio con 375 usuarios.","impacto":"Medio"},
+            {"icono":"🟡","riesgo":"Sesgo de popularidad (fairness)","estado":"Mitigado parcialmente","evidencia":"rho(frecuencia, hit_rate)=-0.233. Q4 hit_rate=41.2% vs Q1=60.4%.","mitigacion":"MMR para diversificacion en el ranking. Identificado y documentado como limitacion.","impacto":"Alto"},
+            {"icono":"🟡","riesgo":"Cobertura desigual","estado":"Mitigado parcialmente","evidencia":"36% sin recomendaciones. Cold-start explica solo 23.9% — 76% son usuarios de nicho.","mitigacion":"Fallback a popularidad para usuarios sin candidatos. Documentado en H16.","impacto":"Alto"},
+            {"icono":"🔴","riesgo":"Cold-start extremo","estado":"Sin mitigacion completa","evidencia":"433 usuarios con <=37 compras sin cobertura. Grafos de co-compra insuficientemente densos.","mitigacion":"Sin solucion estructural implementada. Trabajo futuro: embeddings de contenido o hibrido frio.","impacto":"Alto"},
+        ]
+
+        import pandas as pd
+        # Contadores de semaforo
+        n_verde  = sum(1 for r in riesgos if r["icono"]=="🟢")
+        n_amarillo = sum(1 for r in riesgos if r["icono"]=="🟡")
+        n_rojo   = sum(1 for r in riesgos if r["icono"]=="🔴")
+        k1,k2,k3,k4 = st.columns(4)
+        k1.markdown('<div class="kpi-box"><div class="kpi-value" style="color:#1D9E75">' + str(n_verde) + '</div><div class="kpi-label">🟢 Implementados</div></div>', unsafe_allow_html=True)
+        k2.markdown('<div class="kpi-box"><div class="kpi-value" style="color:#EF9F27">' + str(n_amarillo) + '</div><div class="kpi-label">🟡 Mitigados parcialmente</div></div>', unsafe_allow_html=True)
+        k3.markdown('<div class="kpi-box"><div class="kpi-value" style="color:#D85A30">' + str(n_rojo) + '</div><div class="kpi-label">🔴 Sin mitigacion completa</div></div>', unsafe_allow_html=True)
+        k4.markdown('<div class="kpi-box"><div class="kpi-value">8</div><div class="kpi-label">Total riesgos evaluados</div></div>', unsafe_allow_html=True)
+        st.write("")
+
+        for r in riesgos:
+            color_border = "#1D9E75" if r["icono"]=="🟢" else "#EF9F27" if r["icono"]=="🟡" else "#D85A30"
+            with st.expander(f"{r['icono']} **{r['riesgo']}** — {r['estado']}"):
+                col_e1, col_e2 = st.columns(2)
+                with col_e1:
+                    st.markdown("**Evidencia empirica**")
+                    st.info(r["evidencia"])
+                with col_e2:
+                    st.markdown("**Mitigacion implementada**")
+                    if r["icono"] == "🟢":
+                        st.success(r["mitigacion"])
+                    elif r["icono"] == "🟡":
+                        st.warning(r["mitigacion"])
+                    else:
+                        st.error(r["mitigacion"])
+        st.write("")
+        st.caption("Alineado con NIST AI RMF, ISO/IEC 42001 y AI Act art. 9 (gestion de riesgos). El sistema identifica, documenta y mitiga riesgos de forma transparente — incluso cuando la mitigacion es parcial o inexistente.")
+
+    with tab_card:
+        st.markdown("**Model Card — Ficha tecnica del sistema**")
+        st.caption("Documentacion formal del sistema al estilo Google Model Cards y IBM AI FactSheets. Describe el modelo, sus metricas, limitaciones, uso previsto y contexto regulatorio.")
+        st.write("")
+
+        col_mc1, col_mc2 = st.columns(2)
+        with col_mc1:
+            st.markdown("#### Descripcion del sistema")
+            st.markdown("""
+| Campo | Valor |
+|-------|-------|
+| **Nombre** | Sistema de Recomendacion Explicable |
+| **Version** | 1.0 (Tesis de Maestria) |
+| **Tipo** | Recomendador hibrido co-compra |
+| **Arquitectura** | Item-item + ALS + BPR + ensamble |
+| **Dataset** | Amazon Purchases 2018-2024 |
+| **Usuarios** | 5,027 |
+| **Items** | 939,083 ASINs |
+| **Periodo** | 2018-2024 |
+| **XAI** | SHAP + LIME (rho=1.00) |
+            """)
+
+            st.markdown("#### Performance offline")
+            st.markdown("""
+| Metrica | Valor |
+|---------|-------|
+| **NDCG@10** | 0.050 |
+| **Hit rate D10** | 4.35% |
+| **Hit rate D1** | 0.16% |
+| **Ratio D10/D1** | 27x |
+| **Calibracion** | rho=1.00 |
+| **SHAP-LIME concordancia** | rho=1.00 |
+            """)
+
+            st.markdown("#### Privacidad y consentimiento")
+            st.markdown("""
+| Campo | Valor |
+|-------|-------|
+| **Niveles de privacidad** | 3 (No privada / Moderada / Sensible) |
+| **Historial ocultable** | Si |
+| **Experimento consentimiento** | 375 usuarios, efecto +0.04 razones |
+| **Datos sensibles** | Anonimizados, sin PII |
+| **Marco regulatorio** | GDPR + AI Act |
+            """)
+
+        with col_mc2:
+            st.markdown("#### Cobertura y fairness")
+            st.markdown("""
+| Campo | Valor |
+|-------|-------|
+| **Usuarios cubiertos** | 3,217 / 5,027 (64%) |
+| **Sin recomendaciones** | 1,810 (36%) |
+| **Causa principal** | Densidad insuficiente en grafo |
+| **Sesgo popularidad** | rho=-0.233 (documentado) |
+| **Q4 hit rate** | 41.2% |
+| **Q1 hit rate** | 60.4% |
+| **ILD media** | 6.84 categorias |
+| **ILD neutral a privacidad** | ANOVA p=0.16 |
+            """)
+
+            st.markdown("#### Uso previsto (Intended Use)")
+            st.success("Demostracion academica de sistemas de recomendacion explicables. Investigacion en XAI, AI Governance y compliance regulatorio. Prototipo funcional para validacion de hipotesis.")
+
+            st.markdown("#### Fuera de alcance (Out-of-scope)")
+            st.error("Uso en produccion comercial sin auditoría adicional. Recomendaciones en tiempo real con datos frescos. Usuarios fuera del rango del dataset Amazon Purchases 2018-2024.")
+
+            st.markdown("#### Limitaciones conocidas")
+            st.warning("""
+- Cold-start extremo: sin solucion estructural para usuarios con <37 compras
+- Sesgo de popularidad: MMR mitiga pero no elimina rho=-0.233
+- Cobertura de nicho: ABIS_BOOK con 498 usuarios sin cobertura
+- Señal temporal: peso W=20% pero importancia SHAP=1.7%
+- Validacion externa: sin encuesta de usuarios reales (trabajo futuro)
+            """)
+
+        st.write("")
+        st.markdown("#### Hallazgos XAI — resumen ejecutivo")
+        resumen_h = [
+            {"N":"H1-H2","Cat":"Senal dominante","Hallazgo":"Co-compra SHAP=64.8% (peso=40%). Contraste Top#1 vs Bottom#N: 13x."},
+            {"N":"H3-H4","Cat":"Validacion","Hallazgo":"SHAP-LIME rho=1.00. Calibracion perfecta: D10 tiene 27x mas hits que D1."},
+            {"N":"H5-H7","Cat":"Diseno","Hallazgo":"Neutralidad privacidad 0.9%. Confianza local 0.807. Señales independientes."},
+            {"N":"H8-H9","Cat":"Comportamiento","Hallazgo":"Umbral implicito pos 1-3. Fallback por categoria (Books 67.6%)."},
+            {"N":"H10-H11","Cat":"Robustez/Limitacion","Hallazgo":"Cold-start vs historial rico <1pp. Senal temporal W=20% pero SHAP=1.7%."},
+            {"N":"H12-H13","Cat":"Anomalia","Hallazgo":"Grupo 4 razones: hit rate=36.5%. Grupo 1 razon: 12.23%."},
+            {"N":"H14","Cat":"HTE","Hallazgo":"Historial rico +0.064 (p<0.001) vs cold-start +0.026 (p=0.60 no sig.)."},
+            {"N":"H15","Cat":"Fairness","Hallazgo":"rho(frecuencia, hit_rate)=-0.233. Sesgo de popularidad estructural."},
+            {"N":"H16","Cat":"Cobertura","Hallazgo":"64% cubiertos. Cold-start explica solo 23.9% del 36% sin cobertura."},
+            {"N":"H17","Cat":"ILD","Hallazgo":"rho(ILD, hit_rate)=-0.562. Especializacion predice mejor. ILD neutral a privacidad."},
+            {"N":"H18","Cat":"Coherencia XAI","Hallazgo":"Repeat domina 8/10 categorias. Gift Card no usa Popularidad sino Repeat."},
+            {"N":"H19","Cat":"Contrafactual","Hallazgo":"92.2% factible (delta<=0.30). Gap mediano=0.025. Via: co-compra delta=0.063."},
+        ]
+        import pandas as pd
+        df_h = pd.DataFrame(resumen_h)
+        st.dataframe(df_h, hide_index=True, use_container_width=True)
+
+elif "Gobernanza" in pagina or "Legal-by-Design" in pagina:
+    st.markdown('<div class="main-header">Legal-by-Design Matrix</div>', unsafe_allow_html=True)
+    st.markdown('<div class="main-sub">Como cada principio regulatorio se implementa en el sistema</div>', unsafe_allow_html=True)
+    st.write("")
+    st.info("Esta pantalla traduce principios juridicos abstractos (GDPR, AI Act) en mecanismos tecnicos concretos del sistema. Cada fila muestra un principio regulatorio, el riesgo que mitiga, la implementacion tecnica especifica, y la evidencia empirica de los hallazgos.")
+
+    # Matriz Legal-by-Design
+    import pandas as pd
+    matrix_data = [
+        {
+            "Principio": "Transparencia",
+            "Marco": "GDPR art. 13-14 / AI Act art. 13",
+            "Riesgo mitigado": "Caja negra — usuario no entiende por que recibe recomendaciones",
+            "Implementacion tecnica": "SHAP + LIME generan razones visibles por recomendacion (pills verdes). explain_type registra el tipo de senal usada.",
+            "Evidencia empirica": "H1: Co-compra SHAP=64.8% vs peso teorico 40%. H3: SHAP-LIME rho=1.00. H4: Calibracion score D10 27x D1."
+        },
+        {
+            "Principio": "Consentimiento granular",
+            "Marco": "GDPR art. 7 / ePrivacy",
+            "Riesgo mitigado": "Consentimiento binario — aceptar todo o nada, sin control real",
+            "Implementacion tecnica": "privacy_level con 3 niveles (No_privada / Privada_moderada / Privada_sensible). share_history configurable. Experimento de consentimiento aleatorio.",
+            "Evidencia empirica": "H5: Neutralidad SHAP entre grupos (0.9% variacion). H6: Confianza local estable (0.807 media). H14: HTE +0.064 historial rico vs +0.026 cold-start."
+        },
+        {
+            "Principio": "Minimizacion de datos",
+            "Marco": "GDPR art. 5(1)(c) / AI Act art. 10",
+            "Riesgo mitigado": "Uso excesivo de datos personales mas alla de lo necesario",
+            "Implementacion tecnica": "Exclusion configurable de senales segun privacy_level. Historial oculto en Privada_sensible. Solo se usan datos anonimizados del dataset.",
+            "Evidencia empirica": "H5: El modelo no discrimina por privacidad en SHAP. H17: ILD neutral a privacidad (ANOVA p=0.16). Simulador muestra impacto en tiempo real."
+        },
+        {
+            "Principio": "Explicacion accionable",
+            "Marco": "GDPR art. 22 / AI Act art. 86",
+            "Riesgo mitigado": "Derecho a explicacion meramente descriptiva, no util para el usuario",
+            "Implementacion tecnica": "Analisis contrafactual: delta minimo en S1 para entrar al Top-5. Mensaje accionable: que tiene que cambiar para mejorar el ranking.",
+            "Evidencia empirica": "H19: 92.2% de casos con contrafactual factible (delta<=0.30). Gap mediano=0.0251. Via mas eficiente: co-compra (delta=0.063 mediano)."
+        },
+        {
+            "Principio": "No discriminacion / Fairness",
+            "Marco": "AI Act art. 10 / Directiva 2000/43/CE",
+            "Riesgo mitigado": "El sistema favorece sistematicamente a ciertos perfiles de usuario o producto",
+            "Implementacion tecnica": "Analisis de fairness por cuartil de frecuencia. MMR para diversificacion. Cobertura del sistema documentada.",
+            "Evidencia empirica": "H15: rho(frecuencia, hit_rate)=-0.233 — sesgo de popularidad documentado. H16: 36% sin cobertura, diferencia por volumen no por capacidad de pago (p=0.26 ticket)."
+        },
+        {
+            "Principio": "Trazabilidad y auditabilidad",
+            "Marco": "AI Act art. 12 / GDPR art. 30",
+            "Riesgo mitigado": "Imposibilidad de auditar o verificar decisiones automatizadas",
+            "Implementacion tecnica": "explain_type registra la senal dominante por recomendacion. xai_master_findings_table.csv consolida 19 hallazgos auditables. Pipeline reproducible en Colab.",
+            "Evidencia empirica": "H7: Senales independientes (rho<0.09 en 9/10 pares). H18: Razones coherentes por categoria sin programacion explicita — auditabilidad emergente."
+        },
+        {
+            "Principio": "Supervision humana",
+            "Marco": "AI Act art. 14 / GDPR art. 22(3)",
+            "Riesgo mitigado": "Automatizacion cerrada sin posibilidad de intervencion o correccion",
+            "Implementacion tecnica": "Simulador de privacidad configurable en tiempo real. Buscador inverso para ver a quien se recomienda cada item. Comparacion de usuarios para detectar inconsistencias.",
+            "Evidencia empirica": "App interactiva con 9 pantallas. 3,217 usuarios explorables individualmente. Simulador muestra impacto de cambios de privacidad en tiempo real."
+        },
+        {
+            "Principio": "Robustez y precision",
+            "Marco": "AI Act art. 15 / ISO/IEC 42001",
+            "Riesgo mitigado": "Sistema impreciso o no robusto ante variaciones de perfil",
+            "Implementacion tecnica": "Modelo hibrido: co-compra item-item + ALS + BPR + ensamble. Evaluacion offline con NDCG@10. Analisis de robustez por segmento de historial.",
+            "Evidencia empirica": "H4: Calibracion perfecta rho=1.00. H10: Cold-start vs historial rico diferencia <1pp en S1. H14: HTE significativo en 5/11 segmentos."
+        },
+    ]
+
+    df_matrix = pd.DataFrame(matrix_data)
+
+    # Tabs por marco regulatorio
+    tab_gdpr, tab_ai, tab_all, tab_risk, tab_card = st.tabs(["GDPR","AI Act","Matriz completa","Panel de Riesgo","Model Card"])
 
     with tab_gdpr:
         st.markdown("**Implementacion de principios GDPR en el sistema**")
@@ -1581,7 +1932,7 @@ elif "Gobernanza" in pagina or "Legal-by-Design" in pagina:
     df_matrix = pd.DataFrame(matrix_data)
 
     # Tabs por marco regulatorio
-    tab_gdpr, tab_ai, tab_all = st.tabs(["GDPR","AI Act","Matriz completa"])
+    tab_gdpr, tab_ai, tab_all, tab_risk, tab_card = st.tabs(["GDPR","AI Act","Matriz completa","Panel de Riesgo","Model Card"])
 
     with tab_gdpr:
         st.markdown("**Implementacion de principios GDPR en el sistema**")
@@ -1714,7 +2065,7 @@ elif "Gobernanza" in pagina or "Legal-by-Design" in pagina:
     df_matrix = pd.DataFrame(matrix_data)
 
     # Tabs por marco regulatorio
-    tab_gdpr, tab_ai, tab_all = st.tabs(["GDPR","AI Act","Matriz completa"])
+    tab_gdpr, tab_ai, tab_all, tab_risk, tab_card = st.tabs(["GDPR","AI Act","Matriz completa","Panel de Riesgo","Model Card"])
 
     with tab_gdpr:
         st.markdown("**Implementacion de principios GDPR en el sistema**")
@@ -1847,7 +2198,7 @@ elif "Gobernanza" in pagina or "Legal-by-Design" in pagina:
     df_matrix = pd.DataFrame(matrix_data)
 
     # Tabs por marco regulatorio
-    tab_gdpr, tab_ai, tab_all = st.tabs(["GDPR","AI Act","Matriz completa"])
+    tab_gdpr, tab_ai, tab_all, tab_risk, tab_card = st.tabs(["GDPR","AI Act","Matriz completa","Panel de Riesgo","Model Card"])
 
     with tab_gdpr:
         st.markdown("**Implementacion de principios GDPR en el sistema**")
@@ -1980,7 +2331,7 @@ elif "Gobernanza" in pagina or "Legal-by-Design" in pagina:
     df_matrix = pd.DataFrame(matrix_data)
 
     # Tabs por marco regulatorio
-    tab_gdpr, tab_ai, tab_all = st.tabs(["GDPR","AI Act","Matriz completa"])
+    tab_gdpr, tab_ai, tab_all, tab_risk, tab_card = st.tabs(["GDPR","AI Act","Matriz completa","Panel de Riesgo","Model Card"])
 
     with tab_gdpr:
         st.markdown("**Implementacion de principios GDPR en el sistema**")
@@ -2113,7 +2464,7 @@ elif "Gobernanza" in pagina or "Legal-by-Design" in pagina:
     df_matrix = pd.DataFrame(matrix_data)
 
     # Tabs por marco regulatorio
-    tab_gdpr, tab_ai, tab_all = st.tabs(["GDPR","AI Act","Matriz completa"])
+    tab_gdpr, tab_ai, tab_all, tab_risk, tab_card = st.tabs(["GDPR","AI Act","Matriz completa","Panel de Riesgo","Model Card"])
 
     with tab_gdpr:
         st.markdown("**Implementacion de principios GDPR en el sistema**")
@@ -2246,7 +2597,7 @@ elif "Gobernanza" in pagina or "Legal-by-Design" in pagina:
     df_matrix = pd.DataFrame(matrix_data)
 
     # Tabs por marco regulatorio
-    tab_gdpr, tab_ai, tab_all = st.tabs(["GDPR","AI Act","Matriz completa"])
+    tab_gdpr, tab_ai, tab_all, tab_risk, tab_card = st.tabs(["GDPR","AI Act","Matriz completa","Panel de Riesgo","Model Card"])
 
     with tab_gdpr:
         st.markdown("**Implementacion de principios GDPR en el sistema**")
@@ -2379,7 +2730,7 @@ elif "Gobernanza" in pagina or "Legal-by-Design" in pagina:
     df_matrix = pd.DataFrame(matrix_data)
 
     # Tabs por marco regulatorio
-    tab_gdpr, tab_ai, tab_all = st.tabs(["GDPR","AI Act","Matriz completa"])
+    tab_gdpr, tab_ai, tab_all, tab_risk, tab_card = st.tabs(["GDPR","AI Act","Matriz completa","Panel de Riesgo","Model Card"])
 
     with tab_gdpr:
         st.markdown("**Implementacion de principios GDPR en el sistema**")
@@ -2512,7 +2863,7 @@ elif "Gobernanza" in pagina or "Legal-by-Design" in pagina:
     df_matrix = pd.DataFrame(matrix_data)
 
     # Tabs por marco regulatorio
-    tab_gdpr, tab_ai, tab_all = st.tabs(["GDPR","AI Act","Matriz completa"])
+    tab_gdpr, tab_ai, tab_all, tab_risk, tab_card = st.tabs(["GDPR","AI Act","Matriz completa","Panel de Riesgo","Model Card"])
 
     with tab_gdpr:
         st.markdown("**Implementacion de principios GDPR en el sistema**")
@@ -2645,7 +2996,7 @@ elif "Gobernanza" in pagina or "Legal-by-Design" in pagina:
     df_matrix = pd.DataFrame(matrix_data)
 
     # Tabs por marco regulatorio
-    tab_gdpr, tab_ai, tab_all = st.tabs(["GDPR","AI Act","Matriz completa"])
+    tab_gdpr, tab_ai, tab_all, tab_risk, tab_card = st.tabs(["GDPR","AI Act","Matriz completa","Panel de Riesgo","Model Card"])
 
     with tab_gdpr:
         st.markdown("**Implementacion de principios GDPR en el sistema**")
@@ -2778,7 +3129,7 @@ elif "Gobernanza" in pagina or "Legal-by-Design" in pagina:
     df_matrix = pd.DataFrame(matrix_data)
 
     # Tabs por marco regulatorio
-    tab_gdpr, tab_ai, tab_all = st.tabs(["GDPR","AI Act","Matriz completa"])
+    tab_gdpr, tab_ai, tab_all, tab_risk, tab_card = st.tabs(["GDPR","AI Act","Matriz completa","Panel de Riesgo","Model Card"])
 
     with tab_gdpr:
         st.markdown("**Implementacion de principios GDPR en el sistema**")
@@ -2911,7 +3262,7 @@ elif "Gobernanza" in pagina or "Legal-by-Design" in pagina:
     df_matrix = pd.DataFrame(matrix_data)
 
     # Tabs por marco regulatorio
-    tab_gdpr, tab_ai, tab_all = st.tabs(["GDPR","AI Act","Matriz completa"])
+    tab_gdpr, tab_ai, tab_all, tab_risk, tab_card = st.tabs(["GDPR","AI Act","Matriz completa","Panel de Riesgo","Model Card"])
 
     with tab_gdpr:
         st.markdown("**Implementacion de principios GDPR en el sistema**")
@@ -3044,7 +3395,7 @@ elif "Gobernanza" in pagina or "Legal-by-Design" in pagina:
     df_matrix = pd.DataFrame(matrix_data)
 
     # Tabs por marco regulatorio
-    tab_gdpr, tab_ai, tab_all = st.tabs(["GDPR","AI Act","Matriz completa"])
+    tab_gdpr, tab_ai, tab_all, tab_risk, tab_card = st.tabs(["GDPR","AI Act","Matriz completa","Panel de Riesgo","Model Card"])
 
     with tab_gdpr:
         st.markdown("**Implementacion de principios GDPR en el sistema**")
@@ -3177,140 +3528,7 @@ elif "Gobernanza" in pagina or "Legal-by-Design" in pagina:
     df_matrix = pd.DataFrame(matrix_data)
 
     # Tabs por marco regulatorio
-    tab_gdpr, tab_ai, tab_all = st.tabs(["GDPR","AI Act","Matriz completa"])
-
-    with tab_gdpr:
-        st.markdown("**Implementacion de principios GDPR en el sistema**")
-        st.caption("Cada fila muestra como un articulo del GDPR se traduce en una decision de arquitectura o interfaz concreta, con evidencia empirica de los hallazgos.")
-        gdpr_items = ["Transparencia","Consentimiento granular","Minimizacion de datos","Explicacion accionable","Trazabilidad y auditabilidad","Supervision humana"]
-        df_gdpr = df_matrix[df_matrix["Principio"].isin(gdpr_items)].copy()
-        for _, row in df_gdpr.iterrows():
-            with st.expander(f"**{row['Principio']}** — {row['Marco']}"):
-                col_a, col_b = st.columns(2)
-                with col_a:
-                    st.markdown("**Riesgo mitigado**")
-                    st.warning(row["Riesgo mitigado"])
-                    st.markdown("**Implementacion tecnica**")
-                    st.info(row["Implementacion tecnica"])
-                with col_b:
-                    st.markdown("**Evidencia empirica**")
-                    st.success(row["Evidencia empirica"])
-
-    with tab_ai:
-        st.markdown("**Implementacion de principios del AI Act en el sistema**")
-        st.caption("El AI Act (2024) clasifica los sistemas de recomendacion como IA de alto riesgo en contextos criticos. Esta matriz muestra como el sistema anticipa sus requisitos.")
-        ai_items = ["Transparencia","Minimizacion de datos","No discriminacion / Fairness","Trazabilidad y auditabilidad","Supervision humana","Robustez y precision"]
-        df_ai = df_matrix[df_matrix["Principio"].isin(ai_items)].copy()
-        for _, row in df_ai.iterrows():
-            with st.expander(f"**{row['Principio']}** — {row['Marco']}"):
-                col_a, col_b = st.columns(2)
-                with col_a:
-                    st.markdown("**Riesgo mitigado**")
-                    st.warning(row["Riesgo mitigado"])
-                    st.markdown("**Implementacion tecnica**")
-                    st.info(row["Implementacion tecnica"])
-                with col_b:
-                    st.markdown("**Evidencia empirica**")
-                    st.success(row["Evidencia empirica"])
-
-    with tab_all:
-        st.markdown("**Matriz completa — 8 principios regulatorios**")
-        st.caption("Vision consolidada de todos los principios implementados. Cada fila puede usarse como referencia para el capitulo de metodologia y discusion de la tesis.")
-        st.dataframe(
-            df_matrix[["Principio","Marco","Implementacion tecnica","Evidencia empirica"]],
-            hide_index=True, use_container_width=True
-        )
-        st.write("")
-        col_s1, col_s2, col_s3, col_s4 = st.columns(4)
-        col_s1.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">8</div><div class="kpi-label">Principios implementados</div></div>', unsafe_allow_html=True)
-        col_s2.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">19</div><div class="kpi-label">Hallazgos como evidencia</div></div>', unsafe_allow_html=True)
-        col_s3.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">2</div><div class="kpi-label">Marcos regulatorios (GDPR + AI Act)</div></div>', unsafe_allow_html=True)
-        col_s4.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">9</div><div class="kpi-label">Pantallas de la app como evidencia</div></div>', unsafe_allow_html=True)
-        st.write("")
-        st.markdown("""
-        <div class="rec-card" style="border-color:#1D9E75">
-          <div style="font-size:0.85rem;font-weight:600;color:#E8E6E0;margin-bottom:6px">Contribucion diferencial de esta tesis</div>
-          <div style="font-size:0.82rem;color:#8A8880;line-height:1.7">
-            La mayoria de la literatura describe principios regulatorios pero no los implementa en sistemas reales.<br>
-            Esta tesis demuestra que <b style="color:#1D9E75">regulacion y ML no son mundos separados</b>: cada principio del GDPR y el AI Act
-            tiene un correlato tecnico concreto, medible empiricamente con los 19 hallazgos del estudio.<br><br>
-            Referentes mas cercanos: Wachter et al. (contrafactual), IBM FactSheets, NIST AI RMF.<br>
-            Diferencial: sistema experimental completo con evaluacion empirica integrada.
-          </div>
-        </div>
-        """, unsafe_allow_html=True)
-
-elif "Gobernanza" in pagina or "Legal-by-Design" in pagina:
-    st.markdown('<div class="main-header">Legal-by-Design Matrix</div>', unsafe_allow_html=True)
-    st.markdown('<div class="main-sub">Como cada principio regulatorio se implementa en el sistema</div>', unsafe_allow_html=True)
-    st.write("")
-    st.info("Esta pantalla traduce principios juridicos abstractos (GDPR, AI Act) en mecanismos tecnicos concretos del sistema. Cada fila muestra un principio regulatorio, el riesgo que mitiga, la implementacion tecnica especifica, y la evidencia empirica de los hallazgos.")
-
-    # Matriz Legal-by-Design
-    import pandas as pd
-    matrix_data = [
-        {
-            "Principio": "Transparencia",
-            "Marco": "GDPR art. 13-14 / AI Act art. 13",
-            "Riesgo mitigado": "Caja negra — usuario no entiende por que recibe recomendaciones",
-            "Implementacion tecnica": "SHAP + LIME generan razones visibles por recomendacion (pills verdes). explain_type registra el tipo de senal usada.",
-            "Evidencia empirica": "H1: Co-compra SHAP=64.8% vs peso teorico 40%. H3: SHAP-LIME rho=1.00. H4: Calibracion score D10 27x D1."
-        },
-        {
-            "Principio": "Consentimiento granular",
-            "Marco": "GDPR art. 7 / ePrivacy",
-            "Riesgo mitigado": "Consentimiento binario — aceptar todo o nada, sin control real",
-            "Implementacion tecnica": "privacy_level con 3 niveles (No_privada / Privada_moderada / Privada_sensible). share_history configurable. Experimento de consentimiento aleatorio.",
-            "Evidencia empirica": "H5: Neutralidad SHAP entre grupos (0.9% variacion). H6: Confianza local estable (0.807 media). H14: HTE +0.064 historial rico vs +0.026 cold-start."
-        },
-        {
-            "Principio": "Minimizacion de datos",
-            "Marco": "GDPR art. 5(1)(c) / AI Act art. 10",
-            "Riesgo mitigado": "Uso excesivo de datos personales mas alla de lo necesario",
-            "Implementacion tecnica": "Exclusion configurable de senales segun privacy_level. Historial oculto en Privada_sensible. Solo se usan datos anonimizados del dataset.",
-            "Evidencia empirica": "H5: El modelo no discrimina por privacidad en SHAP. H17: ILD neutral a privacidad (ANOVA p=0.16). Simulador muestra impacto en tiempo real."
-        },
-        {
-            "Principio": "Explicacion accionable",
-            "Marco": "GDPR art. 22 / AI Act art. 86",
-            "Riesgo mitigado": "Derecho a explicacion meramente descriptiva, no util para el usuario",
-            "Implementacion tecnica": "Analisis contrafactual: delta minimo en S1 para entrar al Top-5. Mensaje accionable: que tiene que cambiar para mejorar el ranking.",
-            "Evidencia empirica": "H19: 92.2% de casos con contrafactual factible (delta<=0.30). Gap mediano=0.0251. Via mas eficiente: co-compra (delta=0.063 mediano)."
-        },
-        {
-            "Principio": "No discriminacion / Fairness",
-            "Marco": "AI Act art. 10 / Directiva 2000/43/CE",
-            "Riesgo mitigado": "El sistema favorece sistematicamente a ciertos perfiles de usuario o producto",
-            "Implementacion tecnica": "Analisis de fairness por cuartil de frecuencia. MMR para diversificacion. Cobertura del sistema documentada.",
-            "Evidencia empirica": "H15: rho(frecuencia, hit_rate)=-0.233 — sesgo de popularidad documentado. H16: 36% sin cobertura, diferencia por volumen no por capacidad de pago (p=0.26 ticket)."
-        },
-        {
-            "Principio": "Trazabilidad y auditabilidad",
-            "Marco": "AI Act art. 12 / GDPR art. 30",
-            "Riesgo mitigado": "Imposibilidad de auditar o verificar decisiones automatizadas",
-            "Implementacion tecnica": "explain_type registra la senal dominante por recomendacion. xai_master_findings_table.csv consolida 19 hallazgos auditables. Pipeline reproducible en Colab.",
-            "Evidencia empirica": "H7: Senales independientes (rho<0.09 en 9/10 pares). H18: Razones coherentes por categoria sin programacion explicita — auditabilidad emergente."
-        },
-        {
-            "Principio": "Supervision humana",
-            "Marco": "AI Act art. 14 / GDPR art. 22(3)",
-            "Riesgo mitigado": "Automatizacion cerrada sin posibilidad de intervencion o correccion",
-            "Implementacion tecnica": "Simulador de privacidad configurable en tiempo real. Buscador inverso para ver a quien se recomienda cada item. Comparacion de usuarios para detectar inconsistencias.",
-            "Evidencia empirica": "App interactiva con 9 pantallas. 3,217 usuarios explorables individualmente. Simulador muestra impacto de cambios de privacidad en tiempo real."
-        },
-        {
-            "Principio": "Robustez y precision",
-            "Marco": "AI Act art. 15 / ISO/IEC 42001",
-            "Riesgo mitigado": "Sistema impreciso o no robusto ante variaciones de perfil",
-            "Implementacion tecnica": "Modelo hibrido: co-compra item-item + ALS + BPR + ensamble. Evaluacion offline con NDCG@10. Analisis de robustez por segmento de historial.",
-            "Evidencia empirica": "H4: Calibracion perfecta rho=1.00. H10: Cold-start vs historial rico diferencia <1pp en S1. H14: HTE significativo en 5/11 segmentos."
-        },
-    ]
-
-    df_matrix = pd.DataFrame(matrix_data)
-
-    # Tabs por marco regulatorio
-    tab_gdpr, tab_ai, tab_all = st.tabs(["GDPR","AI Act","Matriz completa"])
+    tab_gdpr, tab_ai, tab_all, tab_risk, tab_card = st.tabs(["GDPR","AI Act","Matriz completa","Panel de Riesgo","Model Card"])
 
     with tab_gdpr:
         st.markdown("**Implementacion de principios GDPR en el sistema**")
