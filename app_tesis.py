@@ -267,6 +267,42 @@ if not st.session_state.app_iniciada:
         <div class="w-stat"><span class="w-stat-num">0.050</span><span class="w-stat-lbl">NDCG@10</span></div>
       </div>
       <div class="w-progress-wrap">
+      <script>
+        // Sonido de transición con Web Audio API — se activa al cargar
+        (function() {
+          try {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+
+            function playTone(freq, startTime, duration, gainVal, type) {
+              const osc  = ctx.createOscillator();
+              const gain = ctx.createGain();
+              osc.connect(gain);
+              gain.connect(ctx.destination);
+              osc.type = type || 'sine';
+              osc.frequency.setValueAtTime(freq, startTime);
+              gain.gain.setValueAtTime(0, startTime);
+              gain.gain.linearRampToValueAtTime(gainVal, startTime + 0.02);
+              gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+              osc.start(startTime);
+              osc.stop(startTime + duration);
+            }
+
+            // Acorde suave al inicio: do - mi - sol (arpegio)
+            const t = ctx.currentTime + 0.1;
+            playTone(261.63, t,        0.6, 0.10, 'sine');  // do
+            playTone(329.63, t + 0.08, 0.6, 0.08, 'sine');  // mi
+            playTone(392.00, t + 0.16, 0.6, 0.07, 'sine');  // sol
+
+            // Tono de "listo" al completar los 3 segundos
+            const t2 = ctx.currentTime + 2.85;
+            playTone(523.25, t2,        0.35, 0.09, 'sine');  // do alto
+            playTone(659.25, t2 + 0.12, 0.35, 0.08, 'sine');  // mi alto
+            playTone(783.99, t2 + 0.22, 0.50, 0.10, 'sine');  // sol alto
+          } catch(e) {
+            // Browser bloqueó el audio — ignorar silenciosamente
+          }
+        })();
+      </script>
         <div class="w-progress-label">Cargando sistema...</div>
         <div class="w-progress-bar">
           <div class="w-progress-fill"></div>
