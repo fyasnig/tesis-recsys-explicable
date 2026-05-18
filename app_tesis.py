@@ -519,7 +519,6 @@ with st.sidebar:
         "⚖️  Comparar Usuarios",
         "🔎  Buscador de Ítems",
         "📈  Equidad & Cobertura",
-        "🎯  Diversidad & Coherencia XAI",
         "🔮  Explicación Accionable",
         "⚖️  Gobernanza Regulatoria",
     ], label_visibility="collapsed")
@@ -1901,73 +1900,10 @@ elif "Equidad" in pagina or "Hallazgos 14" in pagina:
             st.plotly_chart(fig_cv, use_container_width=True)
             st.caption("Diferencias todas significativas (p<0.001) excepto ticket promedio (p=0.26). El sistema no discrimina por capacidad de pago — discrimina por volumen y diversidad de compras. El cold-start extremo explica solo el 23.9%: el 76% restante son usuarios especializados en nichos con grafos de co-compra poco densos.")
 
-elif "Diversidad" in pagina or "Hallazgos 17" in pagina:
-    st.markdown('<div class="main-header">Hallazgos 17 · 18</div>', unsafe_allow_html=True)
-    st.markdown('<div class="main-sub">Diversidad · Razones XAI por categoría</div>', unsafe_allow_html=True)
-    st.write("")
-    st.info("H17: ILD mide diversidad de categorías en recomendaciones (rho=-0.562 con hit rate). H18: razón XAI dominante por tipo de ítem — propiedad emergente del grafo.")
-    t17, t18 = st.tabs(["H17 ILD","H18 Razones por Categoría"])
-    with t17:
-        st.caption("ILD = número de categorías distintas en las recomendaciones. rho(ILD, hit_rate)=-0.562: especialización predice mejor la compra real.")
-        if ild_df is None:
-            st.info("Corré el bloque ILD para generar ild_analisis.csv.")
-        else:
-            k1,k2,k3,k4 = st.columns(4)
-            k1.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">' + f'{ild_df["ild_category"].mean():.1f}' + '</div><div class="kpi-label">ILD media</div></div>', unsafe_allow_html=True)
-            k2.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">' + f'{ild_df["ild_category"].median():.0f}' + '</div><div class="kpi-label">ILD mediana</div></div>', unsafe_allow_html=True)
-            k3.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value" style="color:#D85A30">' + f'{(ild_df["ild_category"]==1).mean():.1%}' + '</div><div class="kpi-label">Mono-categoría</div></div>', unsafe_allow_html=True)
-            k4.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value" style="color:#1D9E75">' + f'{(ild_df["ild_category"]>=5).mean():.1%}' + '</div><div class="kpi-label">Muy diversos</div></div>', unsafe_allow_html=True)
-            col_a, col_b = st.columns(2)
-            with col_a:
-                ild_hist = ild_df["ild_category"].value_counts().sort_index()
-                fig_h = px.bar(x=ild_hist.index, y=ild_hist.values,
-                               color_discrete_sequence=[COLORS["primary"]],
-                               labels={"x":"N categorias","y":"N usuarios"}, template="plotly_dark")
-                fig_h.add_vline(x=ild_df["ild_category"].mean(), line_dash="dash", line_color=COLORS["accent"])
-                fig_h.update_layout(**pbase(), height=240, showlegend=False, margin=dict(l=0,r=0,t=10,b=0))
-                st.plotly_chart(fig_h, use_container_width=True)
-                st.caption("Pico en 1-2 (especializados) y cola larga hasta 20 (generalistas).")
-            with col_b:
-                if "cuartil_hist" in ild_df.columns:
-                    ild_q = ild_df.groupby("cuartil_hist", observed=True)["ild_category"].median().reset_index()
-                    fig_q2 = px.bar(ild_q, x="cuartil_hist", y="ild_category",
-                                   color_discrete_sequence=[COLORS["secondary"]],
-                                   labels={"cuartil_hist":"Cuartil","ild_category":"ILD mediana"},
-                                   template="plotly_dark", text="ild_category")
-                    fig_q2.update_traces(texttemplate="%{text:.0f}", textposition="outside")
-                    fig_q2.update_layout(**pbase(), height=240, showlegend=False, margin=dict(l=0,r=0,t=10,b=0))
-                    st.plotly_chart(fig_q2, use_container_width=True)
-                    st.caption("Q1=3.0 a Q4=10.0. Más historial = más diversidad = menor precisión.")
-    with t18:
-        st.caption("Repeat domina en 8/10 categorías. Gift Card no usa Popularidad sino Repeat (30.7%). Propiedad emergente del grafo de co-compra.")
-        if raz_df is None:
-            st.info("Corré el bloque de análisis para generar razones_por_categoria.csv.")
-        else:
-            REASON_COLORS = {"Co-compra":COLORS["primary"],"Afinidad categoria":COLORS["secondary"],
-                             "Repeat":COLORS["accent"],"Popularidad":"#9B59B6","Estacionalidad":"#5DCAA5",
-                             "Afinidad marca":"#E74C3C","Importancia categoria":"#F39C12",
-                             "Recencia":COLORS["neutral"],"Importancia marca":"#1ABC9C","Sin razon":"#444","Otra":"#666"}
-            top_cats = raz_df["category"].value_counts().head(10).index.tolist()
-            cat_r = raz_df[raz_df["category"].isin(top_cats)].groupby(["category","reason_type"]).size().reset_index(name="n")
-            totals = cat_r.groupby("category")["n"].transform("sum")
-            cat_r["pct"] = cat_r["n"] / totals * 100
-            reason_order = ["Co-compra","Repeat","Afinidad categoria","Importancia categoria","Popularidad","Estacionalidad","Afinidad marca","Importancia marca","Recencia","Sin razon","Otra"]
-            fig_st = go.Figure()
-            for reason in reason_order:
-                sub = cat_r[cat_r["reason_type"]==reason]
-                if sub.empty: continue
-                cat_vals = {row["category"]: row["pct"] for _,row in sub.iterrows()}
-                fig_st.add_trace(go.Bar(name=reason, x=[cat_vals.get(c,0) for c in top_cats], y=top_cats,
-                                        orientation="h", marker_color=REASON_COLORS.get(reason,COLORS["neutral"]), marker_line_width=0))
-            fig_st.update_layout(**pbase(), barmode="stack", height=360, margin=dict(l=0,r=0,t=10,b=0),
-                                 legend=dict(orientation="h",y=1.12,font=dict(color="#8A8880",size=9)),
-                                 xaxis=dict(title="% de razones",gridcolor="rgba(255,255,255,0.05)"),
-                                 yaxis=dict(gridcolor="rgba(0,0,0,0)"))
-            st.plotly_chart(fig_st, use_container_width=True)
 
 elif "Accionable" in pagina or "Hallazgos 19" in pagina:
-    st.markdown('<div class="main-header">Hallazgo 19 - Contrafactual</div>', unsafe_allow_html=True)
-    st.markdown('<div class="main-sub">Delta minimo para entrar al Top-5 - GDPR art. 22</div>', unsafe_allow_html=True)
+    st.markdown('<div class="main-header">Explicación Accionable</div>', unsafe_allow_html=True)
+    st.markdown('<div class="main-sub">Delta mínimo para entrar al Top-5 · Contrafactual · GDPR art. 22</div>', unsafe_allow_html=True)
     st.write("")
     st.info("Para cada usuario: que tiene que cambiar para que un item NO recomendado entre al Top-5. Conecta con GDPR art. 22.")
     if cf_df is None:
