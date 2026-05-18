@@ -1140,6 +1140,10 @@ elif "Simulador" in pagina:
                 )
                 continue
 
+            # Saltar items sin razones visibles
+            if nr == 0:
+                continue
+
             ind = "🟢" if nr>=2 else ("🟡" if nr==1 else "🔴")
             pills = "".join(
                 f'<span class="reason-pill">{r.strip()[:45]}</span>'
