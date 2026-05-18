@@ -494,7 +494,8 @@ with st.spinner("Cargando datos..."):
     ild_df    = load('ild_analisis.csv')
     raz_df    = load('razones_por_categoria.csv')
     cf_df     = load('contrafactual_analisis.csv')
-    alias_df  = load('user_aliases.csv')
+    alias_csv = Path('user_aliases.csv')
+    alias_df  = pd.read_csv(alias_csv) if alias_csv.exists() else None
     alias_map = dict(zip(alias_df['Survey ResponseID'], alias_df['alias'])) if alias_df is not None else {}
     if corr_df is not None and corr_df.columns[0] != corr_df.index[0]:
         corr_df = corr_df.set_index(corr_df.columns[0])
