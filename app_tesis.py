@@ -1013,7 +1013,7 @@ elif "Simulador" in pagina:
 
     with ctrl:
         uid2 = st.selectbox("Usuario", users, key='s_uid',
-                            format_func=lambda x: f"···{str(x)[-8:]}")
+                            format_func=lambda x: get_alias(x, alias_map))
         priv = st.select_slider("Privacidad",
             options=["No_privada","Privada_moderada","Privada_sensible"],
             value="Privada_sensible",
@@ -1560,9 +1560,9 @@ elif "Comparar" in pagina:
     users = sorted(recs['Survey ResponseID'].dropna().unique().tolist())
     col_u1, col_u2 = st.columns(2)
     with col_u1:
-        uid_a = st.selectbox("Usuario A", users, key='cmp_a', format_func=lambda x: f"···{str(x)[-8:]}")
+        uid_a = st.selectbox("Usuario A", users, key='cmp_a', format_func=lambda x: get_alias(x, alias_map))
     with col_u2:
-        uid_b = st.selectbox("Usuario B", users, index=min(1,len(users)-1), key='cmp_b', format_func=lambda x: f"···{str(x)[-8:]}")
+        uid_b = st.selectbox("Usuario B", users, index=min(1,len(users)-1), key='cmp_b', format_func=lambda x: get_alias(x, alias_map))
 
     def get_ud(uid):
         ur = recs[recs['Survey ResponseID']==uid].copy()
