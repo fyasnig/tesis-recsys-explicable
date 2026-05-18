@@ -1105,6 +1105,63 @@ elif "Simulador" in pagina:
             imp_html += '</div>'
             st.markdown(imp_html, unsafe_allow_html=True)
 
+        # ── Graceful Degradation Config ──────────────────
+        degradacion = {
+            "No_privada":       {"confianza": 94, "estrategia": "Personalized Ranking",
+                                 "color_est": "#1D9E75", "factor_score": 1.0,
+                                 "ocultar_hist": False, "impacto": None},
+            "Privada_moderada": {"confianza": 74, "estrategia": "Hybrid Ranking",
+                                 "color_est": "#EF9F27", "factor_score": 0.88,
+                                 "ocultar_hist": False, "impacto": {
+                                     "Personalizacion": -18, "Explicabilidad": -25,
+                                     "Diversidad": +8, "Riesgo inferencial": -45}},
+            "Privada_sensible": {"confianza": 51, "estrategia": "Contextual/Global Ranking",
+                                 "color_est": "#D85A30", "factor_score": 0.72,
+                                 "ocultar_hist": True, "impacto": {
+                                     "Personalizacion": -42, "Explicabilidad": -31,
+                                     "Diversidad": +18, "Riesgo inferencial": -67}},
+        }
+        deg = degradacion.get(priv, degradacion["No_privada"])
+
+        # ── Estrategia activa + confianza ─────────────────
+        col_est, col_conf = st.columns([2,1])
+        with col_est:
+            st.markdown(
+                f'<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);'
+                f'border-left:3px solid {deg["color_est"]};border-radius:8px;padding:0.5rem 0.85rem;'
+                f'font-size:0.78rem;margin-bottom:0.75rem">'
+                f'<span style="color:rgba(138,136,128,0.7);text-transform:uppercase;font-size:0.65rem;'
+                f'letter-spacing:0.1em">Estrategia activa</span><br>'
+                f'<span style="color:{deg["color_est"]};font-weight:600">{deg["estrategia"]}</span>'
+                f'</div>',
+                unsafe_allow_html=True
+            )
+        with col_conf:
+            conf_color = "#1D9E75" if deg["confianza"] >= 80 else ("#EF9F27" if deg["confianza"] >= 60 else "#D85A30")
+            st.markdown(
+                f'<div class="kpi-box" style="padding:0.5rem 0.75rem">'
+                f'<div class="kpi-value" style="color:{conf_color};font-size:1.4rem">{deg["confianza"]}%</div>'
+                f'<div class="kpi-label">Confianza del modelo</div>'
+                f'</div>',
+                unsafe_allow_html=True
+            )
+
+        # ── Impacto acumulado ─────────────────────────────
+        if deg["impacto"]:
+            imp_html = '<div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.75rem">'
+            for dim, val in deg["impacto"].items():
+                col_imp = "#1D9E75" if val < 0 and dim == "Riesgo inferencial" else                           ("#D85A30" if val < 0 else "#1D9E75")
+                signo = "+" if val > 0 else ""
+                imp_html += (
+                    f'<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);'
+                    f'border-radius:8px;padding:0.3rem 0.65rem;font-size:0.72rem">'
+                    f'<span style="color:rgba(138,136,128,0.6)">{dim}</span> '
+                    f'<span style="color:{col_imp};font-weight:600">{signo}{val}%</span>'
+                    f'</div>'
+                )
+            imp_html += '</div>'
+            st.markdown(imp_html, unsafe_allow_html=True)
+
         st.markdown("**Recomendaciones con el perfil seleccionado**")
         items_ocultos = 0
         for i,(_, row) in enumerate(ur2.iterrows(), 1):
@@ -1172,69 +1229,6 @@ elif "Simulador" in pagina:
                 f"⚠️ {items_ocultos} item(s) ocultados por requerir datos de historial personal. "
                 f"El sistema usa fallback a ranking global para mantener cobertura — graceful degradation."
             )
-
-    # ── Privacy-to-Utility Exchange ──────────────────────
-    st.write("")
-    st.markdown("---")
-    st.markdown("**Privacy-to-Utility Exchange — el costo real de cada nivel de privacidad**")
-    st.caption("Cada decision de privacidad tiene un costo algoritmico medible. Esta tabla muestra cuanto pierde y cuanto gana el usuario con cada nivel — consentimiento informado cuantificado.")
-    st.write("")
-
-    exchange_data = {
-        "Dimension": ["Razon co-compra visible","Razon afinidad marca","Razon categoria preferida",
-                      "Cobertura del sistema","Explicaciones por rec",
-                      "Perfilado longitudinal","Inferencia conductual","Trazabilidad cross-session"],
-        "Priv. Baja":     ["Si","Si","Si","64%","2.95","Alto","Alta","Alta"],
-        "Priv. Moderada": ["Si","Si","Si","64%","2.55","Medio","Media","Media"],
-        "Priv. Alta":     ["Si","No","No","64%","2.32","Bajo","Baja","Baja"],
-        "Tipo": ["utilidad","utilidad","utilidad","utilidad","utilidad","riesgo","riesgo","riesgo"],
-    }
-    import pandas as pd
-    df_ex = pd.DataFrame(exchange_data)
-    col_ex1, col_ex2 = st.columns(2)
-    with col_ex1:
-        st.markdown("**Lo que ganas compartiendo datos**")
-        df_util = df_ex[df_ex["Tipo"]=="utilidad"][["Dimension","Priv. Baja","Priv. Moderada","Priv. Alta"]]
-        st.dataframe(df_util, hide_index=True, use_container_width=True)
-    with col_ex2:
-        st.markdown("**Lo que proteges limitando datos**")
-        df_riesgo = df_ex[df_ex["Tipo"]=="riesgo"][["Dimension","Priv. Baja","Priv. Moderada","Priv. Alta"]]
-        st.dataframe(df_riesgo, hide_index=True, use_container_width=True)
-
-    st.write("")
-    categorias_r = ["Explicabilidad","Personalizacion","Cobertura","Protec. perfilado","Protec. inferencia","Minimizacion datos"]
-    niveles_r = {
-        "Priv. Baja":     [1.0, 1.0, 1.0, 0.1, 0.1, 0.1],
-        "Priv. Moderada": [0.85, 0.85, 1.0, 0.5, 0.5, 0.5],
-        "Priv. Alta":     [0.60, 0.40, 1.0, 1.0, 1.0, 1.0],
-    }
-    colores_r = [COLORS["primary"], COLORS["accent"], COLORS["secondary"]]
-    fig_radar = go.Figure()
-    for (nombre, valores), color in zip(niveles_r.items(), colores_r):
-        fig_radar.add_trace(go.Scatterpolar(
-            r=valores + [valores[0]],
-            theta=categorias_r + [categorias_r[0]],
-            fill="toself", name=nombre, line_color=color, opacity=0.8
-        ))
-    fig_radar.update_layout(
-        **pbase(),
-        polar=dict(
-            radialaxis=dict(visible=True, range=[0,1], gridcolor="rgba(255,255,255,0.08)",
-                            tickfont=dict(color="#8A8880",size=9)),
-            angularaxis=dict(gridcolor="rgba(255,255,255,0.08)", tickfont=dict(color="#B4B2A9",size=10))
-        ),
-        height=380,
-        legend=dict(orientation="h", y=-0.15, font=dict(color="#8A8880",size=10)),
-        margin=dict(l=40,r=40,t=20,b=60)
-    )
-    st.plotly_chart(fig_radar, use_container_width=True)
-    st.caption("El radar muestra el trade-off real entre utilidad algoritmica y proteccion de datos. No existe configuracion optima — es una decision del usuario segun sus prioridades. Consentimiento informado cuantificado.")
-
-# ══════════════════════════════════════════════════════════
-# P3 — ANÁLISIS XAI GLOBAL
-# ══════════════════════════════════════════════════════════
-elif "XAI" in pagina:
-    st.markdown('<div class="main-header">Análisis XAI Global</div>', unsafe_allow_html=True)
     st.markdown('<div class="main-sub">SHAP + LIME · Importancia de señales · Calibración</div>', unsafe_allow_html=True)
     st.write("")
     st.info("🔬 **Qué muestra esta pantalla:** Análisis global del modelo usando dos métodos de explicabilidad (SHAP y LIME). SHAP mide cuánto contribuye cada señal al score final en promedio. LIME construye modelos locales lineales alrededor de cada predicción. Que ambos métodos coincidan (ρ=1.00) valida que la interpretación es robusta y no depende del método elegido.")
