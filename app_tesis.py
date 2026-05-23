@@ -1028,19 +1028,31 @@ if "Dashboard" in pagina:
 # ══════════════════════════════════════════════════════════
 elif "Simulador" in pagina:
     modo_bb = st.session_state.get("modo_bb_global", False)
-    modo_bb = st.session_state.get("modo_bb_global", False)
-    st.markdown('<div class="main-header">Simulador de Privacidad</div>', unsafe_allow_html=True)
-    st.markdown('<div class="main-sub">Cambiá el nivel y observá el impacto en las explicaciones</div>', unsafe_allow_html=True)
-    st.write("")
-    st.info("🔒 **Qué muestra esta pantalla:** El sistema permite tres niveles de privacidad. Al mover el slider, las razones de cada recomendación cambian en tiempo real — algunas desaparecen porque usan datos que el usuario no quiere compartir. Esto demuestra que el sistema es **explicable bajo cualquier restricción de privacidad**, no solo cuando el usuario comparte todo. Los KPIs muestran cuántas razones se pierden al subir la privacidad.")
+    if not modo_bb:
+        st.markdown('<div class="main-header">Simulador de Privacidad</div>', unsafe_allow_html=True)
+        st.markdown('<div class="main-sub">Cambiá el nivel y observá el impacto en las explicaciones</div>', unsafe_allow_html=True)
+        st.write("")
+        st.info("🔒 **Qué muestra esta pantalla:** El sistema permite tres niveles de privacidad. Al mover el slider, las razones de cada recomendación cambian en tiempo real — algunas desaparecen porque usan datos que el usuario no quiere compartir. Esto demuestra que el sistema es **explicable bajo cualquier restricción de privacidad**, no solo cuando el usuario comparte todo. Los KPIs muestran cuántas razones se pierden al subir la privacidad.")
+    else:
+        st.markdown('<div class="main-header">Recomendaciones del sistema</div>', unsafe_allow_html=True)
+        st.markdown('<div class="main-sub">Productos recomendados por el sistema — sin contexto, sin control</div>', unsafe_allow_html=True)
+        st.write("")
 
     if recs is None:
         st.error("No se encontró `app_recs_final.parquet`."); st.stop()
 
     users = sorted(recs['Survey ResponseID'].dropna().unique().tolist())
-    ctrl, sim = st.columns([1,2])
+    if not modo_bb:
+        ctrl, sim = st.columns([1,2])
+    else:
+        sim = st.container()
 
-    with ctrl:
+    if modo_bb:
+        uid2 = st.selectbox("Usuario", users, key='s_uid',
+                            format_func=lambda x: get_alias(x, alias_map))
+        priv = "Privada_sensible"  # BB siempre usa privacidad alta
+    else:
+      with ctrl:
         uid2 = st.selectbox("Usuario", users, key='s_uid',
                             format_func=lambda x: get_alias(x, alias_map))
         priv = st.select_slider("Privacidad",
