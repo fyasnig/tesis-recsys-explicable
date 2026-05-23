@@ -1050,7 +1050,7 @@ elif "Simulador" in pagina:
     if modo_bb:
         uid2 = st.selectbox("Usuario", users, key='s_uid',
                             format_func=lambda x: get_alias(x, alias_map))
-        priv = "Privada_sensible"  # BB siempre usa privacidad alta
+        priv = "Privada_sensible"
     else:
       with ctrl:
         uid2 = st.selectbox("Usuario", users, key='s_uid',
@@ -1103,14 +1103,15 @@ elif "Simulador" in pagina:
             "Privada_sensible": {"confianza":51,"estrategia":"Contextual/Global Ranking","color_est":"#D85A30","factor_score":0.72,"ocultar_hist":True,"impacto":{"Personalizacion":-42,"Explicabilidad":-31,"Diversidad":18,"Riesgo inferencial":-67}},
         }
         deg = degradacion.get(priv, degradacion["No_privada"])
-        col_est, col_conf = st.columns([2,1])
-        with col_est:
-            st.markdown(
-                f'<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-left:3px solid {deg["color_est"]};border-radius:8px;padding:0.5rem 0.85rem;font-size:0.78rem;margin-bottom:0.75rem"><span style="color:rgba(138,136,128,0.7);text-transform:uppercase;font-size:0.65rem;letter-spacing:0.1em">Estrategia activa</span><br><span style="color:{deg["color_est"]};font-weight:600">{deg["estrategia"]}</span></div>',
-                unsafe_allow_html=True)
-        with col_conf:
-            conf_color = "#1D9E75" if deg["confianza"]>=80 else ("#EF9F27" if deg["confianza"]>=60 else "#D85A30")
-            st.markdown(f'<div class="kpi-box" style="padding:0.5rem 0.75rem"><div class="kpi-value" style="color:{conf_color};font-size:1.4rem">{deg["confianza"]}%</div><div class="kpi-label">Confianza del modelo</div></div>', unsafe_allow_html=True)
+        if not modo_bb:
+            col_est, col_conf = st.columns([2,1])
+            with col_est:
+                st.markdown(
+                    f'<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-left:3px solid {deg["color_est"]};border-radius:8px;padding:0.5rem 0.85rem;font-size:0.78rem;margin-bottom:0.75rem"><span style="color:rgba(138,136,128,0.7);text-transform:uppercase;font-size:0.65rem;letter-spacing:0.1em">Estrategia activa</span><br><span style="color:{deg["color_est"]};font-weight:600">{deg["estrategia"]}</span></div>',
+                    unsafe_allow_html=True)
+            with col_conf:
+                conf_color = "#1D9E75" if deg["confianza"]>=80 else ("#EF9F27" if deg["confianza"]>=60 else "#D85A30")
+                st.markdown(f'<div class="kpi-box" style="padding:0.5rem 0.75rem"><div class="kpi-value" style="color:{conf_color};font-size:1.4rem">{deg["confianza"]}%</div><div class="kpi-label">Confianza del modelo</div></div>', unsafe_allow_html=True)
         if not modo_bb and deg["impacto"]:
             imp_html = '<div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.75rem">'
             for dim, val in deg["impacto"].items():
@@ -1151,13 +1152,14 @@ elif "Simulador" in pagina:
             st.caption(f"{items_ocultos} item(s) no disponibles con privacidad alta — el sistema usa fallback a ranking global.")
 
     # ── Privacy-to-Utility Exchange ──────────────────────
-    st.write("")
-    st.markdown("---")
-    st.markdown("**Privacy-to-Utility Exchange — el costo real de cada nivel de privacidad**")
-    st.caption("Cada decision de privacidad tiene un costo algoritmico medible. Esta tabla muestra cuanto pierde y cuanto gana el usuario con cada nivel — consentimiento informado cuantificado.")
-    st.write("")
+    if not modo_bb:
+        st.write("")
+        st.markdown("---")
+        st.markdown("**Privacy-to-Utility Exchange — el costo real de cada nivel de privacidad**")
+        st.caption("Cada decision de privacidad tiene un costo algoritmico medible. Esta tabla muestra cuanto pierde y cuanto gana el usuario con cada nivel — consentimiento informado cuantificado.")
+        st.write("")
 
-    exchange_data = {
+        exchange_data = {
         "Dimension": ["Razon co-compra visible","Razon afinidad marca","Razon categoria preferida",
                       "Cobertura del sistema","Explicaciones por rec",
                       "Perfilado longitudinal","Inferencia conductual","Trazabilidad cross-session"],
