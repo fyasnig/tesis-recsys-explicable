@@ -45,393 +45,8 @@ hr{border-color:#2A2F45;}
 .item-stat{font-size:0.72rem;color:#8A8880;margin-top:0.35rem;}
 .popularity-bar{background:#2A2F45;border-radius:3px;height:5px;margin-top:4px;}
 .popularity-fill{height:5px;border-radius:3px;}
-
-/* Animaciones */
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-@keyframes shimmer {
-  0%   { background-position: -200% center; }
-  100% { background-position: 200% center; }
-}
-@keyframes pulse-green {
-  0%, 100% { text-shadow: 0 0 8px rgba(29,158,117,0.4); }
-  50%       { text-shadow: 0 0 20px rgba(29,158,117,0.9); }
-}
-@keyframes countUp {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-.fade-in-up { animation: fadeInUp 0.6s ease forwards; }
-.shimmer-text {
-  background: linear-gradient(90deg, #1D9E75, #E8E6E0, #1D9E75);
-  background-size: 200% auto;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: shimmer 3s linear infinite;
-}
-.pulse-green { animation: pulse-green 2s ease-in-out infinite; }
-.welcome-card {
-  background: linear-gradient(135deg, #1E2130 0%, #181C28 100%);
-  border: 1px solid #1D9E75;
-  border-radius: 16px;
-  padding: 2.5rem 3rem;
-  text-align: center;
-  animation: fadeInUp 0.8s ease forwards;
-}
-.welcome-title {
-  font-family: 'DM Serif Display', serif;
-  font-size: 3rem;
-  color: #E8E6E0;
-  letter-spacing: -0.02em;
-  line-height: 1.1;
-}
-.welcome-sub {
-  font-size: 1rem;
-  color: #8A8880;
-  margin: 0.5rem 0 2rem;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-}
-.stat-welcome {
-  display: inline-block;
-  margin: 0.5rem 1rem;
-  text-align: center;
-}
-.stat-num {
-  font-family: 'DM Serif Display', serif;
-  font-size: 2rem;
-  color: #1D9E75;
-  display: block;
-}
-.stat-lbl {
-  font-size: 0.75rem;
-  color: #8A8880;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-}
-
-
-/* ── KPI boxes premium ── */
-.kpi-box {
-    background: linear-gradient(135deg, #1E2130 0%, #181C28 100%) !important;
-    border: 1px solid rgba(255,255,255,0.06) !important;
-    border-radius: 14px !important;
-    padding: 1.1rem 1.2rem !important;
-    text-align: center !important;
-    position: relative !important;
-    overflow: hidden !important;
-    transition: border-color 0.3s ease, transform 0.2s ease !important;
-}
-.kpi-box::before {
-    content: '';
-    position: absolute; top: 0; left: 0; right: 0; height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(29,158,117,0.4), transparent);
-    opacity: 0; transition: opacity 0.3s;
-}
-.kpi-box:hover { border-color: rgba(29,158,117,0.25) !important; transform: translateY(-2px) !important; }
-.kpi-box:hover::before { opacity: 1; }
-.kpi-value {
-    font-family: 'DM Serif Display', serif !important;
-    font-size: 2rem !important;
-    color: #1D9E75 !important;
-    line-height: 1 !important;
-    margin-bottom: 0.3rem !important;
-    letter-spacing: -0.02em !important;
-}
-.kpi-label {
-    font-size: 0.68rem !important;
-    color: rgba(138,136,128,0.7) !important;
-    text-transform: uppercase !important;
-    letter-spacing: 0.1em !important;
-    font-weight: 500 !important;
-}
-/* ── Rec cards premium ── */
-.rec-card {
-    background: linear-gradient(135deg, #1A1E2E 0%, #141824 100%) !important;
-    border: 1px solid rgba(255,255,255,0.05) !important;
-    border-radius: 14px !important;
-    padding: 1rem 1.2rem !important;
-    margin-bottom: 0.6rem !important;
-    transition: border-color 0.25s ease, transform 0.2s ease, box-shadow 0.25s ease !important;
-    position: relative !important;
-}
-.rec-card::after {
-    content: '';
-    position: absolute; left: 0; top: 15%; bottom: 15%;
-    width: 2px; border-radius: 2px;
-    background: linear-gradient(180deg, transparent, #1D9E75, transparent);
-    opacity: 0; transition: opacity 0.3s;
-}
-.rec-card:hover {
-    border-color: rgba(29,158,117,0.2) !important;
-    transform: translateX(4px) !important;
-    box-shadow: -4px 0 20px rgba(29,158,117,0.08) !important;
-}
-.rec-card:hover::after { opacity: 1; }
-/* ── Reason pills premium ── */
-.reason-pill {
-    display: inline-block !important;
-    background: rgba(29,158,117,0.08) !important;
-    color: #1D9E75 !important;
-    border: 1px solid rgba(29,158,117,0.2) !important;
-    border-radius: 100px !important;
-    padding: 0.15rem 0.65rem !important;
-    font-size: 0.72rem !important;
-    font-weight: 500 !important;
-    margin: 0.1rem 0.05rem !important;
-    transition: background 0.2s, border-color 0.2s !important;
-}
-.reason-pill:hover { background: rgba(29,158,117,0.15) !important; border-color: rgba(29,158,117,0.4) !important; }
-/* ── Stat chips premium ── */
-.stat-chip {
-    display: inline-flex !important; align-items: center !important; gap: 0.3rem !important;
-    background: rgba(255,255,255,0.03) !important;
-    border: 1px solid rgba(255,255,255,0.07) !important;
-    color: #B4B2A9 !important; border-radius: 8px !important;
-    padding: 0.3rem 0.75rem !important; font-size: 0.75rem !important;
-    font-weight: 500 !important; margin: 0.15rem 0.1rem !important;
-    transition: border-color 0.2s !important;
-}
-.stat-chip:hover { border-color: rgba(29,158,117,0.3) !important; }
-/* ── Sidebar premium ── */
-section[data-testid="stSidebar"] {
-    background: #0F1219 !important;
-    border-right: 1px solid rgba(255,255,255,0.05) !important;
-}
-section[data-testid="stSidebar"] [data-testid="stRadio"] label {
-    border-radius: 8px !important; padding: 0.4rem 0.6rem !important;
-    transition: background 0.2s !important; margin: 1px 0 !important;
-}
-section[data-testid="stSidebar"] [data-testid="stRadio"] label:hover {
-    background: rgba(255,255,255,0.04) !important;
-}
-/* ── Tabs premium ── */
-.stTabs [data-baseweb="tab-list"] {
-    background: rgba(255,255,255,0.02) !important; border-radius: 10px !important;
-    padding: 3px !important; border: 1px solid rgba(255,255,255,0.05) !important; gap: 2px !important;
-}
-.stTabs [data-baseweb="tab"] {
-    border-radius: 8px !important; color: rgba(138,136,128,0.7) !important;
-    font-weight: 500 !important; font-size: 0.83rem !important; transition: color 0.2s !important;
-}
-.stTabs [aria-selected="true"] {
-    background: #1D9E75 !important; color: white !important;
-    box-shadow: 0 2px 8px rgba(29,158,117,0.3) !important;
-}
-/* ── Info boxes premium ── */
-[data-testid="stInfo"]    { background: rgba(29,158,117,0.06) !important; border: 1px solid rgba(29,158,117,0.2) !important; border-radius: 10px !important; border-left: 3px solid #1D9E75 !important; }
-[data-testid="stWarning"] { background: rgba(239,159,39,0.06) !important; border: 1px solid rgba(239,159,39,0.2) !important; border-radius: 10px !important; border-left: 3px solid #EF9F27 !important; }
-[data-testid="stError"]   { background: rgba(216,90,48,0.06) !important; border: 1px solid rgba(216,90,48,0.2) !important; border-radius: 10px !important; border-left: 3px solid #D85A30 !important; }
-[data-testid="stSuccess"] { background: rgba(29,158,117,0.06) !important; border: 1px solid rgba(29,158,117,0.2) !important; border-radius: 10px !important; border-left: 3px solid #1D9E75 !important; }
-/* ── Scrollbar premium ── */
-::-webkit-scrollbar { width: 4px; height: 4px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(29,158,117,0.3); border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(29,158,117,0.5); }
-/* ── Dataframes + Selectbox premium ── */
-[data-testid="stDataFrame"] { border-radius: 10px !important; overflow: hidden !important; }
-[data-testid="stSelectbox"] > div > div { background: #1E2130 !important; border: 1px solid rgba(255,255,255,0.08) !important; border-radius: 10px !important; }
-/* ── Tooltips ── */
-.kpi-tooltip { position: relative; display: inline-block; cursor: help; }
-.kpi-tooltip .tt-text {
-    visibility: hidden; opacity: 0; background: #1E2130; color: #B4B2A9;
-    border: 1px solid rgba(255,255,255,0.1); border-radius: 10px;
-    padding: 0.6rem 0.85rem; font-size: 0.74rem; line-height: 1.55;
-    width: 230px; text-align: left; position: absolute; z-index: 9999;
-    bottom: 130%; left: 50%; transform: translateX(-50%);
-    transition: opacity 0.2s ease; box-shadow: 0 8px 24px rgba(0,0,0,0.5); pointer-events: none;
-}
-.kpi-tooltip .tt-text::after {
-    content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
-    border: 5px solid transparent; border-top-color: rgba(255,255,255,0.1);
-}
-.kpi-tooltip:hover .tt-text { visibility: visible; opacity: 1; }
-.tt-icon { display: inline-block; color: rgba(138,136,128,0.4); font-size: 0.65rem; margin-left: 3px; vertical-align: super; cursor: help; transition: color 0.2s; }
-.kpi-tooltip:hover .tt-icon { color: rgba(29,158,117,0.7); }
-/* ── Page transitions ── */
-.main-header { animation: fadeInUp 0.4s ease both; }
-.main-sub    { animation: fadeInUp 0.4s ease 0.05s both; }
-
 </style>
 """, unsafe_allow_html=True)
-
-# ── Pantalla de bienvenida ────────────────────────────────
-if 'app_iniciada' not in st.session_state:
-    st.session_state.app_iniciada = False
-
-if not st.session_state.app_iniciada:
-    st.markdown("""
-    <style>
-    html, body, [data-testid="stAppViewContainer"] { background: #0A0D14 !important; }
-    [data-testid="stAppViewContainer"]::before {
-        content: '';
-        position: fixed; top:0; left:0; right:0; bottom:0;
-        background:
-            radial-gradient(ellipse 60% 50% at 15% 60%, rgba(29,158,117,0.12) 0%, transparent 70%),
-            radial-gradient(ellipse 50% 40% at 85% 25%, rgba(83,74,183,0.10) 0%, transparent 70%);
-        pointer-events: none; z-index: 0;
-    }
-    [data-testid="stSidebar"]    { display: none !important; }
-    [data-testid="stHeader"]     { background: transparent !important; }
-    [data-testid="stToolbar"]    { display: none !important; }
-    [data-testid="stDecoration"] { display: none !important; }
-    .block-container { padding-top: 0 !important; max-width: 100% !important; }
-
-    .w-page {
-        height: 100vh;
-        display: flex; flex-direction: column;
-        align-items: center; justify-content: center;
-        text-align: center; padding: 1.5rem;
-        position: relative; z-index: 1;
-    }
-    .w-badge {
-        display: inline-flex; align-items: center; gap: 0.5rem;
-        background: rgba(29,158,117,0.1);
-        border: 1px solid rgba(29,158,117,0.3);
-        color: #1D9E75; border-radius: 100px;
-        padding: 0.3rem 1.1rem; font-size: 0.72rem;
-        font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase;
-        margin-bottom: 1.2rem;
-        animation: fadeInUp 0.5s ease both;
-    }
-    .w-badge-dot {
-        width: 6px; height: 6px; background: #1D9E75;
-        border-radius: 50%; animation: pulse-green 2s ease-in-out infinite;
-    }
-    .w-title {
-        font-family: 'DM Serif Display', serif;
-        font-size: clamp(2rem, 5vw, 3.8rem);
-        color: #ECE9E3; letter-spacing: -0.03em;
-        line-height: 1; margin: 0;
-        animation: fadeInUp 0.6s ease 0.1s both;
-    }
-    .w-title-accent {
-        font-family: 'DM Serif Display', serif; font-style: italic;
-        font-size: clamp(2rem, 5vw, 3.8rem);
-        letter-spacing: -0.03em; line-height: 1.05; margin: 0 0 0.4rem;
-        background: linear-gradient(100deg, #1D9E75 0%, #5DCAA5 40%, #1D9E75 80%);
-        background-size: 200% auto;
-        -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-        animation: fadeInUp 0.6s ease 0.15s both, shimmer 5s linear infinite;
-    }
-    .w-divider {
-        width: 40px; height: 1px;
-        background: linear-gradient(90deg, transparent, #1D9E75, transparent);
-        margin: 0.8rem auto 1rem;
-        animation: fadeInUp 0.6s ease 0.25s both;
-    }
-    .w-desc {
-        font-size: 0.92rem; color: rgba(180,178,169,0.85);
-        line-height: 1.6; max-width: 460px; margin: 0 auto 1.5rem;
-        font-weight: 300; animation: fadeInUp 0.6s ease 0.3s both;
-    }
-    .w-desc strong { color: #ECE9E3; font-weight: 500; }
-    .w-stats {
-        display: flex; gap: 0.8rem; justify-content: center;
-        flex-wrap: wrap; margin-bottom: 2rem;
-        animation: fadeInUp 0.6s ease 0.4s both;
-    }
-    .w-stat {
-        background: rgba(255,255,255,0.025);
-        border: 1px solid rgba(255,255,255,0.07);
-        border-radius: 12px; padding: 0.75rem 1.1rem;
-        min-width: 80px;
-    }
-    .w-stat-num {
-        font-family: 'DM Serif Display', serif;
-        font-size: 1.5rem; color: #1D9E75;
-        display: block; line-height: 1; margin-bottom: 0.3rem;
-    }
-    .w-stat-lbl {
-        font-size: 0.62rem; color: rgba(138,136,128,0.8);
-        text-transform: uppercase; letter-spacing: 0.12em; font-weight: 500;
-    }
-
-    /* Barra de progreso animada */
-    .w-progress-wrap {
-        width: 200px; margin: 0 auto;
-        animation: fadeInUp 0.6s ease 0.5s both;
-    }
-    .w-progress-label {
-        font-size: 0.72rem; color: rgba(138,136,128,0.6);
-        letter-spacing: 0.1em; text-transform: uppercase;
-        margin-bottom: 0.5rem;
-    }
-    .w-progress-bar {
-        height: 2px; background: rgba(255,255,255,0.06);
-        border-radius: 2px; overflow: hidden;
-    }
-    .w-progress-fill {
-        height: 100%;
-        background: linear-gradient(90deg, #1D9E75, #5DCAA5);
-        border-radius: 2px;
-        animation: progressFill 3s linear forwards;
-    }
-    @keyframes progressFill {
-        from { width: 0%; }
-        to   { width: 100%; }
-    }
-
-    .w-tags {
-        display: flex; gap: 0.4rem; justify-content: center;
-        flex-wrap: wrap; margin-top: 1.2rem;
-        animation: fadeInUp 0.6s ease 0.6s both;
-    }
-    .w-tag {
-        font-size: 0.62rem; color: rgba(138,136,128,0.4);
-        letter-spacing: 0.1em; text-transform: uppercase;
-        padding: 0.2rem 0.5rem;
-        border: 1px solid rgba(255,255,255,0.04); border-radius: 4px;
-    }
-    </style>
-
-    <div class="w-page">
-      <div class="w-badge">
-        <span class="w-badge-dot"></span>
-        Tesis de Maestría &nbsp;·&nbsp; Franco Yasnig
-      </div>
-      <div class="w-title">Sistema de Recomendación</div>
-      <div class="w-title-accent">Explicable</div>
-      <div class="w-divider"></div>
-      <div class="w-desc">
-        Sistema híbrido con <strong>explicabilidad XAI</strong>,
-        control de privacidad granular y
-        <strong>compliance regulatorio</strong> operacionalizado
-        sobre Amazon Purchases 2018–2024.
-      </div>
-      <div class="w-stats">
-        <div class="w-stat"><span class="w-stat-num">5,027</span><span class="w-stat-lbl">Usuarios</span></div>
-        <div class="w-stat"><span class="w-stat-num">939K</span><span class="w-stat-lbl">Ítems</span></div>
-        <div class="w-stat"><span class="w-stat-num">19</span><span class="w-stat-lbl">Hallazgos</span></div>
-        <div class="w-stat"><span class="w-stat-num">9</span><span class="w-stat-lbl">Pantallas</span></div>
-        <div class="w-stat"><span class="w-stat-num">0.050</span><span class="w-stat-lbl">NDCG@10</span></div>
-      </div>
-      <div class="w-progress-wrap">
-        <div class="w-progress-label">Cargando sistema...</div>
-        <div class="w-progress-bar">
-          <div class="w-progress-fill"></div>
-        </div>
-      </div>
-      <div class="w-tags">
-        <span class="w-tag">SHAP</span>
-        <span class="w-tag">LIME</span>
-        <span class="w-tag">GDPR</span>
-        <span class="w-tag">AI Act</span>
-        <span class="w-tag">XAI</span>
-        <span class="w-tag">Privacy-by-Design</span>
-        <span class="w-tag">AI Governance</span>
-      </div>
-    </div>
-    """, unsafe_allow_html=True)
-
-    import time
-    time.sleep(3)
-    st.session_state.app_iniciada = True
-    st.rerun()
-
-
 
 # ── HELPERS ───────────────────────────────────────────────
 def cnt(x):
@@ -491,12 +106,6 @@ with st.spinner("Cargando datos..."):
     hte_df    = load('hte_experimento.csv')
     fair_df   = load('fairness_catalogo.csv')
     cov_df    = load('cobertura_sistema.csv')
-    ild_df    = load('ild_analisis.csv')
-    raz_df    = load('razones_por_categoria.csv')
-    cf_df     = load('contrafactual_analisis.csv')
-    alias_csv = Path('user_aliases.csv')
-    alias_df  = pd.read_csv(alias_csv) if alias_csv.exists() else None
-    alias_map = dict(zip(alias_df['Survey ResponseID'], alias_df['alias'])) if alias_df is not None else {}
     if corr_df is not None and corr_df.columns[0] != corr_df.index[0]:
         corr_df = corr_df.set_index(corr_df.columns[0])
 
@@ -509,132 +118,20 @@ with st.sidebar:
     st.markdown("""
     <div style="padding:1rem 0 0.5rem">
       <div style="font-family:'DM Serif Display',serif;font-size:1.15rem;color:#E8E6E0;line-height:1.25">
-        Sistema de<br>Recomendación<br><span class="shimmer-text" style="font-size:1.15rem">Explicable</span></div>
+        Sistema de<br>Recomendación<br><span style="color:#1D9E75">Explicable</span></div>
       <div style="font-size:0.68rem;color:#8A8880;margin-top:0.4rem;text-transform:uppercase;letter-spacing:0.08em">
         Tesis de Maestría · Franco Yasnig</div>
     </div><hr>""", unsafe_allow_html=True)
 
-    # ── Modo Black-Box filtra el menú ─────────────────
-    if "modo_bb_global" not in st.session_state:
-        st.session_state.modo_bb_global = False
-
-    modo_bb_global = st.toggle("⬛ Modo Black-Box",
-        value=st.session_state.modo_bb_global,
-        help="Activo: muestra el sistema sin explicaciones XAI. Desactivo: muestra todas las pantallas.")
-    st.session_state.modo_bb_global = modo_bb_global
-
-    if modo_bb_global:
-        st.markdown('<div class="defensa-badge" style="background:rgba(216,90,48,0.1);border-color:rgba(216,90,48,0.4);color:#D85A30">⬛ MODO BLACK-BOX</div>', unsafe_allow_html=True)
-        opciones_menu = [
-            "🏠  Dashboard de Usuario",
-            "🔒  Simulador de Privacidad",
-            "⚖️  Comparar Usuarios",
-            "🔎  Buscador de Ítems",
-        ]
-    else:
-        opciones_menu = [
-            "🏠  Dashboard de Usuario",
-            "🔒  Simulador de Privacidad",
-            "📊  Análisis XAI Global",
-            "🧪  Experimento & Hallazgos",
-            "⚖️  Comparar Usuarios",
-            "🔎  Buscador de Ítems",
-            "📈  Equidad & Cobertura",
-            "🔮  Explicación Accionable",
-            "⚖️  Gobernanza Regulatoria",
-        ]
-
-    pagina = st.radio("Nav", opciones_menu, label_visibility="collapsed")
-
-    # ── Modo A/B para encuesta ──────────────────────
-    _modo = st.query_params.get("modo", "tratamiento")
-    mostrar_xai = (_modo != "control")
-    if not mostrar_xai:
-        st.markdown('''<div style="background:rgba(83,74,183,0.12);border:1px solid
-        rgba(83,74,183,0.3);border-radius:8px;padding:0.4rem 0.8rem;
-        font-size:0.72rem;color:#9B8FE0;margin-bottom:0.5rem;text-align:center">
-        🔬 Modo Evaluación</div>''', unsafe_allow_html=True)
-    # ── Estado dinámico del modelo ──────────────────
-    estado_cfg = {
-        "Dashboard":  {"Precision":"Alta","Privacidad":"Variable","Cobertura":"64%","XAI":"Activo"},
-        "Simulador":  {"Precision":"Alta","Privacidad":"Configurable","Cobertura":"64%","XAI":"Activo"},
-        "XAI":        {"Precision":"Alta","Privacidad":"Anonima","Cobertura":"100%","XAI":"Analisis"},
-        "Experimento":{"Precision":"Alta","Privacidad":"Mixta","Cobertura":"64%","XAI":"Validado"},
-        "Comparar":   {"Precision":"Alta","Privacidad":"Variable","Cobertura":"64%","XAI":"Activo"},
-        "Buscador":   {"Precision":"Alta","Privacidad":"Anonima","Cobertura":"64%","XAI":"Inverso"},
-        "Equidad":    {"Precision":"Alta","Privacidad":"Anonima","Cobertura":"64%","XAI":"Fairness"},
-        "Diversidad": {"Precision":"Media","Privacidad":"Neutral","Cobertura":"64%","XAI":"ILD"},
-        "Accionable": {"Precision":"Alta","Privacidad":"Neutral","Cobertura":"92%","XAI":"Contraf."},
-        "Gobernanza": {"Precision":"Alta","Privacidad":"Auditada","Cobertura":"64%","XAI":"Legal"},
-    }
-    estado_key = next((k for k in estado_cfg if k in pagina), "Dashboard")
-    estado = estado_cfg[estado_key]
-    colores_e = {
-        "Alta":"#1D9E75","Media":"#EF9F27","Baja":"#D85A30",
-        "Activo":"#1D9E75","Validado":"#1D9E75","Fairness":"#EF9F27",
-        "Legal":"#534AB7","Contraf.":"#5DCAA5","ILD":"#9B59B6","Inverso":"#534AB7","Analisis":"#5DCAA5",
-        "Variable":"#EF9F27","Configurable":"#EF9F27","Mixta":"#EF9F27",
-        "Anonima":"#1D9E75","Auditada":"#1D9E75","Neutral":"#1D9E75",
-        "64%":"#EF9F27","92%":"#1D9E75","100%":"#1D9E75",
-    }
-    rows_html = "".join(
-        f'<div class="modelo-estado-row">'
-        f'<span class="modelo-estado-key">{k}</span>'
-        f'<span class="modelo-estado-val" style="color:{colores_e.get(v,"#B4B2A9")}">{v}</span>'
-        f'</div>'
-        for k, v in estado.items()
-    )
-    st.markdown(
-        f'<div class="modelo-estado"><div class="modelo-estado-title">Estado del sistema</div>{rows_html}</div>',
-        unsafe_allow_html=True
-    )
-    st.write("")
-
-    # ── Guided Demo Mode ───────────────────────────────
-    if "demo_step" not in st.session_state:
-        st.session_state.demo_step = -1
-    if "demo_activo" not in st.session_state:
-        st.session_state.demo_activo = False
-    demo_guion = [
-        ("Dashboard de Usuario",   "1/6 — Perfil de usuario y recomendaciones con explicaciones XAI visibles."),
-        ("Simulador de Privacidad","2/6 — Cambia el nivel de privacidad y observa el impacto en las explicaciones."),
-        ("Analisis XAI Global",    "3/6 — Co-compra domina con SHAP=64.8%. SHAP-LIME rho=1.00 — interpretabilidad robusta."),
-        ("Experimento & Hallazgos","4/6 — Experimento causal: +0.04 razones con consentimiento. 19 hallazgos documentados."),
-        ("Equidad & Cobertura",    "5/6 — Sesgo popularidad rho=-0.233. 36% sin cobertura discrimina por volumen, no gasto."),
-        ("Gobernanza Regulatoria", "6/6 — Legal-by-Design Matrix: cada principio GDPR y AI Act implementado con evidencia."),
-    ]
-    if not st.session_state.demo_activo:
-        if st.button("▶  Guided Demo", use_container_width=True,
-                     help="Navega automaticamente por las pantallas clave con storytelling."):
-            st.session_state.demo_activo = True
-            st.session_state.demo_step = 0
-            st.rerun()
-    else:
-        step = st.session_state.demo_step
-        if 0 <= step < len(demo_guion):
-            nombre_paso, texto_paso = demo_guion[step]
-            st.markdown(f'<div class="demo-banner">🎬 {texto_paso}</div>', unsafe_allow_html=True)
-            col_prev, col_next, col_stop = st.columns([1,1,1])
-            with col_prev:
-                if st.button("◀", use_container_width=True, key="demo_prev"):
-                    if step > 0:
-                        st.session_state.demo_step -= 1
-                        st.rerun()
-            with col_next:
-                lbl = "▶" if step < len(demo_guion)-1 else "✓ Fin"
-                if st.button(lbl, use_container_width=True, key="demo_next"):
-                    if step < len(demo_guion)-1:
-                        st.session_state.demo_step += 1
-                    else:
-                        st.session_state.demo_activo = False
-                        st.session_state.demo_step = -1
-                    st.rerun()
-            with col_stop:
-                if st.button("✕", use_container_width=True, key="demo_stop"):
-                    st.session_state.demo_activo = False
-                    st.session_state.demo_step = -1
-                    st.rerun()
-            pagina = nombre_paso
+    pagina = st.radio("Nav", [
+        "🏠  Dashboard de Usuario",
+        "🔒  Simulador de Privacidad",
+        "📊  Análisis XAI Global",
+        "🧪  Experimento & Hallazgos",
+        "⚖️  Comparar Usuarios",
+        "🔎  Buscador de Ítems",
+        "📈  Hallazgos 14·15·16",
+    ], label_visibility="collapsed")
 
     st.markdown("""<hr>
     <div style="font-size:0.7rem;color:#8A8880;line-height:1.8">
@@ -649,99 +146,11 @@ with st.sidebar:
 # ══════════════════════════════════════════════════════════
 # P1 — DASHBOARD DE USUARIO
 # ══════════════════════════════════════════════════════════
-
-st.markdown("""
-<script>
-(function() {
-  function animateCounter(el, target, duration) {
-    const isFloat = target % 1 !== 0;
-    const hasDollar = el.dataset.prefix === '$';
-    const start = performance.now();
-    function tick(now) {
-      const p = Math.min((now - start) / duration, 1);
-      const ease = 1 - Math.pow(1 - p, 4);
-      const val = target * ease;
-      el.textContent = (hasDollar ? '$' : '') +
-        (isFloat ? val.toFixed(2) : Math.floor(val).toLocaleString('es-AR'));
-      if (p < 1) requestAnimationFrame(tick);
-    }
-    requestAnimationFrame(tick);
-  }
-  const observer = new MutationObserver(function(mutations) {
-    mutations.forEach(function(m) {
-      m.addedNodes.forEach(function(n) {
-        if (n.nodeType === 1) {
-          (n.querySelectorAll ? n.querySelectorAll('.kpi-value[data-target]') : []).forEach(function(el) {
-            const t = parseFloat(el.dataset.target);
-            if (!isNaN(t)) animateCounter(el, t, 900);
-          });
-        }
-      });
-    });
-  });
-  observer.observe(document.body, { childList: true, subtree: true });
-  setTimeout(function() {
-    document.querySelectorAll('.kpi-value[data-target]').forEach(function(el) {
-      const t = parseFloat(el.dataset.target);
-      if (!isNaN(t)) animateCounter(el, t, 900);
-    });
-  }, 200);
-})();
-</script>
-""", unsafe_allow_html=True)
-
-
-def get_alias(uid, alias_map):
-    """Devuelve alias descriptivo del usuario."""
-    return alias_map.get(uid, f"Usuario {str(uid)[-6:]}")
-
 if "Dashboard" in pagina:
-    # Sonido de bienvenida — se ejecuta una sola vez al entrar al dashboard
-    if 'sonido_reproducido' not in st.session_state:
-        st.session_state.sonido_reproducido = True
-        st.markdown("""
-        <script>
-        setTimeout(function() {
-          try {
-            const ctx = new (window.AudioContext || window.webkitAudioContext)();
-            function tone(freq, t, dur, vol) {
-              const o = ctx.createOscillator();
-              const g = ctx.createGain();
-              o.connect(g); g.connect(ctx.destination);
-              o.type = 'sine';
-              o.frequency.setValueAtTime(freq, t);
-              g.gain.setValueAtTime(0, t);
-              g.gain.linearRampToValueAtTime(vol, t + 0.03);
-              g.gain.exponentialRampToValueAtTime(0.001, t + dur);
-              o.start(t); o.stop(t + dur);
-            }
-            const t = ctx.currentTime;
-            tone(392.00, t + 0.00, 0.5, 0.08);
-            tone(523.25, t + 0.12, 0.5, 0.09);
-            tone(659.25, t + 0.22, 0.5, 0.08);
-            tone(783.99, t + 0.30, 0.7, 0.10);
-          } catch(e) {}
-        }, 300);
-        </script>
-        """, unsafe_allow_html=True)
     st.markdown('<div class="main-header">Dashboard de Usuario</div>', unsafe_allow_html=True)
     st.markdown('<div class="main-sub">Recomendaciones personalizadas con explicaciones XAI</div>', unsafe_allow_html=True)
     st.write("")
-    if not mostrar_xai:
-        st.markdown('''<div style="background:rgba(83,74,183,0.08);border:1px solid
-        rgba(83,74,183,0.25);border-radius:10px;padding:0.85rem 1rem;
-        font-size:0.85rem;color:#B4B2A9;margin-bottom:1rem">
-        Estás viendo una lista de productos recomendados para este usuario.
-        Podés explorar distintos usuarios usando el selector de arriba.
-        </div>''', unsafe_allow_html=True)
-    modo_bb = st.session_state.get("modo_bb_global", False)
-    if modo_bb:
-        st.markdown('<div class="bb-banner"><b>Modo Black-Box activo</b> — '
-            'Las explicaciones XAI estan ocultas. Esto es lo que ve un usuario '
-            'en un sistema de recomendacion tradicional: productos sin contexto, sin control, sin auditoria.</div>',
-            unsafe_allow_html=True)
-    if mostrar_xai and not modo_bb:
-        st.info("📖 **Cómo usar esta pantalla:** Seleccioná cualquiera de los 3,217 usuarios del estudio. Vas a ver su perfil de compras, las métricas del sistema de recomendación, y los productos recomendados con las razones por las que el modelo los eligió. Las etiquetas verdes en cada producto son las **explicaciones XAI** — el núcleo de esta tesis.")
+    st.info("📖 **Cómo usar esta pantalla:** Seleccioná cualquiera de los 3,217 usuarios del estudio. Vas a ver su perfil de compras, las métricas del sistema de recomendación, y los productos recomendados con las razones por las que el modelo los eligió. Las etiquetas verdes en cada producto son las **explicaciones XAI** — el núcleo de esta tesis.")
 
     if recs is None:
         st.error("No se encontró `app_recs_final.parquet`. Corré el Bloque 5 primero.")
@@ -749,7 +158,7 @@ if "Dashboard" in pagina:
 
     users = sorted(recs['Survey ResponseID'].dropna().unique().tolist())
     uid = st.selectbox("Seleccioná un usuario", users,
-                       format_func=lambda x: get_alias(x, alias_map))
+                       format_func=lambda x: f"Usuario ···{str(x)[-8:]}")
 
     ur = recs[recs['Survey ResponseID']==uid].copy()
     ur['nr'] = ur['explain'].apply(cnt)
@@ -794,20 +203,20 @@ if "Dashboard" in pagina:
 
     col_p1, col_p2, col_p3, col_p4 = st.columns(4)
     treated_lbl = " 🧪" if eg == 'treated' else ""
-    col_p1.markdown(f'<div class="kpi-box fade-in-up"><div style="margin-bottom:0.3rem">{badge(pl)}</div><div class="kpi-label">Privacidad{treated_lbl}</div></div>', unsafe_allow_html=True)
-    col_p2.markdown(f'<div class="kpi-box fade-in-up"><div class="kpi-value" style="font-size:1.6rem">{fmt_num(n_purch)}</div><div class="kpi-label">Productos comprados</div></div>', unsafe_allow_html=True)
-    col_p3.markdown(f'<div class="kpi-box fade-in-up"><div class="kpi-value" style="font-size:1.6rem">{fmt_num(total_spend,"$")}</div><div class="kpi-label">Gasto total</div></div>', unsafe_allow_html=True)
-    col_p4.markdown(f'<div class="kpi-box fade-in-up"><div class="kpi-value" style="font-size:1.6rem">{fmt_num(avg_price,"$","",2)}</div><div class="kpi-label">Ticket promedio</div></div>', unsafe_allow_html=True)
+    col_p1.markdown(f'<div class="kpi-box"><div style="margin-bottom:0.3rem">{badge(pl)}</div><div class="kpi-label">Privacidad{treated_lbl}</div></div>', unsafe_allow_html=True)
+    col_p2.markdown(f'<div class="kpi-box"><div class="kpi-value" style="font-size:1.6rem">{fmt_num(n_purch)}</div><div class="kpi-label">Productos comprados</div></div>', unsafe_allow_html=True)
+    col_p3.markdown(f'<div class="kpi-box"><div class="kpi-value" style="font-size:1.6rem">{fmt_num(total_spend,"$")}</div><div class="kpi-label">Gasto total</div></div>', unsafe_allow_html=True)
+    col_p4.markdown(f'<div class="kpi-box"><div class="kpi-value" style="font-size:1.6rem">{fmt_num(avg_price,"$","",2)}</div><div class="kpi-label">Ticket promedio</div></div>', unsafe_allow_html=True)
 
     # Segunda fila de KPIs
     col_q1, col_q2, col_q3, col_q4 = st.columns(4)
-    col_q1.markdown(f'<div class="kpi-box fade-in-up"><div class="kpi-value" style="font-size:1.6rem">{fmt_num(n_orders)}</div><div class="kpi-label">Órdenes únicas</div></div>', unsafe_allow_html=True)
+    col_q1.markdown(f'<div class="kpi-box"><div class="kpi-value" style="font-size:1.6rem">{fmt_num(n_orders)}</div><div class="kpi-label">Órdenes únicas</div></div>', unsafe_allow_html=True)
     recency_fmt = f"{int(float(recency))} días" if recency != '—' else '—'
-    col_q2.markdown(f'<div class="kpi-box fade-in-up"><div class="kpi-value" style="font-size:1.4rem">{recency_fmt}</div><div class="kpi-label">Última compra</div></div>', unsafe_allow_html=True)
+    col_q2.markdown(f'<div class="kpi-box"><div class="kpi-value" style="font-size:1.4rem">{recency_fmt}</div><div class="kpi-label">Última compra</div></div>', unsafe_allow_html=True)
     loyal_txt = "✅ Sí" if str(brand_loyal) in ['True','1','1.0'] else "🔄 No"
-    col_q3.markdown(f'<div class="kpi-box fade-in-up"><div class="kpi-value" style="font-size:1.4rem">{loyal_txt}</div><div class="kpi-label">Leal a marca</div></div>', unsafe_allow_html=True)
+    col_q3.markdown(f'<div class="kpi-box"><div class="kpi-value" style="font-size:1.4rem">{loyal_txt}</div><div class="kpi-label">Leal a marca</div></div>', unsafe_allow_html=True)
     spec_txt = "✅ Sí" if str(cat_spec) in ['True','1','1.0'] else "🔄 No"
-    col_q4.markdown(f'<div class="kpi-box fade-in-up"><div class="kpi-value" style="font-size:1.4rem">{spec_txt}</div><div class="kpi-label">Especialista categoría</div></div>', unsafe_allow_html=True)
+    col_q4.markdown(f'<div class="kpi-box"><div class="kpi-value" style="font-size:1.4rem">{spec_txt}</div><div class="kpi-label">Especialista categoría</div></div>', unsafe_allow_html=True)
 
     # Chips: categorías y marca
     cat_emoji_map = {'GIFT_CARD':'🎁','ABIS_BOOK':'📚','PET_FOOD':'🐾',
@@ -834,18 +243,11 @@ if "Dashboard" in pagina:
     # ── RECOMENDACIONES + GRÁFICOS ────────────────────────
     st.markdown('<hr style="border-color:#2A2F45;margin:0.5rem 0 0.75rem">', unsafe_allow_html=True)
     st.caption("📊 **Métricas del sistema para este usuario.** El score máximo es 1.00 cuando el ítem tiene co-compra directa muy fuerte. Las razones promedio indican qué tan explicables son las recomendaciones: más razones = más contexto visible para el usuario.")
-    if not modo_bb:
-        k1,k2,k3,k4 = st.columns(4)
-    else:
-        k1 = st.columns(1)[0]
-        k2 = k3 = k4 = None
+    k1,k2,k3,k4 = st.columns(4)
     ms = ur['score_display'].max() if 'score_display' in ur.columns else 0
-    kpi_list = [(k1,len(ur),"Recomendaciones")]
-    if not modo_bb:
-        kpi_list += [(k2,f"{ur['nr'].mean():.1f}","Razones promedio"),
-                     (k3,f"{(ur['nr']>=1).mean():.0%}","Con ≥1 razón"),(k4,f"{ms:.2f}","Score máximo")]
-    for col,val,lbl in kpi_list:
-        col.markdown(f'<div class="kpi-box fade-in-up"><div class="kpi-value">{val}</div><div class="kpi-label">{lbl}</div></div>', unsafe_allow_html=True)
+    for col,val,lbl in [(k1,len(ur),"Recomendaciones"),(k2,f"{ur['nr'].mean():.1f}","Razones promedio"),
+                        (k3,f"{(ur['nr']>=1).mean():.0%}","Con ≥1 razón"),(k4,f"{ms:.2f}","Score máximo")]:
+        col.markdown(f'<div class="kpi-box"><div class="kpi-value">{val}</div><div class="kpi-label">{lbl}</div></div>', unsafe_allow_html=True)
 
     st.write("")
     cr, cc = st.columns([3,2])
@@ -907,13 +309,9 @@ if "Dashboard" in pagina:
             bar_pct   = min(int(score_val * 100), 100)
             bar_color = '#1D9E75' if score_val > 0.5 else ('#EF9F27' if score_val > 0.2 else '#534AB7')
 
-            if modo_bb:
-                pills = '<span style="font-size:0.78rem;color:rgba(138,136,128,0.35);font-style:italic">Explicacion no disponible</span>'
-            else:
-                if not modo_bb:
-                    pills = ''.join(f'<span class="reason-pill">{r.strip()[:48]}</span>'
-                                for r in explain.split(' · ') if r.strip()) if explain.strip() else \
-                        '<span style="font-size:0.78rem;color:#8A8880;font-style:italic">Sin razones visibles</span>'
+            pills = ''.join(f'<span class="reason-pill">{r.strip()[:48]}</span>'
+                            for r in explain.split(' · ') if r.strip()) if explain.strip() else \
+                    '<span style="font-size:0.78rem;color:#8A8880;font-style:italic">Sin razones visibles</span>'
 
             # Métricas del producto como mini-stats
             prod_stats = ''
@@ -959,8 +357,7 @@ if "Dashboard" in pagina:
               <div style="margin-top:0.5rem">{pills}</div>
             </div>""", unsafe_allow_html=True)
 
-    if not modo_bb:
-      with cc:
+    with cc:
         st.markdown("**Señales explicativas usadas**")
         rc = {'Co-compra':0,'Afinidad':0,'Categoría':0,'Estacional.':0,'Popularidad':0,'Repeat':0,'Otras':0}
         for exp in ur['explain'].dropna():
@@ -1027,8 +424,6 @@ if "Dashboard" in pagina:
 # P2 — SIMULADOR DE PRIVACIDAD
 # ══════════════════════════════════════════════════════════
 elif "Simulador" in pagina:
-    modo_bb = st.session_state.get("modo_bb_global", False)
-    modo_bb = st.session_state.get("modo_bb_global", False)
     st.markdown('<div class="main-header">Simulador de Privacidad</div>', unsafe_allow_html=True)
     st.markdown('<div class="main-sub">Cambiá el nivel y observá el impacto en las explicaciones</div>', unsafe_allow_html=True)
     st.write("")
@@ -1042,7 +437,7 @@ elif "Simulador" in pagina:
 
     with ctrl:
         uid2 = st.selectbox("Usuario", users, key='s_uid',
-                            format_func=lambda x: get_alias(x, alias_map))
+                            format_func=lambda x: f"···{str(x)[-8:]}")
         priv = st.select_slider("Privacidad",
             options=["No_privada","Privada_moderada","Privada_sensible"],
             value="Privada_sensible",
@@ -1078,122 +473,29 @@ elif "Simulador" in pagina:
         d = as_ - ao
         dc = "#1D9E75" if d>=0 else "#D85A30"
 
-        if not modo_bb:
-            m1,m2,m3 = st.columns(3)
-            m1.markdown(f'<div class="kpi-box fade-in-up"><div class="kpi-value">{ao:.1f}</div><div class="kpi-label">Razones original</div></div>', unsafe_allow_html=True)
-            m2.markdown(f'<div class="kpi-box fade-in-up"><div class="kpi-value" style="color:{dc}">{as_:.1f}</div><div class="kpi-label">Razones simulado</div></div>', unsafe_allow_html=True)
-        m3.markdown(f'<div class="kpi-box fade-in-up"><div class="kpi-value" style="color:{dc}">{d:+.1f}</div><div class="kpi-label">Diferencia</div></div>', unsafe_allow_html=True)
+        m1,m2,m3 = st.columns(3)
+        m1.markdown(f'<div class="kpi-box"><div class="kpi-value">{ao:.1f}</div><div class="kpi-label">Razones original</div></div>', unsafe_allow_html=True)
+        m2.markdown(f'<div class="kpi-box"><div class="kpi-value" style="color:{dc}">{as_:.1f}</div><div class="kpi-label">Razones simulado</div></div>', unsafe_allow_html=True)
+        m3.markdown(f'<div class="kpi-box"><div class="kpi-value" style="color:{dc}">{d:+.1f}</div><div class="kpi-label">Diferencia</div></div>', unsafe_allow_html=True)
 
-        # ── Graceful Degradation ─────────────────────────
-        degradacion = {
-            "No_privada":       {"confianza":94,"estrategia":"Personalized Ranking","color_est":"#1D9E75","factor_score":1.0,"ocultar_hist":False,"impacto":None},
-            "Privada_moderada": {"confianza":74,"estrategia":"Hybrid Ranking","color_est":"#EF9F27","factor_score":0.88,"ocultar_hist":False,"impacto":{"Personalizacion":-18,"Explicabilidad":-25,"Diversidad":8,"Riesgo inferencial":-45}},
-            "Privada_sensible": {"confianza":51,"estrategia":"Contextual/Global Ranking","color_est":"#D85A30","factor_score":0.72,"ocultar_hist":True,"impacto":{"Personalizacion":-42,"Explicabilidad":-31,"Diversidad":18,"Riesgo inferencial":-67}},
-        }
-        deg = degradacion.get(priv, degradacion["No_privada"])
-        col_est, col_conf = st.columns([2,1])
-        with col_est:
-            st.markdown(
-                f'<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-left:3px solid {deg["color_est"]};border-radius:8px;padding:0.5rem 0.85rem;font-size:0.78rem;margin-bottom:0.75rem"><span style="color:rgba(138,136,128,0.7);text-transform:uppercase;font-size:0.65rem;letter-spacing:0.1em">Estrategia activa</span><br><span style="color:{deg["color_est"]};font-weight:600">{deg["estrategia"]}</span></div>',
-                unsafe_allow_html=True)
-        with col_conf:
-            conf_color = "#1D9E75" if deg["confianza"]>=80 else ("#EF9F27" if deg["confianza"]>=60 else "#D85A30")
-            st.markdown(f'<div class="kpi-box" style="padding:0.5rem 0.75rem"><div class="kpi-value" style="color:{conf_color};font-size:1.4rem">{deg["confianza"]}%</div><div class="kpi-label">Confianza del modelo</div></div>', unsafe_allow_html=True)
-        if not modo_bb and deg["impacto"]:
-            imp_html = '<div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.75rem">'
-            for dim, val in deg["impacto"].items():
-                col_imp = "#1D9E75" if (val<0 and dim=="Riesgo inferencial") else ("#D85A30" if val<0 else "#1D9E75")
-                signo = "+" if val>0 else ""
-                imp_html += f'<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:8px;padding:0.3rem 0.65rem;font-size:0.72rem"><span style="color:rgba(138,136,128,0.6)">{dim}</span> <span style="color:{col_imp};font-weight:600">{signo}{val}%</span></div>'
-            imp_html += '</div>'
-            st.markdown(imp_html, unsafe_allow_html=True)
         st.markdown("**Recomendaciones con el perfil seleccionado**")
-        items_ocultos = 0
         for i,(_, row) in enumerate(ur2.iterrows(), 1):
-            title   = str(row.get("title","Sin título"))[:65] if pd.notna(row.get("title")) else "Sin título"
-            explain = str(row.get("esim","")) if pd.notna(row.get("esim")) else ""
+            title   = str(row.get('title','Sin título'))[:65] if pd.notna(row.get('title')) else 'Sin título'
+            explain = str(row.get('esim','')) if pd.notna(row.get('esim')) else ''
             nr      = cnt(explain)
-            if nr == 0:
-                continue
-            score_r   = float(row.get("score_display",0.5)) if pd.notna(row.get("score_display")) else 0.5
-            score_deg = score_r * deg["factor_score"]
-            solo_hist = (deg["ocultar_hist"] and
-                         all("junto" in p or "recurrente" in p for p in str(row.get("explain","")).split(" · ") if p.strip()) and
-                         str(row.get("explain","")).strip() != "")
-            if solo_hist:
-                items_ocultos += 1
-                st.markdown(
-                    f'<div class="rec-card" style="opacity:0.45;border-color:rgba(216,90,48,0.3)"><div style="display:flex;justify-content:space-between"><div class="rec-rank" style="color:#D85A30">#{i} — No disponible</div><div style="font-size:0.7rem;color:#D85A30">Privacidad alta</div></div><div style="font-size:0.78rem;color:rgba(138,136,128,0.5);margin-top:0.3rem;font-style:italic">Este item requeria historial de co-compra. No disponible con privacidad alta.</div></div>',
-                    unsafe_allow_html=True)
-                continue
-            ind   = "🟢" if nr>=2 else ("🟡" if nr==1 else "🔴")
-            if not modo_bb:
-                pills = "".join(f'<span class="reason-pill">{r.strip()[:45]}</span>' for r in explain.split(" · ") if r.strip())
-            else:
-                pills = ""
-            sc    = "#1D9E75" if score_deg>0.5 else ("#EF9F27" if score_deg>0.25 else "#D85A30")
-            st.markdown(
-                f'<div class="rec-card"><div style="display:flex;justify-content:space-between;align-items:center"><div class="rec-rank">#{i}</div><div style="display:flex;align-items:center;gap:0.5rem"><span style="font-size:0.72rem;color:#8A8880">{ind} {nr} razones</span><span style="font-family:monospace;font-size:0.75rem;color:{sc};font-weight:600"> · {score_deg:.3f}</span><span style="font-size:0.62rem;color:rgba(138,136,128,0.5)">confianza</span></div></div><div class="rec-title" style="margin-top:0.25rem">{title}</div><div style="margin-top:0.3rem">{pills}</div></div>',
-                unsafe_allow_html=True)
-        if items_ocultos > 0:
-            st.caption(f"{items_ocultos} item(s) no disponibles con privacidad alta — el sistema usa fallback a ranking global.")
-
-    # ── Privacy-to-Utility Exchange ──────────────────────
-    st.write("")
-    st.markdown("---")
-    st.markdown("**Privacy-to-Utility Exchange — el costo real de cada nivel de privacidad**")
-    st.caption("Cada decision de privacidad tiene un costo algoritmico medible. Esta tabla muestra cuanto pierde y cuanto gana el usuario con cada nivel — consentimiento informado cuantificado.")
-    st.write("")
-
-    exchange_data = {
-        "Dimension": ["Razon co-compra visible","Razon afinidad marca","Razon categoria preferida",
-                      "Cobertura del sistema","Explicaciones por rec",
-                      "Perfilado longitudinal","Inferencia conductual","Trazabilidad cross-session"],
-        "Priv. Baja":     ["Si","Si","Si","64%","2.95","Alto","Alta","Alta"],
-        "Priv. Moderada": ["Si","Si","Si","64%","2.55","Medio","Media","Media"],
-        "Priv. Alta":     ["Si","No","No","64%","2.32","Bajo","Baja","Baja"],
-        "Tipo": ["utilidad","utilidad","utilidad","utilidad","utilidad","riesgo","riesgo","riesgo"],
-    }
-    import pandas as pd
-    df_ex = pd.DataFrame(exchange_data)
-    col_ex1, col_ex2 = st.columns(2)
-    with col_ex1:
-        st.markdown("**Lo que ganas compartiendo datos**")
-        df_util = df_ex[df_ex["Tipo"]=="utilidad"][["Dimension","Priv. Baja","Priv. Moderada","Priv. Alta"]]
-        st.dataframe(df_util, hide_index=True, use_container_width=True)
-    with col_ex2:
-        st.markdown("**Lo que proteges limitando datos**")
-        df_riesgo = df_ex[df_ex["Tipo"]=="riesgo"][["Dimension","Priv. Baja","Priv. Moderada","Priv. Alta"]]
-        st.dataframe(df_riesgo, hide_index=True, use_container_width=True)
-
-    st.write("")
-    categorias_r = ["Explicabilidad","Personalizacion","Cobertura","Protec. perfilado","Protec. inferencia","Minimizacion datos"]
-    niveles_r = {
-        "Priv. Baja":     [1.0, 1.0, 1.0, 0.1, 0.1, 0.1],
-        "Priv. Moderada": [0.85, 0.85, 1.0, 0.5, 0.5, 0.5],
-        "Priv. Alta":     [0.60, 0.40, 1.0, 1.0, 1.0, 1.0],
-    }
-    colores_r = [COLORS["primary"], COLORS["accent"], COLORS["secondary"]]
-    fig_radar = go.Figure()
-    for (nombre, valores), color in zip(niveles_r.items(), colores_r):
-        fig_radar.add_trace(go.Scatterpolar(
-            r=valores + [valores[0]],
-            theta=categorias_r + [categorias_r[0]],
-            fill="toself", name=nombre, line_color=color, opacity=0.8
-        ))
-    fig_radar.update_layout(
-        **pbase(),
-        polar=dict(
-            radialaxis=dict(visible=True, range=[0,1], gridcolor="rgba(255,255,255,0.08)",
-                            tickfont=dict(color="#8A8880",size=9)),
-            angularaxis=dict(gridcolor="rgba(255,255,255,0.08)", tickfont=dict(color="#B4B2A9",size=10))
-        ),
-        height=380,
-        legend=dict(orientation="h", y=-0.15, font=dict(color="#8A8880",size=10)),
-        margin=dict(l=40,r=40,t=20,b=60)
-    )
-    st.plotly_chart(fig_radar, use_container_width=True)
-    st.caption("El radar muestra el trade-off real entre utilidad algoritmica y proteccion de datos. No existe configuracion optima — es una decision del usuario segun sus prioridades. Consentimiento informado cuantificado.")
+            ind     = "🟢" if nr>=2 else ("🟡" if nr==1 else "🔴")
+            pills   = ''.join(f'<span class="reason-pill">{r.strip()[:45]}</span>'
+                              for r in explain.split(' · ') if r.strip()) if explain.strip() else \
+                      '<span style="font-size:0.76rem;color:#8A8880;font-style:italic">Sin razones visibles</span>'
+            st.markdown(f"""
+            <div class="rec-card">
+              <div style="display:flex;justify-content:space-between">
+                <div class="rec-rank">#{i}</div>
+                <div style="font-size:0.72rem;color:#8A8880">{ind} {nr} razones</div>
+              </div>
+              <div class="rec-title" style="margin-top:0.25rem">{title}</div>
+              <div style="margin-top:0.3rem">{pills}</div>
+            </div>""", unsafe_allow_html=True)
 
 # ══════════════════════════════════════════════════════════
 # P3 — ANÁLISIS XAI GLOBAL
@@ -1204,7 +506,7 @@ elif "XAI" in pagina:
     st.write("")
     st.info("🔬 **Qué muestra esta pantalla:** Análisis global del modelo usando dos métodos de explicabilidad (SHAP y LIME). SHAP mide cuánto contribuye cada señal al score final en promedio. LIME construye modelos locales lineales alrededor de cada predicción. Que ambos métodos coincidan (ρ=1.00) valida que la interpretación es robusta y no depende del método elegido.")
 
-    t1,t2,t3,t4,t5 = st.tabs(["📈 Importancia SHAP","🔗 Correlación señales","📉 Slice por posición","🎯 Calibración","💰 Valor de tus datos"])
+    t1,t2,t3,t4 = st.tabs(["📈 Importancia SHAP","🔗 Correlación señales","📉 Slice por posición","🎯 Calibración"])
 
     FL = {'pct_shap_S1_copurchase':'Co-compra','pct_shap_S2_affinities':'Afinidad perfil',
           'pct_shap_S3_temporal_eff':'Estacionalidad','pct_shap_S4_recency_item':'Recencia',
@@ -1327,386 +629,6 @@ elif "XAI" in pagina:
                 st.markdown("""<div style="background:#1E2130;border:1px solid #2A2F45;border-radius:10px;padding:0.85rem;font-size:0.79rem;color:#8A8880;margin-top:0.5rem;line-height:1.7">
                   El score predice compras reales de forma monotónica perfecta — <b style="color:#1D9E75">validez externa</b> del modelo.
                 </div>""", unsafe_allow_html=True)
-
-# P3 — ANÁLISIS XAI GLOBAL
-# ══════════════════════════════════════════════════════════
-elif "XAI" in pagina:
-    st.markdown('<div class="main-header">Análisis XAI Global</div>', unsafe_allow_html=True)
-    st.markdown('<div class="main-sub">SHAP + LIME · Importancia de señales · Calibración</div>', unsafe_allow_html=True)
-    st.write("")
-    st.info("🔬 **Qué muestra esta pantalla:** Análisis global del modelo usando dos métodos de explicabilidad (SHAP y LIME). SHAP mide cuánto contribuye cada señal al score final en promedio. LIME construye modelos locales lineales alrededor de cada predicción. Que ambos métodos coincidan (ρ=1.00) valida que la interpretación es robusta y no depende del método elegido.")
-
-    t1,t2,t3,t4,t5 = st.tabs(["📈 Importancia SHAP","🔗 Correlación señales","📉 Slice por posición","🎯 Calibración","💰 Valor de tus datos"])
-
-    FL = {'pct_shap_S1_copurchase':'Co-compra','pct_shap_S2_affinities':'Afinidad perfil',
-          'pct_shap_S3_temporal_eff':'Estacionalidad','pct_shap_S4_recency_item':'Recencia',
-          'pct_shap_S5_popularity':'Popularidad',
-          'pct_S1_copurchase':'Co-compra','pct_S2_affinities':'Afinidad perfil',
-          'pct_S3_temporal_eff':'Estacionalidad','pct_S4_recency_item':'Recencia',
-          'pct_S5_popularity':'Popularidad'}
-
-    with t1:
-        if shap_g is None:
-            st.info("Corré el bloque XAI para generar `xai_shap_global_importance.csv`.")
-        else:
-            sg = shap_g.sort_values('mean_abs_shap', ascending=True).copy()
-            sg['pct'] = sg['mean_abs_shap']/sg['mean_abs_shap'].sum()*100
-            c1,c2 = st.columns([3,2])
-            with c1:
-                st.markdown("**Importancia relativa SHAP vs peso teórico**")
-                st.caption("Las barras verdes (SHAP) muestran la importancia *real* medida empíricamente. Las barras grises son los pesos teóricos asignados al diseñar el modelo. Si SHAP > peso teórico, esa señal discrimina más de lo esperado. **Hallazgo clave:** Co-compra tiene peso=40% pero importancia SHAP=64.8% — su alta varianza la hace mucho más discriminante de lo que sugiere el peso.")
-                fig = go.Figure()
-                fig.add_trace(go.Bar(y=sg['label'],x=sg['pct'],orientation='h',name='SHAP',
-                                     marker_color=COLORS['primary'],marker_line_width=0))
-                fig.add_trace(go.Bar(y=sg['label'],x=sg['weight']*100,orientation='h',
-                                     name='Peso teórico',marker_color='rgba(180,178,169,0.3)',
-                                     marker_line_color='rgba(180,178,169,0.6)',marker_line_width=1))
-                fig.update_layout(**pbase(),barmode='overlay',height=300,
-                                  legend=dict(orientation='h',y=1.1,font=dict(color='#8A8880',size=10)),
-                                  xaxis=dict(title='%',gridcolor='rgba(255,255,255,0.05)'),
-                                  yaxis=dict(gridcolor='rgba(0,0,0,0)'))
-                st.plotly_chart(fig, use_container_width=True)
-            with c2:
-                st.markdown("**Tabla de importancia**")
-                tbl = sg[['label','weight','mean_abs_shap']].copy()
-                tbl['Peso'] = (tbl['weight']*100).map('{:.0f}%'.format)
-                tbl['SHAP'] = (tbl['mean_abs_shap']/tbl['mean_abs_shap'].sum()*100).map('{:.1f}%'.format)
-                tbl = tbl.rename(columns={'label':'Señal'}).drop(columns=['weight','mean_abs_shap'])
-                st.dataframe(tbl.sort_values('SHAP',ascending=False), hide_index=True, use_container_width=True)
-                st.markdown("""<div style="background:#1E2130;border:1px solid #2A2F45;border-radius:10px;padding:0.85rem;font-size:0.8rem;color:#8A8880;line-height:1.7;margin-top:0.75rem">
-                  <b style="color:#1D9E75">ρ SHAP-LIME = 1.000</b><br>
-                  Dos métodos XAI independientes, mismo ranking — interpretabilidad robusta y verificable.
-                </div>""", unsafe_allow_html=True)
-
-        if shap_priv is not None:
-            st.markdown("**Importancia SHAP por grupo de privacidad**")
-            pc = [c for c in shap_priv.columns if c.startswith('pct_shap_')]
-            if pc:
-                dm = shap_priv[['privacy_level']+pc].melt(id_vars='privacy_level',value_vars=pc,var_name='f',value_name='pct')
-                dm['f'] = dm['f'].map(FL).fillna(dm['f'])
-                dm['pct'] *= 100
-                fp = px.bar(dm,x='f',y='pct',color='privacy_level',barmode='group',
-                            color_discrete_map={'No_privada':COLORS['primary'],'Privada_moderada':COLORS['accent'],'Privada_sensible':COLORS['danger']},
-                            labels={'pct':'SHAP (%)','f':''},template='plotly_dark')
-                fp.update_layout(**pbase(),height=270,
-                                 legend=dict(title='',orientation='h',y=1.1,font=dict(color='#8A8880',size=10)),
-                                 yaxis=dict(gridcolor='rgba(255,255,255,0.05)'),xaxis=dict(gridcolor='rgba(0,0,0,0)'))
-                st.plotly_chart(fp, use_container_width=True)
-                st.caption("✅ Variación máxima en co-compra: 0.9% — el modelo de scoring es neutral a la privacidad del usuario.")
-
-    with t2:
-        if corr_df is None:
-            st.info("Corré el bloque XAI para generar `xai_shap_signal_correlation.csv`.")
-        else:
-            st.markdown("**Correlación Spearman entre SHAP values — ¿señales sustitutos o complementarias?**")
-            st.caption("**Cómo leer este gráfico:** Cada celda muestra la correlación entre dos señales. Verde oscuro = alta correlación (se mueven juntas). Amarillo claro = independientes. Rojo = correlación negativa. Si dos señales tienen ρ≈0, capturan dimensiones distintas del comportamiento de compra — son complementarias, no redundantes. **Hallazgo:** 9 de 10 pares son independientes. La única excepción es recencia-popularidad (ρ=0.54), que tiene sentido: ítems populares tienden a haberse vendido recientemente.")
-            z = corr_df.values
-            fc = go.Figure(go.Heatmap(z=z,x=list(corr_df.columns),y=list(corr_df.index),
-                                      colorscale='RdYlGn',zmid=0,zmin=-1,zmax=1,
-                                      text=[[f'{v:.2f}' for v in row] for row in z],
-                                      texttemplate='%{text}',textfont=dict(size=11)))
-            fc.update_layout(**pbase(),height=360,margin=dict(l=0,r=0,t=10,b=0))
-            st.plotly_chart(fc, use_container_width=True)
-
-    with t3:
-        if shap_sl is None:
-            st.info("Corré el bloque XAI para generar `xai_shap_slice_by_rank.csv`.")
-        else:
-            st.markdown("**Importancia SHAP por posición en el ranking — fallback explícito**")
-            st.caption("**Cómo leer este gráfico:** El eje X muestra la posición en el ranking (Top 1-3 son los mejores candidatos, Pos 11-20 los más débiles). El eje Y muestra qué porcentaje del score se explica por cada señal. Lo notable: en el Top 1-3, la co-compra explica el 84.6% del score — el sistema usa casi exclusivamente esa señal para los mejores candidatos. A partir de la posición 4, otras señales como afinidad de perfil y popularidad compensan. Esto se llama **fallback explícito**: el modelo usa señales más débiles cuando la co-compra no es suficientemente fuerte.")
-            ps = [c for c in shap_sl.columns if c.startswith('pct_')]
-            if ps:
-                dm2 = shap_sl[['rank_group']+ps].melt(id_vars='rank_group',value_vars=ps,var_name='f',value_name='pct')
-                dm2['f'] = dm2['f'].map(FL).fillna(dm2['f'])
-                dm2['pct'] *= 100
-                fs = px.line(dm2,x='rank_group',y='pct',color='f',markers=True,
-                             color_discrete_map={'Co-compra':COLORS['primary'],'Afinidad perfil':COLORS['secondary'],
-                                                 'Popularidad':COLORS['accent'],'Estacionalidad':COLORS['neutral'],'Recencia':'#5DCAA5'},
-                             labels={'pct':'SHAP (%)','rank_group':'Posición'},template='plotly_dark')
-                fs.update_layout(**pbase(),height=350,
-                                 legend=dict(title='',orientation='h',y=1.1,font=dict(color='#8A8880',size=10)),
-                                 yaxis=dict(gridcolor='rgba(255,255,255,0.05)'),xaxis=dict(gridcolor='rgba(255,255,255,0.05)'))
-                st.plotly_chart(fs, use_container_width=True)
-                st.caption("Co-compra cae de 84.6% (Top 1-3) a 55.4% (Pos 11-20) — fallback explícito hacia señales de ítem.")
-
-    with t4:
-        if calib is None:
-            st.info("Corré el bloque XAI para generar `xai_score_calibration.csv`.")
-        else:
-            st.markdown("**Calibración del score_final — hit rate por decil**")
-            st.caption("**Cómo leer este gráfico:** Los 87,526 pares usuario-ítem se dividen en 10 grupos (deciles) ordenados por score. D1 son los ítems con score más bajo, D10 los de score más alto. El eje Y muestra qué porcentaje de esos ítems el usuario *efectivamente compró* después (hit rate). Si el modelo está bien calibrado, el hit rate debe crecer de izquierda a derecha. **Hallazgo:** La correlación es perfecta (ρ=1.00) — cada decil tiene más compras reales que el anterior. D10 tiene 27 veces más hits que D1, lo que valida que el score predice compras reales.")
-            cc1,cc2 = st.columns([3,2])
-            with cc1:
-                clrs = [COLORS['neutral'] if i<5 else COLORS['primary'] for i in range(len(calib))]
-                fca = go.Figure()
-                fca.add_trace(go.Bar(x=calib['score_decile'],y=calib['hit_rate']*100,
-                                     marker_color=clrs,marker_line_width=0,
-                                     text=(calib['hit_rate']*100).map('{:.2f}%'.format),
-                                     textposition='outside',textfont=dict(color='#8A8880',size=9)))
-                fca.add_hline(y=calib['hit_rate'].mean()*100,line_dash='dash',line_color=COLORS['accent'],
-                              annotation_text=f"Media: {calib['hit_rate'].mean():.2%}",
-                              annotation_font_color=COLORS['accent'])
-                fca.update_layout(**pbase(),height=310,showlegend=False,
-                                  xaxis=dict(title='Decil de score',gridcolor='rgba(0,0,0,0)'),
-                                  yaxis=dict(title='Hit rate (%)',gridcolor='rgba(255,255,255,0.05)'))
-                st.plotly_chart(fca, use_container_width=True)
-            with cc2:
-                d1  = calib[calib['score_decile']=='D1']['hit_rate'].values[0]
-                d10 = calib[calib['score_decile']=='D10']['hit_rate'].values[0]
-                ratio = round(d10/d1) if d1>0 else 0
-                for v,l in [("ρ=1.00","Correlación decil-hit"),(f"{ratio}x","D10 vs D1"),(f"{d10:.2%}","Hit rate D10")]:
-                    st.markdown(f'<div class="kpi-box" style="margin-bottom:0.6rem"><div class="kpi-value">{v}</div><div class="kpi-label">{l}</div></div>', unsafe_allow_html=True)
-                st.markdown("""<div style="background:#1E2130;border:1px solid #2A2F45;border-radius:10px;padding:0.85rem;font-size:0.79rem;color:#8A8880;margin-top:0.5rem;line-height:1.7">
-                  El score predice compras reales de forma monotónica perfecta — <b style="color:#1D9E75">validez externa</b> del modelo.
-                </div>""", unsafe_allow_html=True)
-
-    with t5:
-        st.markdown("**Data Contribution Index (DCI) — cuanto vale cada dato tuyo para el modelo**")
-        st.caption("Cada senal del modelo usa un tipo de dato personal distinto. El DCI muestra cuanto contribuye cada dato al score final, medido con SHAP. Esto convierte la importancia tecnica en algo concreto: el valor real que tiene tu historial, tus marcas o tu estacionalidad para el algoritmo.")
-        st.write("")
-        dci_data = [
-            {"dato": "Historial de co-compras", "shap_pct": 64.8, "gdpr": "Art. 5 — Datos de comportamiento", "nivel": "Muy alto", "color": "#1D9E75",
-             "desc": "El dato mas valioso. El modelo lo usa para inferir que productos se compran juntos con tu historial. Sin el, la precision cae ~13%."},
-            {"dato": "Afinidad de perfil (marca/cat)", "shap_pct": 20.1, "gdpr": "Art. 5 — Preferencias inferidas", "nivel": "Alto", "color": "#534AB7",
-             "desc": "Tu marca y categoria favorita. El modelo lo usa para filtrar items coherentes con tu perfil. Ocultar esto reduce la personalizacion."},
-            {"dato": "Recencia del item", "shap_pct": 9.1, "gdpr": "Art. 5 — Datos temporales", "nivel": "Medio", "color": "#EF9F27",
-             "desc": "Hace cuanto fue comprado el item por otros. Dato agregado, no individual — bajo riesgo de privacidad, contribucion media."},
-            {"dato": "Popularidad del item", "shap_pct": 4.3, "gdpr": "Art. 5 — Datos publicos agregados", "nivel": "Bajo", "color": "#B4B2A9",
-             "desc": "Cuantos usuarios compraron el item. Dato completamente anonimo y agregado. El modelo NO necesita datos personales para calcular esto."},
-            {"dato": "Estacionalidad", "shap_pct": 1.7, "gdpr": "Art. 5 — Datos contextuales", "nivel": "Muy bajo", "color": "#D85A30",
-             "desc": "Patron de compra por epoca del ano. Contribucion marginal. El sistema NO necesita este dato — validacion de minimizacion GDPR."},
-        ]
-        k1,k2,k3,k4 = st.columns(4)
-        k1.markdown('<div class="kpi-box"><div class="kpi-value">5</div><div class="kpi-label">Tipos de datos usados</div></div>', unsafe_allow_html=True)
-        k2.markdown('<div class="kpi-box"><div class="kpi-value" style="color:#1D9E75">64.8%</div><div class="kpi-label">Valor historial (DCI max)</div></div>', unsafe_allow_html=True)
-        k3.markdown('<div class="kpi-box"><div class="kpi-value" style="color:#D85A30">1.7%</div><div class="kpi-label">Valor estacionalidad (DCI min)</div></div>', unsafe_allow_html=True)
-        k4.markdown('<div class="kpi-box"><div class="kpi-value" style="color:#EF9F27">38x</div><div class="kpi-label">Ratio max/min DCI</div></div>', unsafe_allow_html=True)
-        st.write("")
-        col_dci1, col_dci2 = st.columns([2,3])
-        with col_dci1:
-            st.markdown("**Contribucion de cada dato al modelo**")
-            fig_dci = go.Figure(go.Bar(
-                y=[d["dato"] for d in dci_data],
-                x=[d["shap_pct"] for d in dci_data],
-                orientation="h",
-                marker_color=[d["color"] for d in dci_data],
-                marker_line_width=0,
-                text=[f'{d["shap_pct"]:.1f}%' for d in dci_data],
-                textposition="outside",
-                textfont=dict(color="#8A8880", size=10)
-            ))
-            fig_dci.update_layout(**pbase(), height=260,
-                                  margin=dict(l=0,r=60,t=10,b=0),
-                                  xaxis=dict(title="% contribucion SHAP", gridcolor="rgba(255,255,255,0.05)"),
-                                  yaxis=dict(gridcolor="rgba(0,0,0,0)"))
-            st.plotly_chart(fig_dci, use_container_width=True)
-            st.caption("Fuente: SHAP values sobre 87,526 pares usuario-item. H1: Co-compra SHAP=64.8% vs peso teorico=40%.")
-        with col_dci2:
-            st.markdown("**Detalle por tipo de dato**")
-            for d in dci_data:
-                bar_w = int(d["shap_pct"] / 64.8 * 100)
-                nivel_icon = {"Muy alto":"🔴","Alto":"🟠","Medio":"🟡","Bajo":"🟢","Muy bajo":"🟢"}.get(d["nivel"],"⚪")
-                st.markdown(
-                    f'<div class="rec-card" style="margin-bottom:0.5rem;padding:0.75rem 1rem">'
-                    f'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">'
-                    f'<div style="font-size:0.85rem;font-weight:600;color:#E8E6E0">{d["dato"]}</div>'
-                    f'<div style="font-size:0.72rem;color:{d["color"]};font-weight:600">{nivel_icon} {d["nivel"]}</div>'
-                    f'</div>'
-                    f'<div style="background:#2A2F45;border-radius:3px;height:4px;margin-bottom:6px">'
-                    f'<div style="background:{d["color"]};height:4px;border-radius:3px;width:{bar_w}%"></div>'
-                    f'</div>'
-                    f'<div style="font-size:0.76rem;color:#8A8880;line-height:1.5">{d["desc"]}</div>'
-                    f'<div style="font-size:0.68rem;color:rgba(138,136,128,0.5);margin-top:4px">{d["gdpr"]}</div>'
-                    f'</div>', unsafe_allow_html=True)
-        st.write("")
-        st.markdown('<div class="rec-card" style="border-color:#1D9E75">'
-            '<div style="font-size:0.88rem;font-weight:600;color:#E8E6E0;margin-bottom:6px">Validacion minimizacion de datos — GDPR art. 5(1)(c)</div>'
-            '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;font-size:0.82rem;color:#8A8880">'
-            '<div><b style="color:#1D9E75">Dato necesario:</b><br>Historial co-compras (DCI=64.8%). Sin el, el sistema no puede personalizar.</div>'
-            '<div><b style="color:#EF9F27">Dato marginal:</b><br>Estacionalidad (DCI=1.7%). El sistema funciona casi igual sin el.</div>'
-            '<div><b style="color:#1D9E75">Dato anonimo:</b><br>Popularidad (DCI=4.3%). No requiere datos personales.</div>'
-            '</div></div>', unsafe_allow_html=True)
-
-
-# ══════════════════════════════════════════════════════════
-# P3 — ANÁLISIS XAI GLOBAL
-# ══════════════════════════════════════════════════════════
-elif pagina.startswith("📊"):
-    st.markdown('<div class="main-header">Análisis XAI Global</div>', unsafe_allow_html=True)
-    st.markdown('<div class="main-sub">SHAP + LIME · Importancia de señales · Calibración</div>', unsafe_allow_html=True)
-    st.write("")
-    st.info("🔬 **Qué muestra esta pantalla:** Análisis global del modelo usando dos métodos de explicabilidad (SHAP y LIME). SHAP mide cuánto contribuye cada señal al score final en promedio. LIME construye modelos locales lineales alrededor de cada predicción. Que ambos métodos coincidan (ρ=1.00) valida que la interpretación es robusta y no depende del método elegido.")
-
-    t1,t2,t3,t4,t5 = st.tabs(["📈 Importancia SHAP","🔗 Correlación señales","📉 Slice por posición","🎯 Calibración","💰 Valor de tus datos"])
-
-    FL = {"pct_shap_S1_copurchase":"Co-compra","pct_shap_S2_affinities":"Afinidad perfil",
-          "pct_shap_S3_temporal_eff":"Estacionalidad","pct_shap_S4_recency_item":"Recencia",
-          "pct_shap_S5_popularity":"Popularidad",
-          "pct_S1_copurchase":"Co-compra","pct_S2_affinities":"Afinidad perfil",
-          "pct_S3_temporal_eff":"Estacionalidad","pct_S4_recency_item":"Recencia",
-          "pct_S5_popularity":"Popularidad"}
-
-    with t1:
-        if shap_g is None:
-            st.info("Corré el bloque XAI para generar xai_shap_global_importance.csv.")
-        else:
-            sg = shap_g.sort_values("mean_abs_shap", ascending=True).copy()
-            sg["pct"] = sg["mean_abs_shap"]/sg["mean_abs_shap"].sum()*100
-            c1,c2 = st.columns([3,2])
-            with c1:
-                st.markdown("**Importancia relativa SHAP vs peso teórico**")
-                st.caption("Las barras verdes (SHAP) muestran la importancia real medida empíricamente. Las barras grises son los pesos teóricos. Hallazgo clave: Co-compra tiene peso=40% pero importancia SHAP=64.8%.")
-                fig = go.Figure()
-                fig.add_trace(go.Bar(y=sg["label"],x=sg["pct"],orientation="h",name="SHAP",
-                                     marker_color=COLORS["primary"],marker_line_width=0))
-                fig.add_trace(go.Bar(y=sg["label"],x=sg["weight"]*100,orientation="h",
-                                     name="Peso teórico",marker_color="rgba(180,178,169,0.3)",
-                                     marker_line_color="rgba(180,178,169,0.6)",marker_line_width=1))
-                fig.update_layout(**pbase(),barmode="overlay",height=300,
-                                  legend=dict(orientation="h",y=1.1,font=dict(color="#8A8880",size=10)),
-                                  xaxis=dict(title="%",gridcolor="rgba(255,255,255,0.05)"),
-                                  yaxis=dict(gridcolor="rgba(0,0,0,0)"))
-                st.plotly_chart(fig, use_container_width=True)
-            with c2:
-                st.markdown("**Tabla de importancia**")
-                tbl = sg[["label","weight","mean_abs_shap"]].copy()
-                tbl["Peso"] = (tbl["weight"]*100).map("{:.0f}%".format)
-                tbl["SHAP"] = (tbl["mean_abs_shap"]/tbl["mean_abs_shap"].sum()*100).map("{:.1f}%".format)
-                tbl = tbl.rename(columns={"label":"Señal"}).drop(columns=["weight","mean_abs_shap"])
-                st.dataframe(tbl.sort_values("SHAP",ascending=False), hide_index=True, use_container_width=True)
-                st.markdown("""<div style="background:#1E2130;border:1px solid #2A2F45;border-radius:10px;padding:0.85rem;font-size:0.8rem;color:#8A8880;line-height:1.7;margin-top:0.75rem">
-                  <b style="color:#1D9E75">ρ SHAP-LIME = 1.000</b><br>
-                  Dos métodos XAI independientes, mismo ranking — interpretabilidad robusta y verificable.
-                </div>""", unsafe_allow_html=True)
-
-        if shap_priv is not None:
-            st.markdown("**Importancia SHAP por grupo de privacidad**")
-            pc = [c for c in shap_priv.columns if c.startswith("pct_shap_")]
-            if pc:
-                dm = shap_priv[["privacy_level"]+pc].melt(id_vars="privacy_level",value_vars=pc,var_name="f",value_name="pct")
-                dm["f"] = dm["f"].map(FL).fillna(dm["f"])
-                dm["pct"] *= 100
-                fp = px.bar(dm,x="f",y="pct",color="privacy_level",barmode="group",
-                            color_discrete_map={"No_privada":COLORS["primary"],"Privada_moderada":COLORS["accent"],"Privada_sensible":COLORS["danger"]},
-                            labels={"pct":"SHAP (%)","f":""},template="plotly_dark")
-                fp.update_layout(**pbase(),height=270,
-                                 legend=dict(title="",orientation="h",y=1.1,font=dict(color="#8A8880",size=10)),
-                                 yaxis=dict(gridcolor="rgba(255,255,255,0.05)"),xaxis=dict(gridcolor="rgba(0,0,0,0)"))
-                st.plotly_chart(fp, use_container_width=True)
-                st.caption("Variación máxima en co-compra: 0.9% — el modelo de scoring es neutral a la privacidad del usuario.")
-
-    with t2:
-        if corr_df is None:
-            st.info("Corré el bloque XAI para generar xai_shap_signal_correlation.csv.")
-        else:
-            st.markdown("**Correlación Spearman entre SHAP values**")
-            st.caption("Verde oscuro = alta correlación. Hallazgo: 9 de 10 pares son independientes.")
-            z = corr_df.values
-            fc = go.Figure(go.Heatmap(z=z,x=list(corr_df.columns),y=list(corr_df.index),
-                                      colorscale="RdYlGn",zmid=0,zmin=-1,zmax=1,
-                                      text=[[f"{v:.2f}" for v in row] for row in z],
-                                      texttemplate="%{text}",textfont=dict(size=11)))
-            fc.update_layout(**pbase(),height=360,margin=dict(l=0,r=0,t=10,b=0))
-            st.plotly_chart(fc, use_container_width=True)
-
-    with t3:
-        if shap_sl is None:
-            st.info("Corré el bloque XAI para generar xai_shap_slice_by_rank.csv.")
-        else:
-            st.markdown("**Importancia SHAP por posición en el ranking**")
-            st.caption("Co-compra cae de 84.6% (Top 1-3) a 55.4% (Pos 11-20) — fallback explícito hacia señales de ítem.")
-            ps = [c for c in shap_sl.columns if c.startswith("pct_")]
-            if ps:
-                dm2 = shap_sl[["rank_group"]+ps].melt(id_vars="rank_group",value_vars=ps,var_name="f",value_name="pct")
-                dm2["f"] = dm2["f"].map(FL).fillna(dm2["f"])
-                dm2["pct"] *= 100
-                fs = px.line(dm2,x="rank_group",y="pct",color="f",markers=True,
-                             color_discrete_map={"Co-compra":COLORS["primary"],"Afinidad perfil":COLORS["secondary"],
-                                                 "Popularidad":COLORS["accent"],"Estacionalidad":COLORS["neutral"],"Recencia":"#5DCAA5"},
-                             labels={"pct":"SHAP (%)","rank_group":"Posición"},template="plotly_dark")
-                fs.update_layout(**pbase(),height=350,
-                                 legend=dict(title="",orientation="h",y=1.1,font=dict(color="#8A8880",size=10)),
-                                 yaxis=dict(gridcolor="rgba(255,255,255,0.05)"),xaxis=dict(gridcolor="rgba(255,255,255,0.05)"))
-                st.plotly_chart(fs, use_container_width=True)
-
-    with t4:
-        if calib is None:
-            st.info("Corré el bloque XAI para generar xai_score_calibration.csv.")
-        else:
-            st.markdown("**Calibración del score_final — hit rate por decil**")
-            st.caption("Correlación perfecta (ρ=1.00). D10 tiene 27x más hits que D1 — validez externa del modelo.")
-            cc1,cc2 = st.columns([3,2])
-            with cc1:
-                clrs = [COLORS["neutral"] if i<5 else COLORS["primary"] for i in range(len(calib))]
-                fca = go.Figure()
-                fca.add_trace(go.Bar(x=calib["score_decile"],y=calib["hit_rate"]*100,
-                                     marker_color=clrs,marker_line_width=0,
-                                     text=(calib["hit_rate"]*100).map("{:.2f}%".format),
-                                     textposition="outside",textfont=dict(color="#8A8880",size=9)))
-                fca.add_hline(y=calib["hit_rate"].mean()*100,line_dash="dash",line_color=COLORS["accent"])
-                fca.update_layout(**pbase(),height=310,showlegend=False,
-                                  xaxis=dict(title="Decil de score",gridcolor="rgba(0,0,0,0)"),
-                                  yaxis=dict(title="Hit rate (%)",gridcolor="rgba(255,255,255,0.05)"))
-                st.plotly_chart(fca, use_container_width=True)
-            with cc2:
-                d1  = calib[calib["score_decile"]=="D1"]["hit_rate"].values[0]
-                d10 = calib[calib["score_decile"]=="D10"]["hit_rate"].values[0]
-                ratio = round(d10/d1) if d1>0 else 0
-                for v,l in [("ρ=1.00","Correlación decil-hit"),(f"{ratio}x","D10 vs D1"),(f"{d10:.2%}","Hit rate D10")]:
-                    st.markdown(f'<div class="kpi-box" style="margin-bottom:0.6rem"><div class="kpi-value">{v}</div><div class="kpi-label">{l}</div></div>', unsafe_allow_html=True)
-
-    with t5:
-        st.markdown("**Data Contribution Index (DCI) — cuanto vale cada dato tuyo para el modelo**")
-        st.caption("El DCI muestra cuanto contribuye cada dato al score final, medido con SHAP. Convierte la importancia tecnica en algo concreto.")
-        st.write("")
-        dci_data = [
-            {"dato":"Historial de co-compras","shap_pct":64.8,"gdpr":"Art. 5 — Datos de comportamiento","nivel":"Muy alto","color":"#1D9E75",
-             "desc":"El dato mas valioso. Sin el, la precision cae ~13%."},
-            {"dato":"Afinidad de perfil (marca/cat)","shap_pct":20.1,"gdpr":"Art. 5 — Preferencias inferidas","nivel":"Alto","color":"#534AB7",
-             "desc":"Tu marca y categoria favorita. Ocultar esto reduce la personalizacion."},
-            {"dato":"Recencia del item","shap_pct":9.1,"gdpr":"Art. 5 — Datos temporales","nivel":"Medio","color":"#EF9F27",
-             "desc":"Dato agregado, no individual — bajo riesgo de privacidad."},
-            {"dato":"Popularidad del item","shap_pct":4.3,"gdpr":"Art. 5 — Datos publicos agregados","nivel":"Bajo","color":"#B4B2A9",
-             "desc":"Dato completamente anonimo. El modelo NO necesita datos personales para esto."},
-            {"dato":"Estacionalidad","shap_pct":1.7,"gdpr":"Art. 5 — Datos contextuales","nivel":"Muy bajo","color":"#D85A30",
-             "desc":"Contribucion marginal. El sistema NO necesita este dato — validacion minimizacion GDPR."},
-        ]
-        k1,k2,k3,k4 = st.columns(4)
-        k1.markdown('<div class="kpi-box"><div class="kpi-value">5</div><div class="kpi-label">Tipos de datos usados</div></div>', unsafe_allow_html=True)
-        k2.markdown('<div class="kpi-box"><div class="kpi-value" style="color:#1D9E75">64.8%</div><div class="kpi-label">Valor historial (DCI max)</div></div>', unsafe_allow_html=True)
-        k3.markdown('<div class="kpi-box"><div class="kpi-value" style="color:#D85A30">1.7%</div><div class="kpi-label">Valor estacionalidad (DCI min)</div></div>', unsafe_allow_html=True)
-        k4.markdown('<div class="kpi-box"><div class="kpi-value" style="color:#EF9F27">38x</div><div class="kpi-label">Ratio max/min DCI</div></div>', unsafe_allow_html=True)
-        st.write("")
-        col_dci1, col_dci2 = st.columns([2,3])
-        with col_dci1:
-            st.markdown("**Contribucion de cada dato al modelo**")
-            fig_dci = go.Figure(go.Bar(
-                y=[d["dato"] for d in dci_data], x=[d["shap_pct"] for d in dci_data],
-                orientation="h", marker_color=[d["color"] for d in dci_data], marker_line_width=0,
-                text=[f'{d["shap_pct"]:.1f}%' for d in dci_data],
-                textposition="outside", textfont=dict(color="#8A8880", size=10)
-            ))
-            fig_dci.update_layout(**pbase(), height=260, margin=dict(l=0,r=60,t=10,b=0),
-                                  xaxis=dict(title="% contribucion SHAP", gridcolor="rgba(255,255,255,0.05)"),
-                                  yaxis=dict(gridcolor="rgba(0,0,0,0)"))
-            st.plotly_chart(fig_dci, use_container_width=True)
-        with col_dci2:
-            st.markdown("**Detalle por tipo de dato**")
-            for d in dci_data:
-                bar_w = int(d["shap_pct"] / 64.8 * 100)
-                nivel_icon = {"Muy alto":"🔴","Alto":"🟠","Medio":"🟡","Bajo":"🟢","Muy bajo":"🟢"}.get(d["nivel"],"⚪")
-                st.markdown(
-                    f'<div class="rec-card" style="margin-bottom:0.5rem;padding:0.75rem 1rem">'
-                    f'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">'
-                    f'<div style="font-size:0.85rem;font-weight:600;color:#E8E6E0">{d["dato"]}</div>'
-                    f'<div style="font-size:0.72rem;color:{d["color"]};font-weight:600">{nivel_icon} {d["nivel"]}</div>'
-                    f'</div>'
-                    f'<div style="background:#2A2F45;border-radius:3px;height:4px;margin-bottom:6px">'
-                    f'<div style="background:{d["color"]};height:4px;border-radius:3px;width:{bar_w}%"></div>'
-                    f'</div>'
-                    f'<div style="font-size:0.76rem;color:#8A8880;line-height:1.5">{d["desc"]}</div>'
-                    f'<div style="font-size:0.68rem;color:rgba(138,136,128,0.5);margin-top:4px">{d["gdpr"]}</div>'
-                    f'</div>', unsafe_allow_html=True)
 
 # ══════════════════════════════════════════════════════════
 # P4 — EXPERIMENTO & HALLAZGOS
@@ -1719,7 +641,7 @@ elif "Experimento" in pagina:
     st.write("")
     st.info("🧪 **Qué muestra esta pantalla:** Contiene el experimento causal de consentimiento y el resumen de los 13 hallazgos del análisis XAI. El experimento responde: ¿habilitar el historial de compras en las explicaciones mejora la explicabilidad? La tabla maestra consolida todos los resultados del estudio en un solo lugar.")
 
-    te, th, tf = st.tabs(["🧪 Experimento de Consentimiento","📋 Tabla Maestra XAI","⚠️ Casos de Fallo"])
+    te, th = st.tabs(["🧪 Experimento de Consentimiento","📋 Tabla Maestra XAI"])
 
     with te:
         st.caption("**Cómo leer este gráfico:** El eje Y muestra el promedio de razones visibles por recomendación (máximo posible: 3). Los cuatro grupos permiten comparar: el grupo Control es el baseline (sin historial), el grupo Tratado recibió el historial habilitado, y los grupos No_privada y Privada_sensible son referencias de los extremos del sistema. Si el tratamiento funciona, el grupo Tratado debería tener más razones que el Control.")
@@ -1745,9 +667,9 @@ elif "Experimento" in pagina:
         st.plotly_chart(fe, use_container_width=True)
 
         e1,e2,e3 = st.columns(3)
-        e1.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value" style="color:#EF9F27">+0.04</div><div class="kpi-label">Efecto del consentimiento</div></div>', unsafe_allow_html=True)
-        e2.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">112/375</div><div class="kpi-label">Usuarios tratados</div></div>', unsafe_allow_html=True)
-        e3.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value" style="color:#1D9E75">2.55</div><div class="kpi-label">Avg razones global</div></div>', unsafe_allow_html=True)
+        e1.markdown('<div class="kpi-box"><div class="kpi-value" style="color:#EF9F27">+0.04</div><div class="kpi-label">Efecto del consentimiento</div></div>', unsafe_allow_html=True)
+        e2.markdown('<div class="kpi-box"><div class="kpi-value">112/375</div><div class="kpi-label">Usuarios tratados</div></div>', unsafe_allow_html=True)
+        e3.markdown('<div class="kpi-box"><div class="kpi-value" style="color:#1D9E75">2.55</div><div class="kpi-label">Avg razones global</div></div>', unsafe_allow_html=True)
         st.write("")
         st.caption("El efecto del consentimiento es pequeño (+0.04) porque las señales de ítem compensan la falta de historial — valida el diseño privacy-by-default.")
 
@@ -1782,89 +704,10 @@ elif "Experimento" in pagina:
                     </div>""", unsafe_allow_html=True)
                 st.markdown("")
 
-    with tf:
-        st.markdown("**Casos donde el sistema falla — analisis critico**")
-        st.caption("La ciencia rigurosa documenta tanto los exitos como los fallos. Esta seccion muestra explicitamente las limitaciones estructurales del sistema — no para disculparnos, sino para demostrar rigor cientifico y honestidad metodologica.")
-        st.write("")
-
-        fc1, fc2 = st.tabs(["Cold-start extremo","Sesgo de popularidad"])
-
-        with fc1:
-            st.markdown("**Usuarios sin recomendaciones — el 36% que el sistema no puede servir**")
-            st.error("1,810 usuarios (36%) no reciben ninguna recomendacion. Cold-start extremo explica solo el 23.9% — el 76% restante son usuarios de nicho con grafos de co-compra poco densos.")
-            if cov_df is not None:
-                con_df_f = cov_df[cov_df["tiene_recs"]==True]
-                sin_df_f = cov_df[cov_df["tiene_recs"]==False]
-                col_f1, col_f2 = st.columns(2)
-                with col_f1:
-                    st.markdown("**Perfil tipico de usuario SIN cobertura**")
-                    metr = [c for c in ["total_products","total_spent","num_orders","category_diversity"] if c in cov_df.columns]
-                    labs = ["Productos comprados","Gasto total ($)","Ordenes unicas","Div. categorias"][:len(metr)]
-                    for m, l in zip(metr, labs):
-                        v_sin = sin_df_f[m].mean()
-                        v_con = con_df_f[m].mean()
-                        pct = (v_con - v_sin) / max(v_sin, 1) * 100
-                        st.metric(l, f"{v_sin:.0f}", delta=f"{pct:+.0f}% vs cubiertos", delta_color="inverse")
-                with col_f2:
-                    st.markdown("**Por que falla el sistema para estos usuarios**")
-                    st.markdown("""
-El sistema usa un grafo de co-compra para generar candidatos.
-Si un usuario compra en categorias de nicho (libros especificos,
-suplementos nutricionales poco comunes), el grafo no tiene
-suficientes aristas para generar recomendaciones.
-
-**No es un fallo de privacidad** — el ticket promedio no es
-significativamente distinto (p=0.26). Es un fallo de densidad
-del grafo en dominios especializados.
-
-**Trabajo futuro:** embeddings de contenido (descripciones de
-productos) para usuarios sin vecinos en el grafo.
-                    """)
-            else:
-                st.info("Carga cobertura_sistema.csv para ver el analisis de failure cases.")
-
-        with fc2:
-            st.markdown("**Items muy recomendados con bajo hit rate**")
-            st.error("Los items mas recomendados tienen PEOR hit rate (rho=-0.233). El Amazon eGift Card llega al 27.7% de usuarios pero tiene hit rate de solo 37.1%.")
-            if fair_df is not None:
-                col_f3, col_f4 = st.columns(2)
-                with col_f3:
-                    st.markdown("**Top 5 items mas recomendados con su hit rate**")
-                    top5_fail = fair_df.sort_values("n_usuarios_rec", ascending=False).head(5)
-                    show_f = [c for c in ["title","n_usuarios_rec","pct_usuarios","hit_rate"] if c in top5_fail.columns]
-                    top5_s = top5_fail[show_f].copy()
-                    if "title" in top5_s.columns:
-                        top5_s["title"] = top5_s["title"].str[:35]
-                    if "pct_usuarios" in top5_s.columns:
-                        top5_s["pct_usuarios"] = top5_s["pct_usuarios"].map("{:.1f}%".format)
-                    if "hit_rate" in top5_s.columns:
-                        top5_s["hit_rate"] = top5_s["hit_rate"].map("{:.1%}".format)
-                    st.dataframe(top5_s, hide_index=True, use_container_width=True)
-                with col_f4:
-                    st.markdown("**Por que ocurre este sesgo**")
-                    st.markdown("""
-El grafo de co-compra es denso en productos populares
-(gift cards, consolas digitales). Eso hace que el sistema
-los recomiende a muchos usuarios — pero esos items son
-genericos y no especialmente relevantes para cada usuario.
-
-**Mitigacion parcial:** el MMR (Maximal Marginal Relevance)
-penaliza items que ya aparecen frecuentemente en el ranking.
-Pero el efecto persiste (rho=-0.233) porque el sesgo viene
-de la estructura del grafo, no del ranking final.
-
-**Implicacion regulatoria:** este sesgo es documentable
-y auditable — exactamente lo que pide el AI Act art. 10.
-                    """)
-            else:
-                st.info("Carga fairness_catalogo.csv para ver el analisis de failure cases.")
-
 # ══════════════════════════════════════════════════════════
 # P5 — COMPARAR USUARIOS
 # ══════════════════════════════════════════════════════════
 elif "Comparar" in pagina:
-    modo_bb = st.session_state.get("modo_bb_global", False)
-    modo_bb = st.session_state.get("modo_bb_global", False)
     st.markdown('<div class="main-header">Comparación de Usuarios</div>', unsafe_allow_html=True)
     st.markdown('<div class="main-sub">Recomendaciones y perfiles de dos usuarios lado a lado</div>', unsafe_allow_html=True)
     st.write("")
@@ -1876,9 +719,9 @@ elif "Comparar" in pagina:
     users = sorted(recs['Survey ResponseID'].dropna().unique().tolist())
     col_u1, col_u2 = st.columns(2)
     with col_u1:
-        uid_a = st.selectbox("Usuario A", users, key='cmp_a', format_func=lambda x: get_alias(x, alias_map))
+        uid_a = st.selectbox("Usuario A", users, key='cmp_a', format_func=lambda x: f"···{str(x)[-8:]}")
     with col_u2:
-        uid_b = st.selectbox("Usuario B", users, index=min(1,len(users)-1), key='cmp_b', format_func=lambda x: get_alias(x, alias_map))
+        uid_b = st.selectbox("Usuario B", users, index=min(1,len(users)-1), key='cmp_b', format_func=lambda x: f"···{str(x)[-8:]}")
 
     def get_ud(uid):
         ur = recs[recs['Survey ResponseID']==uid].copy()
@@ -1921,7 +764,7 @@ elif "Comparar" in pagina:
                 (k3, fm(pg(pr,'avg_ticket'),"$","",2), "Ticket prom."),
                 (k4, fm(pg(pr,'recency_days'),"","d"), "Última compra"),
             ]:
-                col_k.markdown(f'<div class="kpi-box fade-in-up"><div class="kpi-value" style="font-size:1.3rem">{val}</div><div class="kpi-label">{lbl}</div></div>', unsafe_allow_html=True)
+                col_k.markdown(f'<div class="kpi-box"><div class="kpi-value" style="font-size:1.3rem">{val}</div><div class="kpi-label">{lbl}</div></div>', unsafe_allow_html=True)
             chips = ''
             for cc, qc in [('category_top1','category_top1_qty'),('category_top2','category_top2_qty')]:
                 cv = pg(pr,cc); qv = pg(pr,qc)
@@ -1948,10 +791,9 @@ elif "Comparar" in pagina:
                 explain = str(row.get('explain','')) if pd.notna(row.get('explain')) else ''
                 score   = f"{row['score_display']:.3f}" if 'score_display' in row and pd.notna(row.get('score_display')) else ''
                 emoji   = cat_emoji_map.get(cat,'🛒')
-                if not modo_bb:
-                    pills   = ''.join(f'<span class="reason-pill">{r.strip()[:40]}</span>'
-                                      for r in explain.split(' · ') if r.strip()) if explain.strip() else \
-                              '<span style="font-size:0.74rem;color:#8A8880;font-style:italic">Sin razones</span>'
+                pills   = ''.join(f'<span class="reason-pill">{r.strip()[:40]}</span>'
+                                  for r in explain.split(' · ') if r.strip()) if explain.strip() else \
+                          '<span style="font-size:0.74rem;color:#8A8880;font-style:italic">Sin razones</span>'
                 st.markdown(f"""
                 <div class="rec-card">
                   <div style="display:flex;justify-content:space-between">
@@ -1963,8 +805,7 @@ elif "Comparar" in pagina:
                 </div>""", unsafe_allow_html=True)
 
     st.markdown('<hr style="border-color:#2A2F45;margin:0.75rem 0">', unsafe_allow_html=True)
-    if not modo_bb:
-        st.markdown("**Señales explicativas usadas por cada usuario**")
+    st.markdown("**Señales explicativas usadas por cada usuario**")
 
     def get_sigs(ur):
         rc = {'Co-compra':0,'Afinidad':0,'Categoría':0,'Estacional.':0,'Popularidad':0,'Repeat':0,'Otras':0}
@@ -1998,8 +839,6 @@ elif "Comparar" in pagina:
 # P6 — BUSCADOR DE ÍTEMS
 # ══════════════════════════════════════════════════════════
 elif "Buscador" in pagina:
-    modo_bb = st.session_state.get("modo_bb_global", False)
-    modo_bb = st.session_state.get("modo_bb_global", False)
     st.markdown('<div class="main-header">Buscador de Ítems</div>', unsafe_allow_html=True)
     st.markdown('<div class="main-sub">¿A quién se le recomendó este producto y por qué?</div>', unsafe_allow_html=True)
     st.write("")
@@ -2043,14 +882,14 @@ elif "Buscador" in pagina:
                     pct_rec = n_rec / recs['Survey ResponseID'].nunique() * 100
                     avg_sc  = item_recs['score_display'].mean() if 'score_display' in item_recs.columns else 0
                     avg_nr  = item_recs['nr'].mean()
-                    k1.markdown(f'<div class="kpi-box fade-in-up"><div class="kpi-value">{n_rec}</div><div class="kpi-label">Usuarios que lo reciben</div></div>', unsafe_allow_html=True)
-                    k2.markdown(f'<div class="kpi-box fade-in-up"><div class="kpi-value">{pct_rec:.1f}%</div><div class="kpi-label">% del total</div></div>', unsafe_allow_html=True)
-                    k3.markdown(f'<div class="kpi-box fade-in-up"><div class="kpi-value">{avg_sc:.3f}</div><div class="kpi-label">Score promedio</div></div>', unsafe_allow_html=True)
-                    k4.markdown(f'<div class="kpi-box fade-in-up"><div class="kpi-value">{avg_nr:.1f}</div><div class="kpi-label">Razones promedio</div></div>', unsafe_allow_html=True)
+                    k1.markdown(f'<div class="kpi-box"><div class="kpi-value">{n_rec}</div><div class="kpi-label">Usuarios que lo reciben</div></div>', unsafe_allow_html=True)
+                    k2.markdown(f'<div class="kpi-box"><div class="kpi-value">{pct_rec:.1f}%</div><div class="kpi-label">% del total</div></div>', unsafe_allow_html=True)
+                    k3.markdown(f'<div class="kpi-box"><div class="kpi-value">{avg_sc:.3f}</div><div class="kpi-label">Score promedio</div></div>', unsafe_allow_html=True)
+                    k4.markdown(f'<div class="kpi-box"><div class="kpi-value">{avg_nr:.1f}</div><div class="kpi-label">Razones promedio</div></div>', unsafe_allow_html=True)
                     if cat_row is not None:
                         rr = cat_row['repeat_buyer_rate'] if 'repeat_buyer_rate' in cat_row.index else None
                         rr_str = f"{float(rr):.1%}" if rr is not None and pd.notna(rr) else '—'
-                        k5.markdown(f'<div class="kpi-box fade-in-up"><div class="kpi-value">{rr_str}</div><div class="kpi-label">Compradores recurrentes</div></div>', unsafe_allow_html=True)
+                        k5.markdown(f'<div class="kpi-box"><div class="kpi-value">{rr_str}</div><div class="kpi-label">Compradores recurrentes</div></div>', unsafe_allow_html=True)
 
                     col_d, col_r = st.columns(2)
                     with col_d:
@@ -2066,8 +905,7 @@ elif "Buscador" in pagina:
                             fig_pd.update_layout(**pbase(), height=240, margin=dict(l=0,r=0,t=10,b=0),
                                                  legend=dict(font=dict(color='#8A8880',size=9)))
                             st.plotly_chart(fig_pd, use_container_width=True)
-                    if not modo_bb:
-                      with col_r:
+                    with col_r:
                         st.markdown("**Razones más usadas para este ítem**")
                         reason_counts = {}
                         for exp in item_recs['explain'].dropna():
@@ -2090,12 +928,8 @@ elif "Buscador" in pagina:
                     sample['Usuario']     = sample['Survey ResponseID'].apply(lambda x: f"···{str(x)[-8:]}")
                     sample['Score']       = sample['score_display'].map('{:.3f}'.format)
                     sample['Razones']     = sample['nr'].astype(str)
-                    if not modo_bb:
-                        sample['Explicación'] = sample['explain'].str[:65]
-                        _cols = ['Usuario','privacy_level','Score','Razones','Explicación']
-                    else:
-                        _cols = ['Usuario','privacy_level','Score']
-                    st.dataframe(sample[_cols],
+                    sample['Explicación'] = sample['explain'].str[:65]
+                    st.dataframe(sample[['Usuario','privacy_level','Score','Razones','Explicación']],
                                  hide_index=True, use_container_width=True)
             else:
                 st.info(f"Ningún producto con '{search_term}' tiene recomendaciones activas.")
@@ -2103,11 +937,11 @@ elif "Buscador" in pagina:
 # ══════════════════════════════════════════════════════════
 # P7 — HALLAZGOS 14·15·16
 # ══════════════════════════════════════════════════════════
-elif "Equidad" in pagina or "Hallazgos 14" in pagina:
-    st.markdown('<div class="main-header">Equidad & Cobertura</div>', unsafe_allow_html=True)
+elif "Hallazgos 14" in pagina:
+    st.markdown('<div class="main-header">Hallazgos 14 · 15 · 16</div>', unsafe_allow_html=True)
     st.markdown('<div class="main-sub">HTE · Fairness del catálogo · Cobertura del sistema</div>', unsafe_allow_html=True)
     st.write("")
-    st.info("📈 Esta pantalla analiza tres dimensiones de equidad del sistema. **HTE:** el consentimiento mejora más las recomendaciones en usuarios con historial rico (+0.064) que en usuarios nuevos (+0.026, no significativo). **Fairness:** los ítems más recomendados tienen peor hit rate — sesgo de popularidad estructural (ρ=−0.233). **Cobertura:** el 36% de usuarios no recibe recomendaciones, no por falta de datos sino porque sus compras son muy especializadas y el grafo de co-compra no tiene suficiente densidad en esos nichos.")
+    st.info("📈 **Qué muestra esta pantalla:** Tres análisis nuevos que complementan los 13 hallazgos originales. El HTE revela que el consentimiento beneficia más a usuarios con historial rico. El fairness documenta un sesgo de popularidad estructural (ρ=−0.233). La cobertura muestra que el 36% de usuarios no recibe recomendaciones por densidad insuficiente del grafo.")
 
     t14, t15, t16 = st.tabs(["🔬 HTE del Experimento","📦 Fairness del Catálogo","👥 Cobertura del Sistema"])
 
@@ -2210,10 +1044,10 @@ elif "Equidad" in pagina or "Hallazgos 14" in pagina:
             sin_df2 = cov_df[cov_df['tiene_recs']==False]
             k1,k2,k3,k4 = st.columns(4)
             dp = (con_df2['total_products'].mean()/max(sin_df2['total_products'].mean(),1)-1)*100 if 'total_products' in cov_df.columns else 0
-            k1.markdown(f'<div class="kpi-box fade-in-up"><div class="kpi-value">{len(con_df2):,}</div><div class="kpi-label">Con cobertura (64%)</div></div>', unsafe_allow_html=True)
-            k2.markdown(f'<div class="kpi-box fade-in-up"><div class="kpi-value" style="color:#D85A30">{len(sin_df2):,}</div><div class="kpi-label">Sin cobertura (36%)</div></div>', unsafe_allow_html=True)
-            k3.markdown(f'<div class="kpi-box fade-in-up"><div class="kpi-value">+{dp:.0f}%</div><div class="kpi-label">Más productos (con vs sin)</div></div>', unsafe_allow_html=True)
-            k4.markdown(f'<div class="kpi-box fade-in-up"><div class="kpi-value" style="color:#EF9F27">23.9%</div><div class="kpi-label">Sin cobertura = cold-start</div></div>', unsafe_allow_html=True)
+            k1.markdown(f'<div class="kpi-box"><div class="kpi-value">{len(con_df2):,}</div><div class="kpi-label">Con cobertura (64%)</div></div>', unsafe_allow_html=True)
+            k2.markdown(f'<div class="kpi-box"><div class="kpi-value" style="color:#D85A30">{len(sin_df2):,}</div><div class="kpi-label">Sin cobertura (36%)</div></div>', unsafe_allow_html=True)
+            k3.markdown(f'<div class="kpi-box"><div class="kpi-value">+{dp:.0f}%</div><div class="kpi-label">Más productos (con vs sin)</div></div>', unsafe_allow_html=True)
+            k4.markdown(f'<div class="kpi-box"><div class="kpi-value" style="color:#EF9F27">23.9%</div><div class="kpi-label">Sin cobertura = cold-start</div></div>', unsafe_allow_html=True)
             st.write("")
             metrics = [c for c in ['total_products','total_spent','num_orders','category_diversity'] if c in cov_df.columns]
             labels  = ['Productos comprados','Gasto total ($)','Órdenes únicas','Div. categorías'][:len(metrics)]
@@ -2231,417 +1065,3 @@ elif "Equidad" in pagina or "Hallazgos 14" in pagina:
                                   xaxis=dict(gridcolor='rgba(0,0,0,0)'))
             st.plotly_chart(fig_cv, use_container_width=True)
             st.caption("Diferencias todas significativas (p<0.001) excepto ticket promedio (p=0.26). El sistema no discrimina por capacidad de pago — discrimina por volumen y diversidad de compras. El cold-start extremo explica solo el 23.9%: el 76% restante son usuarios especializados en nichos con grafos de co-compra poco densos.")
-
-elif "Equidad" in pagina or "Hallazgos 14" in pagina:
-    st.markdown('<div class="main-header">Hallazgos 14 · 15 · 16</div>', unsafe_allow_html=True)
-    st.markdown('<div class="main-sub">HTE · Fairness del catálogo · Cobertura del sistema</div>', unsafe_allow_html=True)
-    st.write("")
-    st.info("Tres análisis nuevos: HTE (efecto heterogéneo del consentimiento), fairness del catálogo (rho=-0.233) y cobertura del sistema (36% sin recomendaciones).")
-    t14, t15, t16 = st.tabs(["HTE del Experimento","Fairness del Catálogo","Cobertura del Sistema"])
-    with t14:
-        st.caption("Historial rico +0.064 (p<0.001) vs cold-start +0.026 (p=0.60 no sig.). El consentimiento solo funciona si hay historial que desbloquear.")
-        if hte_df is None:
-            st.info("Corré el bloque de mejoras para generar hte_experimento.csv.")
-        else:
-            tab_h1, tab_h2, tab_h3 = st.tabs(["Por historial","Por tipo","Por categoría"])
-            for tab_sub, dim in [(tab_h1,"Volumen historial"),(tab_h2,"Tipo de comprador"),(tab_h3,"Categoría top")]:
-                with tab_sub:
-                    sub = hte_df[hte_df["dimension"]==dim].sort_values("efecto_hte", ascending=True)
-                    if sub.empty:
-                        st.info("Sin datos.")
-                        continue
-                    clrs = [COLORS["primary"] if e>0.04 else COLORS["accent"] if e>=0 else COLORS["danger"] for e in sub["efecto_hte"]]
-                    fig = go.Figure(go.Bar(y=sub["segmento"].str[:30], x=sub["efecto_hte"],
-                                          orientation="h", marker_color=clrs, marker_line_width=0,
-                                          text=[f"p={p:.3f}" for p in sub["pval"]],
-                                          textposition="outside", textfont=dict(color="#8A8880",size=9)))
-                    fig.add_vline(x=0.04, line_dash="dash", line_color=COLORS["neutral"])
-                    fig.update_layout(**pbase(), height=max(220,len(sub)*65),
-                                      margin=dict(l=0,r=100,t=10,b=0),
-                                      xaxis=dict(title="Efecto HTE",gridcolor="rgba(255,255,255,0.05)"),
-                                      yaxis=dict(gridcolor="rgba(0,0,0,0)"))
-                    st.plotly_chart(fig, use_container_width=True)
-    with t15:
-        st.caption("rho=-0.233. Q4=41.2% vs Q1=60.4% hit rate. Sesgo de popularidad estructural.")
-        if fair_df is None:
-            st.info("Corré el bloque de mejoras para generar fairness_catalogo.csv.")
-        else:
-            col_f1, col_f2 = st.columns([3,2])
-            with col_f1:
-                fs = fair_df.sort_values("n_usuarios_rec", ascending=False).copy()
-                n_tot = len(fs)
-                fs["xi"] = np.arange(1, n_tot+1) / n_tot * 100
-                fs["yi"] = fs["n_usuarios_rec"].cumsum() / fs["n_usuarios_rec"].sum() * 100
-                fig_l = go.Figure()
-                fig_l.add_trace(go.Scatter(x=fs["xi"],y=fs["yi"],mode="lines",name="Real",line=dict(color=COLORS["primary"],width=2)))
-                fig_l.add_trace(go.Scatter(x=[0,100],y=[0,100],mode="lines",name="Perfecta",line=dict(color=COLORS["neutral"],width=1,dash="dash")))
-                fig_l.add_hline(y=50, line_color=COLORS["accent"], line_width=0.8, line_dash="dot")
-                fig_l.add_hline(y=80, line_color=COLORS["danger"], line_width=0.8, line_dash="dot")
-                fig_l.update_layout(**pbase(), height=280, margin=dict(l=0,r=0,t=10,b=0),
-                                    xaxis=dict(title="% catalogo",gridcolor="rgba(255,255,255,0.05)"),
-                                    yaxis=dict(title="% recs",gridcolor="rgba(255,255,255,0.05)"),
-                                    legend=dict(orientation="h",y=1.1,font=dict(color="#8A8880",size=10)))
-                st.plotly_chart(fig_l, use_container_width=True)
-            with col_f2:
-                if "cuartil_freq" in fair_df.columns and "hit_rate" in fair_df.columns:
-                    hr_q = fair_df.groupby("cuartil_freq", observed=True)["hit_rate"].mean()*100
-                    fig_q = go.Figure(go.Bar(x=[str(l) for l in hr_q.index], y=hr_q.values,
-                                            marker_color=[COLORS["neutral"],COLORS["secondary"],COLORS["accent"],COLORS["primary"]],
-                                            marker_line_width=0,
-                                            text=[f"{v:.1f}%" for v in hr_q.values],
-                                            textposition="outside",textfont=dict(color="#8A8880",size=10)))
-                    fig_q.update_layout(**pbase(), height=280, margin=dict(l=0,r=0,t=10,b=40),
-                                        yaxis=dict(title="Hit rate (%)",gridcolor="rgba(255,255,255,0.05)"),
-                                        xaxis=dict(gridcolor="rgba(0,0,0,0)",tickangle=-15))
-                    st.plotly_chart(fig_q, use_container_width=True)
-    with t16:
-        st.caption("3,217/5,027 usuarios cubiertos (64%). Cold-start extremo = 23.9% del total sin cobertura.")
-        if cov_df is None:
-            st.info("Corré el bloque de mejoras para generar cobertura_sistema.csv.")
-        else:
-            con_df2 = cov_df[cov_df["tiene_recs"]==True]
-            sin_df2 = cov_df[cov_df["tiene_recs"]==False]
-            k1,k2,k3,k4 = st.columns(4)
-            k1.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">' + str(len(con_df2)) + '</div><div class="kpi-label">Con cobertura (64%)</div></div>', unsafe_allow_html=True)
-            k2.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value" style="color:#D85A30">' + str(len(sin_df2)) + '</div><div class="kpi-label">Sin cobertura (36%)</div></div>', unsafe_allow_html=True)
-            k3.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">+226%</div><div class="kpi-label">Más productos</div></div>', unsafe_allow_html=True)
-            k4.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value" style="color:#EF9F27">23.9%</div><div class="kpi-label">Cold-start</div></div>', unsafe_allow_html=True)
-            st.write("")
-            metrics = [c for c in ["total_products","total_spent","num_orders","category_diversity"] if c in cov_df.columns]
-            labels = ["Productos","Gasto ($)","Ordenes","Div. cat."][:len(metrics)]
-            fig_cv = go.Figure()
-            fig_cv.add_trace(go.Bar(name="Con cobertura",x=labels,y=[con_df2[m].mean() for m in metrics],marker_color=COLORS["primary"],marker_line_width=0))
-
-elif "Accionable" in pagina or "\U0001f52e" in pagina:
-    st.markdown('<div class="main-header">Explicación Accionable</div>', unsafe_allow_html=True)
-    st.markdown('<div class="main-sub">Delta mínimo para entrar al Top-5 · Contrafactual · GDPR art. 22</div>', unsafe_allow_html=True)
-    st.write("")
-    st.info("Para cada usuario: qué tiene que cambiar para que un ítem NO recomendado entre al Top-5. Conecta con GDPR art. 22.")
-    if cf_df is None:
-        st.info("No se encontró contrafactual_analisis.csv.")
-    else:
-        n_fact = int((cf_df["gap_score"] <= 0.30).sum()) if "gap_score" in cf_df.columns else 0
-        n_tot  = len(cf_df)
-        v3 = f"{n_fact/n_tot:.1%}" if n_tot > 0 else "N/A"
-        v4 = f"{cf_df['gap_score'].quantile(0.25):.3f}" if "gap_score" in cf_df.columns else "N/A"
-        k1, k2, k3, k4 = st.columns(4)
-        k1.markdown(f'<div class="kpi-box fade-in-up"><div class="kpi-value">{cf_df["gap_score"].median():.4f}</div><div class="kpi-label">Gap mediano</div></div>', unsafe_allow_html=True)
-        k2.markdown(f'<div class="kpi-box fade-in-up"><div class="kpi-value">{cf_df["delta_s1_needed"].median():.4f}</div><div class="kpi-label">Delta S1 mediano</div></div>', unsafe_allow_html=True)
-        k3.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value" style="color:#1D9E75">'+v3+'</div><div class="kpi-label">Casos factibles</div></div>', unsafe_allow_html=True)
-        k4.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value" style="color:#EF9F27">'+v4+'</div><div class="kpi-label">Gap muy bajo</div></div>', unsafe_allow_html=True)
-        st.write("")
-        col1, col2 = st.columns(2)
-        with col1:
-            st.markdown("**Distribucion del gap de score**")
-            st.caption("72.3% de usuarios tiene gap < 0.05. El item #6 esta muy cerca del Top-5.")
-            gap_clip = cf_df["gap_score"].clip(upper=cf_df["gap_score"].quantile(0.95))
-            fig_gap = px.histogram(gap_clip, nbins=40, color_discrete_sequence=[COLORS["primary"]],
-                                   labels={"value":"Gap de score","count":"N usuarios"}, template="plotly_dark")
-            fig_gap.add_vline(x=cf_df["gap_score"].median(), line_dash="dash", line_color=COLORS["accent"])
-            fig_gap.update_layout(**pbase(), height=260, showlegend=False, margin=dict(l=0,r=0,t=10,b=0))
-            st.plotly_chart(fig_gap, use_container_width=True)
-        with col2:
-            st.markdown("**Dificultad del contrafactual**")
-            st.caption("42.7% muy facil - 35.2% facil - 14.4% moderado - 7.8% dificil.")
-            if "dificultad" in cf_df.columns:
-                dc = cf_df["dificultad"].value_counts()
-                fig_pie = px.pie(values=dc.values, names=dc.index,
-                                 color_discrete_sequence=[COLORS["primary"],COLORS["accent"],COLORS["secondary"],COLORS["danger"]],
-                                 hole=0.4, template="plotly_dark")
-                fig_pie.update_layout(**pbase(), height=260, margin=dict(l=0,r=0,t=10,b=0),
-                                      legend=dict(font=dict(color="#8A8880",size=9)))
-                st.plotly_chart(fig_pie, use_container_width=True)
-        st.markdown("**Delta necesario por senal para entrar al Top-5**")
-        st.caption("Menor delta = via mas eficiente. S1 co-compra requiere el menor cambio.")
-        senales = ["S1 Co-compra (W=0.40)","S2 Afinidad (W=0.25)","S5 Popularidad (W=0.10)"]
-        d1 = cf_df["delta_s1_needed"].median()
-        d2 = cf_df["delta_s2_needed"].median() if "delta_s2_needed" in cf_df.columns else 0
-        d5 = cf_df["delta_s5_needed"].median() if "delta_s5_needed" in cf_df.columns else 0
-        fig_bar = go.Figure(go.Bar(x=senales, y=[d1,d2,d5],
-                                   marker_color=[COLORS["primary"],COLORS["secondary"],"#9B59B6"],
-                                   marker_line_width=0, text=[f"{d:.4f}" for d in [d1,d2,d5]],
-                                   textposition="outside", textfont=dict(color="#8A8880",size=10)))
-        fig_bar.add_hline(y=0.3, line_dash="dash", line_color=COLORS["neutral"])
-        fig_bar.update_layout(**pbase(), height=260, showlegend=False, margin=dict(l=0,r=0,t=10,b=0),
-                              yaxis=dict(title="Delta necesario",gridcolor="rgba(255,255,255,0.05)"),
-                              xaxis=dict(gridcolor="rgba(0,0,0,0)"))
-        st.plotly_chart(fig_bar, use_container_width=True)
-        col_g1, col_g2 = st.columns(2)
-        with col_g1:
-            st.success("92.2% de casos tienen contrafactual factible — GDPR art. 22 implementado.")
-        with col_g2:
-            st.info("Neutral a privacidad: No privada d=0.065, Moderada d=0.069, Sensible d=0.061.")
-
-elif "Gobernanza" in pagina or "Legal-by-Design" in pagina:
-    st.markdown('<div class="main-header">Legal-by-Design Matrix</div>', unsafe_allow_html=True)
-    st.markdown('<div class="main-sub">Como cada principio regulatorio se implementa en el sistema</div>', unsafe_allow_html=True)
-    st.write("")
-    st.info("Esta pantalla traduce principios juridicos abstractos (GDPR, AI Act) en mecanismos tecnicos concretos del sistema. Cada fila muestra un principio regulatorio, el riesgo que mitiga, la implementacion tecnica especifica, y la evidencia empirica de los hallazgos.")
-
-    # Matriz Legal-by-Design
-    import pandas as pd
-    matrix_data = [
-        {
-            "Principio": "Transparencia",
-            "Marco": "GDPR art. 13-14 / AI Act art. 13",
-            "Riesgo mitigado": "Caja negra — usuario no entiende por que recibe recomendaciones",
-            "Implementacion tecnica": "SHAP + LIME generan razones visibles por recomendacion (pills verdes). explain_type registra el tipo de senal usada.",
-            "Evidencia empirica": "H1: Co-compra SHAP=64.8% vs peso teorico 40%. H3: SHAP-LIME rho=1.00. H4: Calibracion score D10 27x D1."
-        },
-        {
-            "Principio": "Consentimiento granular",
-            "Marco": "GDPR art. 7 / ePrivacy",
-            "Riesgo mitigado": "Consentimiento binario — aceptar todo o nada, sin control real",
-            "Implementacion tecnica": "privacy_level con 3 niveles (No_privada / Privada_moderada / Privada_sensible). share_history configurable. Experimento de consentimiento aleatorio.",
-            "Evidencia empirica": "H5: Neutralidad SHAP entre grupos (0.9% variacion). H6: Confianza local estable (0.807 media). H14: HTE +0.064 historial rico vs +0.026 cold-start."
-        },
-        {
-            "Principio": "Minimizacion de datos",
-            "Marco": "GDPR art. 5(1)(c) / AI Act art. 10",
-            "Riesgo mitigado": "Uso excesivo de datos personales mas alla de lo necesario",
-            "Implementacion tecnica": "Exclusion configurable de senales segun privacy_level. Historial oculto en Privada_sensible. Solo se usan datos anonimizados del dataset.",
-            "Evidencia empirica": "H5: El modelo no discrimina por privacidad en SHAP. H17: ILD neutral a privacidad (ANOVA p=0.16). Simulador muestra impacto en tiempo real."
-        },
-        {
-            "Principio": "Explicacion accionable",
-            "Marco": "GDPR art. 22 / AI Act art. 86",
-            "Riesgo mitigado": "Derecho a explicacion meramente descriptiva, no util para el usuario",
-            "Implementacion tecnica": "Analisis contrafactual: delta minimo en S1 para entrar al Top-5. Mensaje accionable: que tiene que cambiar para mejorar el ranking.",
-            "Evidencia empirica": "H19: 92.2% de casos con contrafactual factible (delta<=0.30). Gap mediano=0.0251. Via mas eficiente: co-compra (delta=0.063 mediano)."
-        },
-        {
-            "Principio": "No discriminacion / Fairness",
-            "Marco": "AI Act art. 10 / Directiva 2000/43/CE",
-            "Riesgo mitigado": "El sistema favorece sistematicamente a ciertos perfiles de usuario o producto",
-            "Implementacion tecnica": "Analisis de fairness por cuartil de frecuencia. MMR para diversificacion. Cobertura del sistema documentada.",
-            "Evidencia empirica": "H15: rho(frecuencia, hit_rate)=-0.233 — sesgo de popularidad documentado. H16: 36% sin cobertura, diferencia por volumen no por capacidad de pago (p=0.26 ticket)."
-        },
-        {
-            "Principio": "Trazabilidad y auditabilidad",
-            "Marco": "AI Act art. 12 / GDPR art. 30",
-            "Riesgo mitigado": "Imposibilidad de auditar o verificar decisiones automatizadas",
-            "Implementacion tecnica": "explain_type registra la senal dominante por recomendacion. xai_master_findings_table.csv consolida 19 hallazgos auditables. Pipeline reproducible en Colab.",
-            "Evidencia empirica": "H7: Senales independientes (rho<0.09 en 9/10 pares). H18: Razones coherentes por categoria sin programacion explicita — auditabilidad emergente."
-        },
-        {
-            "Principio": "Supervision humana",
-            "Marco": "AI Act art. 14 / GDPR art. 22(3)",
-            "Riesgo mitigado": "Automatizacion cerrada sin posibilidad de intervencion o correccion",
-            "Implementacion tecnica": "Simulador de privacidad configurable en tiempo real. Buscador inverso para ver a quien se recomienda cada item. Comparacion de usuarios para detectar inconsistencias.",
-            "Evidencia empirica": "App interactiva con 9 pantallas. 3,217 usuarios explorables individualmente. Simulador muestra impacto de cambios de privacidad en tiempo real."
-        },
-        {
-            "Principio": "Robustez y precision",
-            "Marco": "AI Act art. 15 / ISO/IEC 42001",
-            "Riesgo mitigado": "Sistema impreciso o no robusto ante variaciones de perfil",
-            "Implementacion tecnica": "Modelo hibrido: co-compra item-item + ALS + BPR + ensamble. Evaluacion offline con NDCG@10. Analisis de robustez por segmento de historial.",
-            "Evidencia empirica": "H4: Calibracion perfecta rho=1.00. H10: Cold-start vs historial rico diferencia <1pp en S1. H14: HTE significativo en 5/11 segmentos."
-        },
-    ]
-
-    df_matrix = pd.DataFrame(matrix_data)
-
-    # Tabs por marco regulatorio
-    tab_gdpr, tab_ai, tab_all, tab_risk, tab_card = st.tabs(["GDPR","AI Act","Matriz completa","Panel de Riesgo","Model Card"])
-
-    with tab_gdpr:
-        st.markdown("**Implementacion de principios GDPR en el sistema**")
-        st.caption("Cada fila muestra como un articulo del GDPR se traduce en una decision de arquitectura o interfaz concreta, con evidencia empirica de los hallazgos.")
-        gdpr_items = ["Transparencia","Consentimiento granular","Minimizacion de datos","Explicacion accionable","Trazabilidad y auditabilidad","Supervision humana"]
-        df_gdpr = df_matrix[df_matrix["Principio"].isin(gdpr_items)].copy()
-        for _, row in df_gdpr.iterrows():
-            with st.expander(f"**{row['Principio']}** — {row['Marco']}"):
-                col_a, col_b = st.columns(2)
-                with col_a:
-                    st.markdown("**Riesgo mitigado**")
-                    st.warning(row["Riesgo mitigado"])
-                    st.markdown("**Implementacion tecnica**")
-                    st.info(row["Implementacion tecnica"])
-                with col_b:
-                    st.markdown("**Evidencia empirica**")
-                    st.success(row["Evidencia empirica"])
-
-    with tab_ai:
-        st.markdown("**Implementacion de principios del AI Act en el sistema**")
-        st.caption("El AI Act (2024) clasifica los sistemas de recomendacion como IA de alto riesgo en contextos criticos. Esta matriz muestra como el sistema anticipa sus requisitos.")
-        ai_items = ["Transparencia","Minimizacion de datos","No discriminacion / Fairness","Trazabilidad y auditabilidad","Supervision humana","Robustez y precision"]
-        df_ai = df_matrix[df_matrix["Principio"].isin(ai_items)].copy()
-        for _, row in df_ai.iterrows():
-            with st.expander(f"**{row['Principio']}** — {row['Marco']}"):
-                col_a, col_b = st.columns(2)
-                with col_a:
-                    st.markdown("**Riesgo mitigado**")
-                    st.warning(row["Riesgo mitigado"])
-                    st.markdown("**Implementacion tecnica**")
-                    st.info(row["Implementacion tecnica"])
-                with col_b:
-                    st.markdown("**Evidencia empirica**")
-                    st.success(row["Evidencia empirica"])
-
-    with tab_all:
-        st.markdown("**Matriz completa — 8 principios regulatorios**")
-        st.caption("Vision consolidada de todos los principios implementados. Cada fila puede usarse como referencia para el capitulo de metodologia y discusion de la tesis.")
-        st.dataframe(
-            df_matrix[["Principio","Marco","Implementacion tecnica","Evidencia empirica"]],
-            hide_index=True, use_container_width=True
-        )
-        st.write("")
-        col_s1, col_s2, col_s3, col_s4 = st.columns(4)
-        col_s1.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">8</div><div class="kpi-label">Principios implementados</div></div>', unsafe_allow_html=True)
-        col_s2.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">19</div><div class="kpi-label">Hallazgos como evidencia</div></div>', unsafe_allow_html=True)
-        col_s3.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">2</div><div class="kpi-label">Marcos regulatorios (GDPR + AI Act)</div></div>', unsafe_allow_html=True)
-        col_s4.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">9</div><div class="kpi-label">Pantallas de la app como evidencia</div></div>', unsafe_allow_html=True)
-        st.write("")
-        st.markdown("""
-        <div class="rec-card" style="border-color:#1D9E75">
-          <div style="font-size:0.85rem;font-weight:600;color:#E8E6E0;margin-bottom:6px">Contribucion diferencial de esta tesis</div>
-          <div style="font-size:0.82rem;color:#8A8880;line-height:1.7">
-            La mayoria de la literatura describe principios regulatorios pero no los implementa en sistemas reales.<br>
-            Esta tesis demuestra que <b style="color:#1D9E75">regulacion y ML no son mundos separados</b>: cada principio del GDPR y el AI Act
-            tiene un correlato tecnico concreto, medible empiricamente con los 19 hallazgos del estudio.<br><br>
-            Referentes mas cercanos: Wachter et al. (contrafactual), IBM FactSheets, NIST AI RMF.<br>
-            Diferencial: sistema experimental completo con evaluacion empirica integrada.
-          </div>
-        </div>
-        """, unsafe_allow_html=True)
-
-    with tab_risk:
-        st.markdown("**Panel de riesgo regulatorio del sistema**")
-        st.caption("Semaforo de compliance basado en evidencia empirica de los 19 hallazgos. Verde = implementado con evidencia. Amarillo = mitigado parcialmente. Rojo = limitacion estructural sin solucion completa.")
-        st.write("")
-
-        riesgos = [
-            {"icono":"🟢","riesgo":"Transparencia XAI","estado":"Implementado","evidencia":"SHAP-LIME rho=1.00. 100% recomendaciones con razon visible. Co-compra SHAP=64.8%.","mitigacion":"SHAP + LIME generan razones locales por recomendacion. Pills verdes en cada producto.","impacto":"Alto"},
-            {"icono":"🟢","riesgo":"Trazabilidad y auditabilidad","estado":"Implementado","evidencia":"explain_type registra senal dominante. 19 hallazgos documentados en CSV auditable.","mitigacion":"Pipeline reproducible en Colab. xai_master_findings_table.csv como registro formal.","impacto":"Alto"},
-            {"icono":"🟢","riesgo":"Robustez de senales XAI","estado":"Implementado","evidencia":"Senales independientes: |rho|<0.09 en 9/10 pares. Calibracion perfecta rho=1.00.","mitigacion":"5 senales complementarias sin redundancia. Modelo hibrido ALS + BPR + co-compra.","impacto":"Alto"},
-            {"icono":"🟢","riesgo":"Neutralidad ante privacidad","estado":"Implementado","evidencia":"ANOVA ILD p=0.16 (no significativo). Variacion SHAP entre grupos = 0.9%.","mitigacion":"privacy_level con 3 niveles. Señales excluidas segun configuracion del usuario.","impacto":"Alto"},
-            {"icono":"🟢","riesgo":"Consentimiento granular","estado":"Implementado","evidencia":"HTE experimento: +0.04 razones promedio en grupo tratado (p<0.001 en historial rico).","mitigacion":"share_history configurable. Experimento de consentimiento aleatorio con 375 usuarios.","impacto":"Medio"},
-            {"icono":"🟡","riesgo":"Sesgo de popularidad (fairness)","estado":"Mitigado parcialmente","evidencia":"rho(frecuencia, hit_rate)=-0.233. Q4 hit_rate=41.2% vs Q1=60.4%.","mitigacion":"MMR para diversificacion en el ranking. Identificado y documentado como limitacion.","impacto":"Alto"},
-            {"icono":"🟡","riesgo":"Cobertura desigual","estado":"Mitigado parcialmente","evidencia":"36% sin recomendaciones. Cold-start explica solo 23.9% — 76% son usuarios de nicho.","mitigacion":"Fallback a popularidad para usuarios sin candidatos. Documentado en H16.","impacto":"Alto"},
-            {"icono":"🔴","riesgo":"Cold-start extremo","estado":"Sin mitigacion completa","evidencia":"433 usuarios con <=37 compras sin cobertura. Grafos de co-compra insuficientemente densos.","mitigacion":"Sin solucion estructural implementada. Trabajo futuro: embeddings de contenido o hibrido frio.","impacto":"Alto"},
-        ]
-
-        import pandas as pd
-        # Contadores de semaforo
-        n_verde  = sum(1 for r in riesgos if r["icono"]=="🟢")
-        n_amarillo = sum(1 for r in riesgos if r["icono"]=="🟡")
-        n_rojo   = sum(1 for r in riesgos if r["icono"]=="🔴")
-        k1,k2,k3,k4 = st.columns(4)
-        k1.markdown('<div class="kpi-box"><div class="kpi-value" style="color:#1D9E75">' + str(n_verde) + '</div><div class="kpi-label">🟢 Implementados</div></div>', unsafe_allow_html=True)
-        k2.markdown('<div class="kpi-box"><div class="kpi-value" style="color:#EF9F27">' + str(n_amarillo) + '</div><div class="kpi-label">🟡 Mitigados parcialmente</div></div>', unsafe_allow_html=True)
-        k3.markdown('<div class="kpi-box"><div class="kpi-value" style="color:#D85A30">' + str(n_rojo) + '</div><div class="kpi-label">🔴 Sin mitigacion completa</div></div>', unsafe_allow_html=True)
-        k4.markdown('<div class="kpi-box"><div class="kpi-value">8</div><div class="kpi-label">Total riesgos evaluados</div></div>', unsafe_allow_html=True)
-        st.write("")
-
-        for r in riesgos:
-            color_border = "#1D9E75" if r["icono"]=="🟢" else "#EF9F27" if r["icono"]=="🟡" else "#D85A30"
-            with st.expander(f"{r['icono']} **{r['riesgo']}** — {r['estado']}"):
-                col_e1, col_e2 = st.columns(2)
-                with col_e1:
-                    st.markdown("**Evidencia empirica**")
-                    st.info(r["evidencia"])
-                with col_e2:
-                    st.markdown("**Mitigacion implementada**")
-                    if r["icono"] == "🟢":
-                        st.success(r["mitigacion"])
-                    elif r["icono"] == "🟡":
-                        st.warning(r["mitigacion"])
-                    else:
-                        st.error(r["mitigacion"])
-        st.write("")
-        st.caption("Alineado con NIST AI RMF, ISO/IEC 42001 y AI Act art. 9 (gestion de riesgos). El sistema identifica, documenta y mitiga riesgos de forma transparente — incluso cuando la mitigacion es parcial o inexistente.")
-
-    with tab_card:
-        st.markdown("**Model Card — Ficha tecnica del sistema**")
-        st.caption("Documentacion formal del sistema al estilo Google Model Cards y IBM AI FactSheets. Describe el modelo, sus metricas, limitaciones, uso previsto y contexto regulatorio.")
-        st.write("")
-
-        col_mc1, col_mc2 = st.columns(2)
-        with col_mc1:
-            st.markdown("#### Descripcion del sistema")
-            st.markdown("""
-| Campo | Valor |
-|-------|-------|
-| **Nombre** | Sistema de Recomendacion Explicable |
-| **Version** | 1.0 (Tesis de Maestria) |
-| **Tipo** | Recomendador hibrido co-compra |
-| **Arquitectura** | Item-item + ALS + BPR + ensamble |
-| **Dataset** | Amazon Purchases 2018-2024 |
-| **Usuarios** | 5,027 |
-| **Items** | 939,083 ASINs |
-| **Periodo** | 2018-2024 |
-| **XAI** | SHAP + LIME (rho=1.00) |
-            """)
-
-            st.markdown("#### Performance offline")
-            st.markdown("""
-| Metrica | Valor |
-|---------|-------|
-| **NDCG@10** | 0.050 |
-| **Hit rate D10** | 4.35% |
-| **Hit rate D1** | 0.16% |
-| **Ratio D10/D1** | 27x |
-| **Calibracion** | rho=1.00 |
-| **SHAP-LIME concordancia** | rho=1.00 |
-            """)
-
-            st.markdown("#### Privacidad y consentimiento")
-            st.markdown("""
-| Campo | Valor |
-|-------|-------|
-| **Niveles de privacidad** | 3 (No privada / Moderada / Sensible) |
-| **Historial ocultable** | Si |
-| **Experimento consentimiento** | 375 usuarios, efecto +0.04 razones |
-| **Datos sensibles** | Anonimizados, sin PII |
-| **Marco regulatorio** | GDPR + AI Act |
-            """)
-
-        with col_mc2:
-            st.markdown("#### Cobertura y fairness")
-            st.markdown("""
-| Campo | Valor |
-|-------|-------|
-| **Usuarios cubiertos** | 3,217 / 5,027 (64%) |
-| **Sin recomendaciones** | 1,810 (36%) |
-| **Causa principal** | Densidad insuficiente en grafo |
-| **Sesgo popularidad** | rho=-0.233 (documentado) |
-| **Q4 hit rate** | 41.2% |
-| **Q1 hit rate** | 60.4% |
-| **ILD media** | 6.84 categorias |
-| **ILD neutral a privacidad** | ANOVA p=0.16 |
-            """)
-
-            st.markdown("#### Uso previsto (Intended Use)")
-            st.success("Demostracion academica de sistemas de recomendacion explicables. Investigacion en XAI, AI Governance y compliance regulatorio. Prototipo funcional para validacion de hipotesis.")
-
-            st.markdown("#### Fuera de alcance (Out-of-scope)")
-            st.error("Uso en produccion comercial sin auditoría adicional. Recomendaciones en tiempo real con datos frescos. Usuarios fuera del rango del dataset Amazon Purchases 2018-2024.")
-
-            st.markdown("#### Limitaciones conocidas")
-            st.warning("""
-- Cold-start extremo: sin solucion estructural para usuarios con <37 compras
-- Sesgo de popularidad: MMR mitiga pero no elimina rho=-0.233
-- Cobertura de nicho: ABIS_BOOK con 498 usuarios sin cobertura
-- Señal temporal: peso W=20% pero importancia SHAP=1.7%
-- Validacion externa: sin encuesta de usuarios reales (trabajo futuro)
-            """)
-
-        st.write("")
-        st.markdown("#### Hallazgos XAI — resumen ejecutivo")
-        resumen_h = [
-            {"N":"H1-H2","Cat":"Senal dominante","Hallazgo":"Co-compra SHAP=64.8% (peso=40%). Contraste Top#1 vs Bottom#N: 13x."},
-            {"N":"H3-H4","Cat":"Validacion","Hallazgo":"SHAP-LIME rho=1.00. Calibracion perfecta: D10 tiene 27x mas hits que D1."},
-            {"N":"H5-H7","Cat":"Diseno","Hallazgo":"Neutralidad privacidad 0.9%. Confianza local 0.807. Señales independientes."},
-            {"N":"H8-H9","Cat":"Comportamiento","Hallazgo":"Umbral implicito pos 1-3. Fallback por categoria (Books 67.6%)."},
-            {"N":"H10-H11","Cat":"Robustez/Limitacion","Hallazgo":"Cold-start vs historial rico <1pp. Senal temporal W=20% pero SHAP=1.7%."},
-            {"N":"H12-H13","Cat":"Anomalia","Hallazgo":"Grupo 4 razones: hit rate=36.5%. Grupo 1 razon: 12.23%."},
-            {"N":"H14","Cat":"HTE","Hallazgo":"Historial rico +0.064 (p<0.001) vs cold-start +0.026 (p=0.60 no sig.)."},
-            {"N":"H15","Cat":"Fairness","Hallazgo":"rho(frecuencia, hit_rate)=-0.233. Sesgo de popularidad estructural."},
-            {"N":"H16","Cat":"Cobertura","Hallazgo":"64% cubiertos. Cold-start explica solo 23.9% del 36% sin cobertura."},
-            {"N":"H17","Cat":"ILD","Hallazgo":"rho(ILD, hit_rate)=-0.562. Especializacion predice mejor. ILD neutral a privacidad."},
-            {"N":"H18","Cat":"Coherencia XAI","Hallazgo":"Repeat domina 8/10 categorias. Gift Card no usa Popularidad sino Repeat."},
-            {"N":"H19","Cat":"Contrafactual","Hallazgo":"92.2% factible (delta<=0.30). Gap mediano=0.025. Via: co-compra delta=0.063."},
-        ]
-        import pandas as pd
-        df_h = pd.DataFrame(resumen_h)
-        st.dataframe(df_h, hide_index=True, use_container_width=True)
