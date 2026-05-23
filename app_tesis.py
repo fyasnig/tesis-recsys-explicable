@@ -1082,7 +1082,7 @@ elif "Simulador" in pagina:
             m1,m2,m3 = st.columns(3)
             m1.markdown(f'<div class="kpi-box fade-in-up"><div class="kpi-value">{ao:.1f}</div><div class="kpi-label">Razones original</div></div>', unsafe_allow_html=True)
             m2.markdown(f'<div class="kpi-box fade-in-up"><div class="kpi-value" style="color:{dc}">{as_:.1f}</div><div class="kpi-label">Razones simulado</div></div>', unsafe_allow_html=True)
-        m3.markdown(f'<div class="kpi-box fade-in-up"><div class="kpi-value" style="color:{dc}">{d:+.1f}</div><div class="kpi-label">Diferencia</div></div>', unsafe_allow_html=True)
+            m3.markdown(f'<div class="kpi-box fade-in-up"><div class="kpi-value" style="color:{dc}">{d:+.1f}</div><div class="kpi-label">Diferencia</div></div>', unsafe_allow_html=True)
 
         # ── Graceful Degradation ─────────────────────────
         degradacion = {
@@ -1948,6 +1948,7 @@ elif "Comparar" in pagina:
                 explain = str(row.get('explain','')) if pd.notna(row.get('explain')) else ''
                 score   = f"{row['score_display']:.3f}" if 'score_display' in row and pd.notna(row.get('score_display')) else ''
                 emoji   = cat_emoji_map.get(cat,'🛒')
+                pills = ''
                 if not modo_bb:
                     pills   = ''.join(f'<span class="reason-pill">{r.strip()[:40]}</span>'
                                       for r in explain.split(' · ') if r.strip()) if explain.strip() else \
