@@ -786,10 +786,17 @@ if "Dashboard" in pagina:
     # ── RECOMENDACIONES + GRÁFICOS ────────────────────────
     st.markdown('<hr style="border-color:#2A2F45;margin:0.5rem 0 0.75rem">', unsafe_allow_html=True)
     st.caption("📊 **Métricas del sistema para este usuario.** El score máximo es 1.00 cuando el ítem tiene co-compra directa muy fuerte. Las razones promedio indican qué tan explicables son las recomendaciones: más razones = más contexto visible para el usuario.")
-    k1,k2,k3,k4 = st.columns(4)
+    if not modo_bb:
+        k1,k2,k3,k4 = st.columns(4)
+    else:
+        k1 = st.columns(1)[0]
+        k2 = k3 = k4 = None
     ms = ur['score_display'].max() if 'score_display' in ur.columns else 0
-    for col,val,lbl in [(k1,len(ur),"Recomendaciones"),(k2,f"{ur['nr'].mean():.1f}","Razones promedio"),
-                        (k3,f"{(ur['nr']>=1).mean():.0%}","Con ≥1 razón"),(k4,f"{ms:.2f}","Score máximo")]:
+    kpi_list = [(k1,len(ur),"Recomendaciones")]
+    if not modo_bb:
+        kpi_list += [(k2,f"{ur['nr'].mean():.1f}","Razones promedio"),
+                     (k3,f"{(ur['nr']>=1).mean():.0%}","Con ≥1 razón"),(k4,f"{ms:.2f}","Score máximo")]
+    for col,val,lbl in kpi_list:
         col.markdown(f'<div class="kpi-box fade-in-up"><div class="kpi-value">{val}</div><div class="kpi-label">{lbl}</div></div>', unsafe_allow_html=True)
 
     st.write("")
@@ -855,9 +862,10 @@ if "Dashboard" in pagina:
             if modo_bb:
                 pills = '<span style="font-size:0.78rem;color:rgba(138,136,128,0.35);font-style:italic">Explicacion no disponible</span>'
             else:
-                pills = ''.join(f'<span class="reason-pill">{r.strip()[:48]}</span>'
-                            for r in explain.split(' · ') if r.strip()) if explain.strip() else \
-                    '<span style="font-size:0.78rem;color:#8A8880;font-style:italic">Sin razones visibles</span>'
+                if not modo_bb:
+                    pills = ''.join(f'<span class="reason-pill">{r.strip()[:48]}</span>'
+                                for r in explain.split(' · ') if r.strip()) if explain.strip() else \
+                        '<span style="font-size:0.78rem;color:#8A8880;font-style:italic">Sin razones visibles</span>'
 
             # Métricas del producto como mini-stats
             prod_stats = ''
@@ -903,7 +911,8 @@ if "Dashboard" in pagina:
               <div style="margin-top:0.5rem">{pills}</div>
             </div>""", unsafe_allow_html=True)
 
-    with cc:
+    if not modo_bb:
+      with cc:
         st.markdown("**Señales explicativas usadas**")
         rc = {'Co-compra':0,'Afinidad':0,'Categoría':0,'Estacional.':0,'Popularidad':0,'Repeat':0,'Otras':0}
         for exp in ur['explain'].dropna():
@@ -1019,9 +1028,10 @@ elif "Simulador" in pagina:
         d = as_ - ao
         dc = "#1D9E75" if d>=0 else "#D85A30"
 
-        m1,m2,m3 = st.columns(3)
-        m1.markdown(f'<div class="kpi-box fade-in-up"><div class="kpi-value">{ao:.1f}</div><div class="kpi-label">Razones original</div></div>', unsafe_allow_html=True)
-        m2.markdown(f'<div class="kpi-box fade-in-up"><div class="kpi-value" style="color:{dc}">{as_:.1f}</div><div class="kpi-label">Razones simulado</div></div>', unsafe_allow_html=True)
+        if not modo_bb:
+            m1,m2,m3 = st.columns(3)
+            m1.markdown(f'<div class="kpi-box fade-in-up"><div class="kpi-value">{ao:.1f}</div><div class="kpi-label">Razones original</div></div>', unsafe_allow_html=True)
+            m2.markdown(f'<div class="kpi-box fade-in-up"><div class="kpi-value" style="color:{dc}">{as_:.1f}</div><div class="kpi-label">Razones simulado</div></div>', unsafe_allow_html=True)
         m3.markdown(f'<div class="kpi-box fade-in-up"><div class="kpi-value" style="color:{dc}">{d:+.1f}</div><div class="kpi-label">Diferencia</div></div>', unsafe_allow_html=True)
 
         # ── Graceful Degradation ─────────────────────────
@@ -1039,7 +1049,7 @@ elif "Simulador" in pagina:
         with col_conf:
             conf_color = "#1D9E75" if deg["confianza"]>=80 else ("#EF9F27" if deg["confianza"]>=60 else "#D85A30")
             st.markdown(f'<div class="kpi-box" style="padding:0.5rem 0.75rem"><div class="kpi-value" style="color:{conf_color};font-size:1.4rem">{deg["confianza"]}%</div><div class="kpi-label">Confianza del modelo</div></div>', unsafe_allow_html=True)
-        if deg["impacto"]:
+        if not modo_bb and deg["impacto"]:
             imp_html = '<div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.75rem">'
             for dim, val in deg["impacto"].items():
                 col_imp = "#1D9E75" if (val<0 and dim=="Riesgo inferencial") else ("#D85A30" if val<0 else "#1D9E75")
@@ -1067,7 +1077,10 @@ elif "Simulador" in pagina:
                     unsafe_allow_html=True)
                 continue
             ind   = "🟢" if nr>=2 else ("🟡" if nr==1 else "🔴")
-            pills = "".join(f'<span class="reason-pill">{r.strip()[:45]}</span>' for r in explain.split(" · ") if r.strip())
+            if not modo_bb:
+                pills = "".join(f'<span class="reason-pill">{r.strip()[:45]}</span>' for r in explain.split(" · ") if r.strip())
+            else:
+                pills = ""
             sc    = "#1D9E75" if score_deg>0.5 else ("#EF9F27" if score_deg>0.25 else "#D85A30")
             st.markdown(
                 f'<div class="rec-card"><div style="display:flex;justify-content:space-between;align-items:center"><div class="rec-rank">#{i}</div><div style="display:flex;align-items:center;gap:0.5rem"><span style="font-size:0.72rem;color:#8A8880">{ind} {nr} razones</span><span style="font-family:monospace;font-size:0.75rem;color:{sc};font-weight:600"> · {score_deg:.3f}</span><span style="font-size:0.62rem;color:rgba(138,136,128,0.5)">confianza</span></div></div><div class="rec-title" style="margin-top:0.25rem">{title}</div><div style="margin-top:0.3rem">{pills}</div></div>',
@@ -1570,9 +1583,10 @@ elif "Comparar" in pagina:
                 explain = str(row.get('explain','')) if pd.notna(row.get('explain')) else ''
                 score   = f"{row['score_display']:.3f}" if 'score_display' in row and pd.notna(row.get('score_display')) else ''
                 emoji   = cat_emoji_map.get(cat,'🛒')
-                pills   = ''.join(f'<span class="reason-pill">{r.strip()[:40]}</span>'
-                                  for r in explain.split(' · ') if r.strip()) if explain.strip() else \
-                          '<span style="font-size:0.74rem;color:#8A8880;font-style:italic">Sin razones</span>'
+                if not modo_bb:
+                    pills   = ''.join(f'<span class="reason-pill">{r.strip()[:40]}</span>'
+                                      for r in explain.split(' · ') if r.strip()) if explain.strip() else \
+                              '<span style="font-size:0.74rem;color:#8A8880;font-style:italic">Sin razones</span>'
                 st.markdown(f"""
                 <div class="rec-card">
                   <div style="display:flex;justify-content:space-between">
@@ -1584,7 +1598,8 @@ elif "Comparar" in pagina:
                 </div>""", unsafe_allow_html=True)
 
     st.markdown('<hr style="border-color:#2A2F45;margin:0.75rem 0">', unsafe_allow_html=True)
-    st.markdown("**Señales explicativas usadas por cada usuario**")
+    if not modo_bb:
+        st.markdown("**Señales explicativas usadas por cada usuario**")
 
     def get_sigs(ur):
         rc = {'Co-compra':0,'Afinidad':0,'Categoría':0,'Estacional.':0,'Popularidad':0,'Repeat':0,'Otras':0}
@@ -1708,8 +1723,12 @@ elif "Buscador" in pagina:
                     sample['Usuario']     = sample['Survey ResponseID'].apply(lambda x: f"···{str(x)[-8:]}")
                     sample['Score']       = sample['score_display'].map('{:.3f}'.format)
                     sample['Razones']     = sample['nr'].astype(str)
-                    sample['Explicación'] = sample['explain'].str[:65]
-                    st.dataframe(sample[['Usuario','privacy_level','Score','Razones','Explicación']],
+                    if not modo_bb:
+                        sample['Explicación'] = sample['explain'].str[:65]
+                        _cols = ['Usuario','privacy_level','Score','Razones','Explicación']
+                    else:
+                        _cols = ['Usuario','privacy_level','Score']
+                    st.dataframe(sample[_cols],
                                  hide_index=True, use_container_width=True)
             else:
                 st.info(f"Ningún producto con '{search_term}' tiene recomendaciones activas.")
