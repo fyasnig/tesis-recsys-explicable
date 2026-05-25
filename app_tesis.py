@@ -112,6 +112,148 @@ hr{border-color:#2A2F45;}
   letter-spacing: 0.08em;
 }
 
+
+/* ── KPI boxes premium ── */
+.kpi-box {
+    background: linear-gradient(135deg, #1E2130 0%, #181C28 100%) !important;
+    border: 1px solid rgba(255,255,255,0.06) !important;
+    border-radius: 14px !important;
+    padding: 1.1rem 1.2rem !important;
+    text-align: center !important;
+    position: relative !important;
+    overflow: hidden !important;
+    transition: border-color 0.3s ease, transform 0.2s ease !important;
+}
+.kpi-box::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(29,158,117,0.4), transparent);
+    opacity: 0; transition: opacity 0.3s;
+}
+.kpi-box:hover { border-color: rgba(29,158,117,0.25) !important; transform: translateY(-2px) !important; }
+.kpi-box:hover::before { opacity: 1; }
+.kpi-value {
+    font-family: 'DM Serif Display', serif !important;
+    font-size: 2rem !important;
+    color: #1D9E75 !important;
+    line-height: 1 !important;
+    margin-bottom: 0.3rem !important;
+    letter-spacing: -0.02em !important;
+}
+.kpi-label {
+    font-size: 0.68rem !important;
+    color: rgba(138,136,128,0.7) !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.1em !important;
+    font-weight: 500 !important;
+}
+/* ── Rec cards premium ── */
+.rec-card {
+    background: linear-gradient(135deg, #1A1E2E 0%, #141824 100%) !important;
+    border: 1px solid rgba(255,255,255,0.05) !important;
+    border-radius: 14px !important;
+    padding: 1rem 1.2rem !important;
+    margin-bottom: 0.6rem !important;
+    transition: border-color 0.25s ease, transform 0.2s ease, box-shadow 0.25s ease !important;
+    position: relative !important;
+}
+.rec-card::after {
+    content: '';
+    position: absolute; left: 0; top: 15%; bottom: 15%;
+    width: 2px; border-radius: 2px;
+    background: linear-gradient(180deg, transparent, #1D9E75, transparent);
+    opacity: 0; transition: opacity 0.3s;
+}
+.rec-card:hover {
+    border-color: rgba(29,158,117,0.2) !important;
+    transform: translateX(4px) !important;
+    box-shadow: -4px 0 20px rgba(29,158,117,0.08) !important;
+}
+.rec-card:hover::after { opacity: 1; }
+/* ── Reason pills premium ── */
+.reason-pill {
+    display: inline-block !important;
+    background: rgba(29,158,117,0.08) !important;
+    color: #1D9E75 !important;
+    border: 1px solid rgba(29,158,117,0.2) !important;
+    border-radius: 100px !important;
+    padding: 0.15rem 0.65rem !important;
+    font-size: 0.72rem !important;
+    font-weight: 500 !important;
+    margin: 0.1rem 0.05rem !important;
+    transition: background 0.2s, border-color 0.2s !important;
+}
+.reason-pill:hover { background: rgba(29,158,117,0.15) !important; border-color: rgba(29,158,117,0.4) !important; }
+/* ── Stat chips premium ── */
+.stat-chip {
+    display: inline-flex !important; align-items: center !important; gap: 0.3rem !important;
+    background: rgba(255,255,255,0.03) !important;
+    border: 1px solid rgba(255,255,255,0.07) !important;
+    color: #B4B2A9 !important; border-radius: 8px !important;
+    padding: 0.3rem 0.75rem !important; font-size: 0.75rem !important;
+    font-weight: 500 !important; margin: 0.15rem 0.1rem !important;
+    transition: border-color 0.2s !important;
+}
+.stat-chip:hover { border-color: rgba(29,158,117,0.3) !important; }
+/* ── Sidebar premium ── */
+section[data-testid="stSidebar"] {
+    background: #0F1219 !important;
+    border-right: 1px solid rgba(255,255,255,0.05) !important;
+}
+section[data-testid="stSidebar"] [data-testid="stRadio"] label {
+    border-radius: 8px !important; padding: 0.4rem 0.6rem !important;
+    transition: background 0.2s !important; margin: 1px 0 !important;
+}
+section[data-testid="stSidebar"] [data-testid="stRadio"] label:hover {
+    background: rgba(255,255,255,0.04) !important;
+}
+/* ── Tabs premium ── */
+.stTabs [data-baseweb="tab-list"] {
+    background: rgba(255,255,255,0.02) !important; border-radius: 10px !important;
+    padding: 3px !important; border: 1px solid rgba(255,255,255,0.05) !important; gap: 2px !important;
+}
+.stTabs [data-baseweb="tab"] {
+    border-radius: 8px !important; color: rgba(138,136,128,0.7) !important;
+    font-weight: 500 !important; font-size: 0.83rem !important; transition: color 0.2s !important;
+}
+.stTabs [aria-selected="true"] {
+    background: #1D9E75 !important; color: white !important;
+    box-shadow: 0 2px 8px rgba(29,158,117,0.3) !important;
+}
+/* ── Info boxes premium ── */
+[data-testid="stInfo"]    { background: rgba(29,158,117,0.06) !important; border: 1px solid rgba(29,158,117,0.2) !important; border-radius: 10px !important; border-left: 3px solid #1D9E75 !important; }
+[data-testid="stWarning"] { background: rgba(239,159,39,0.06) !important; border: 1px solid rgba(239,159,39,0.2) !important; border-radius: 10px !important; border-left: 3px solid #EF9F27 !important; }
+[data-testid="stError"]   { background: rgba(216,90,48,0.06) !important; border: 1px solid rgba(216,90,48,0.2) !important; border-radius: 10px !important; border-left: 3px solid #D85A30 !important; }
+[data-testid="stSuccess"] { background: rgba(29,158,117,0.06) !important; border: 1px solid rgba(29,158,117,0.2) !important; border-radius: 10px !important; border-left: 3px solid #1D9E75 !important; }
+/* ── Scrollbar premium ── */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(29,158,117,0.3); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(29,158,117,0.5); }
+/* ── Dataframes + Selectbox premium ── */
+[data-testid="stDataFrame"] { border-radius: 10px !important; overflow: hidden !important; }
+[data-testid="stSelectbox"] > div > div { background: #1E2130 !important; border: 1px solid rgba(255,255,255,0.08) !important; border-radius: 10px !important; }
+/* ── Tooltips ── */
+.kpi-tooltip { position: relative; display: inline-block; cursor: help; }
+.kpi-tooltip .tt-text {
+    visibility: hidden; opacity: 0; background: #1E2130; color: #B4B2A9;
+    border: 1px solid rgba(255,255,255,0.1); border-radius: 10px;
+    padding: 0.6rem 0.85rem; font-size: 0.74rem; line-height: 1.55;
+    width: 230px; text-align: left; position: absolute; z-index: 9999;
+    bottom: 130%; left: 50%; transform: translateX(-50%);
+    transition: opacity 0.2s ease; box-shadow: 0 8px 24px rgba(0,0,0,0.5); pointer-events: none;
+}
+.kpi-tooltip .tt-text::after {
+    content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
+    border: 5px solid transparent; border-top-color: rgba(255,255,255,0.1);
+}
+.kpi-tooltip:hover .tt-text { visibility: visible; opacity: 1; }
+.tt-icon { display: inline-block; color: rgba(138,136,128,0.4); font-size: 0.65rem; margin-left: 3px; vertical-align: super; cursor: help; transition: color 0.2s; }
+.kpi-tooltip:hover .tt-icon { color: rgba(29,158,117,0.7); }
+/* ── Page transitions ── */
+.main-header { animation: fadeInUp 0.4s ease both; }
+.main-sub    { animation: fadeInUp 0.4s ease 0.05s both; }
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -395,6 +537,47 @@ with st.sidebar:
 # ══════════════════════════════════════════════════════════
 # P1 — DASHBOARD DE USUARIO
 # ══════════════════════════════════════════════════════════
+
+st.markdown("""
+<script>
+(function() {
+  function animateCounter(el, target, duration) {
+    const isFloat = target % 1 !== 0;
+    const hasDollar = el.dataset.prefix === '$';
+    const start = performance.now();
+    function tick(now) {
+      const p = Math.min((now - start) / duration, 1);
+      const ease = 1 - Math.pow(1 - p, 4);
+      const val = target * ease;
+      el.textContent = (hasDollar ? '$' : '') +
+        (isFloat ? val.toFixed(2) : Math.floor(val).toLocaleString('es-AR'));
+      if (p < 1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  }
+  const observer = new MutationObserver(function(mutations) {
+    mutations.forEach(function(m) {
+      m.addedNodes.forEach(function(n) {
+        if (n.nodeType === 1) {
+          (n.querySelectorAll ? n.querySelectorAll('.kpi-value[data-target]') : []).forEach(function(el) {
+            const t = parseFloat(el.dataset.target);
+            if (!isNaN(t)) animateCounter(el, t, 900);
+          });
+        }
+      });
+    });
+  });
+  observer.observe(document.body, { childList: true, subtree: true });
+  setTimeout(function() {
+    document.querySelectorAll('.kpi-value[data-target]').forEach(function(el) {
+      const t = parseFloat(el.dataset.target);
+      if (!isNaN(t)) animateCounter(el, t, 900);
+    });
+  }, 200);
+})();
+</script>
+""", unsafe_allow_html=True)
+
 if "Dashboard" in pagina:
     # Sonido de bienvenida — se ejecuta una sola vez al entrar al dashboard
     if 'sonido_reproducido' not in st.session_state:
