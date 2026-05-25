@@ -954,6 +954,63 @@ elif "Simulador" in pagina:
               <div style="margin-top:0.3rem">{pills}</div>
             </div>""", unsafe_allow_html=True)
 
+    # ── Privacy-to-Utility Exchange ──────────────────────
+    st.write("")
+    st.markdown("---")
+    st.markdown("**Privacy-to-Utility Exchange — el costo real de cada nivel de privacidad**")
+    st.caption("Cada decision de privacidad tiene un costo algoritmico medible. Esta tabla muestra cuanto pierde y cuanto gana el usuario con cada nivel — consentimiento informado cuantificado.")
+    st.write("")
+
+    exchange_data = {
+        "Dimension": ["Razon co-compra visible","Razon afinidad marca","Razon categoria preferida",
+                      "Cobertura del sistema","Explicaciones por rec",
+                      "Perfilado longitudinal","Inferencia conductual","Trazabilidad cross-session"],
+        "Priv. Baja":     ["Si","Si","Si","64%","2.95","Alto","Alta","Alta"],
+        "Priv. Moderada": ["Si","Si","Si","64%","2.55","Medio","Media","Media"],
+        "Priv. Alta":     ["Si","No","No","64%","2.32","Bajo","Baja","Baja"],
+        "Tipo": ["utilidad","utilidad","utilidad","utilidad","utilidad","riesgo","riesgo","riesgo"],
+    }
+    import pandas as pd
+    df_ex = pd.DataFrame(exchange_data)
+    col_ex1, col_ex2 = st.columns(2)
+    with col_ex1:
+        st.markdown("**Lo que ganas compartiendo datos**")
+        df_util = df_ex[df_ex["Tipo"]=="utilidad"][["Dimension","Priv. Baja","Priv. Moderada","Priv. Alta"]]
+        st.dataframe(df_util, hide_index=True, use_container_width=True)
+    with col_ex2:
+        st.markdown("**Lo que proteges limitando datos**")
+        df_riesgo = df_ex[df_ex["Tipo"]=="riesgo"][["Dimension","Priv. Baja","Priv. Moderada","Priv. Alta"]]
+        st.dataframe(df_riesgo, hide_index=True, use_container_width=True)
+
+    st.write("")
+    categorias_r = ["Explicabilidad","Personalizacion","Cobertura","Protec. perfilado","Protec. inferencia","Minimizacion datos"]
+    niveles_r = {
+        "Priv. Baja":     [1.0, 1.0, 1.0, 0.1, 0.1, 0.1],
+        "Priv. Moderada": [0.85, 0.85, 1.0, 0.5, 0.5, 0.5],
+        "Priv. Alta":     [0.60, 0.40, 1.0, 1.0, 1.0, 1.0],
+    }
+    colores_r = [COLORS["primary"], COLORS["accent"], COLORS["secondary"]]
+    fig_radar = go.Figure()
+    for (nombre, valores), color in zip(niveles_r.items(), colores_r):
+        fig_radar.add_trace(go.Scatterpolar(
+            r=valores + [valores[0]],
+            theta=categorias_r + [categorias_r[0]],
+            fill="toself", name=nombre, line_color=color, opacity=0.8
+        ))
+    fig_radar.update_layout(
+        **pbase(),
+        polar=dict(
+            radialaxis=dict(visible=True, range=[0,1], gridcolor="rgba(255,255,255,0.08)",
+                            tickfont=dict(color="#8A8880",size=9)),
+            angularaxis=dict(gridcolor="rgba(255,255,255,0.08)", tickfont=dict(color="#B4B2A9",size=10))
+        ),
+        height=380,
+        legend=dict(orientation="h", y=-0.15, font=dict(color="#8A8880",size=10)),
+        margin=dict(l=40,r=40,t=20,b=60)
+    )
+    st.plotly_chart(fig_radar, use_container_width=True)
+    st.caption("El radar muestra el trade-off real entre utilidad algoritmica y proteccion de datos. No existe configuracion optima — es una decision del usuario segun sus prioridades. Consentimiento informado cuantificado.")
+
 # ══════════════════════════════════════════════════════════
 # P3 — ANÁLISIS XAI GLOBAL
 # ══════════════════════════════════════════════════════════
@@ -963,7 +1020,7 @@ elif "XAI" in pagina:
     st.write("")
     st.info("🔬 **Qué muestra esta pantalla:** Análisis global del modelo usando dos métodos de explicabilidad (SHAP y LIME). SHAP mide cuánto contribuye cada señal al score final en promedio. LIME construye modelos locales lineales alrededor de cada predicción. Que ambos métodos coincidan (ρ=1.00) valida que la interpretación es robusta y no depende del método elegido.")
 
-    t1,t2,t3,t4 = st.tabs(["📈 Importancia SHAP","🔗 Correlación señales","📉 Slice por posición","🎯 Calibración"])
+    t1,t2,t3,t4,t5 = st.tabs(["📈 Importancia SHAP","🔗 Correlación señales","📉 Slice por posición","🎯 Calibración","💰 Valor de tus datos"])
 
     FL = {'pct_shap_S1_copurchase':'Co-compra','pct_shap_S2_affinities':'Afinidad perfil',
           'pct_shap_S3_temporal_eff':'Estacionalidad','pct_shap_S4_recency_item':'Recencia',
@@ -1086,6 +1143,73 @@ elif "XAI" in pagina:
                 st.markdown("""<div style="background:#1E2130;border:1px solid #2A2F45;border-radius:10px;padding:0.85rem;font-size:0.79rem;color:#8A8880;margin-top:0.5rem;line-height:1.7">
                   El score predice compras reales de forma monotónica perfecta — <b style="color:#1D9E75">validez externa</b> del modelo.
                 </div>""", unsafe_allow_html=True)
+
+    with t5:
+        st.markdown("**Data Contribution Index (DCI) — cuanto vale cada dato tuyo para el modelo**")
+        st.caption("Cada senal del modelo usa un tipo de dato personal distinto. El DCI muestra cuanto contribuye cada dato al score final, medido con SHAP. Esto convierte la importancia tecnica en algo concreto: el valor real que tiene tu historial, tus marcas o tu estacionalidad para el algoritmo.")
+        st.write("")
+        dci_data = [
+            {"dato": "Historial de co-compras", "shap_pct": 64.8, "gdpr": "Art. 5 — Datos de comportamiento", "nivel": "Muy alto", "color": "#1D9E75",
+             "desc": "El dato mas valioso. El modelo lo usa para inferir que productos se compran juntos con tu historial. Sin el, la precision cae ~13%."},
+            {"dato": "Afinidad de perfil (marca/cat)", "shap_pct": 20.1, "gdpr": "Art. 5 — Preferencias inferidas", "nivel": "Alto", "color": "#534AB7",
+             "desc": "Tu marca y categoria favorita. El modelo lo usa para filtrar items coherentes con tu perfil. Ocultar esto reduce la personalizacion."},
+            {"dato": "Recencia del item", "shap_pct": 9.1, "gdpr": "Art. 5 — Datos temporales", "nivel": "Medio", "color": "#EF9F27",
+             "desc": "Hace cuanto fue comprado el item por otros. Dato agregado, no individual — bajo riesgo de privacidad, contribucion media."},
+            {"dato": "Popularidad del item", "shap_pct": 4.3, "gdpr": "Art. 5 — Datos publicos agregados", "nivel": "Bajo", "color": "#B4B2A9",
+             "desc": "Cuantos usuarios compraron el item. Dato completamente anonimo y agregado. El modelo NO necesita datos personales para calcular esto."},
+            {"dato": "Estacionalidad", "shap_pct": 1.7, "gdpr": "Art. 5 — Datos contextuales", "nivel": "Muy bajo", "color": "#D85A30",
+             "desc": "Patron de compra por epoca del ano. Contribucion marginal. El sistema NO necesita este dato — validacion de minimizacion GDPR."},
+        ]
+        k1,k2,k3,k4 = st.columns(4)
+        k1.markdown('<div class="kpi-box"><div class="kpi-value">5</div><div class="kpi-label">Tipos de datos usados</div></div>', unsafe_allow_html=True)
+        k2.markdown('<div class="kpi-box"><div class="kpi-value" style="color:#1D9E75">64.8%</div><div class="kpi-label">Valor historial (DCI max)</div></div>', unsafe_allow_html=True)
+        k3.markdown('<div class="kpi-box"><div class="kpi-value" style="color:#D85A30">1.7%</div><div class="kpi-label">Valor estacionalidad (DCI min)</div></div>', unsafe_allow_html=True)
+        k4.markdown('<div class="kpi-box"><div class="kpi-value" style="color:#EF9F27">38x</div><div class="kpi-label">Ratio max/min DCI</div></div>', unsafe_allow_html=True)
+        st.write("")
+        col_dci1, col_dci2 = st.columns([2,3])
+        with col_dci1:
+            st.markdown("**Contribucion de cada dato al modelo**")
+            fig_dci = go.Figure(go.Bar(
+                y=[d["dato"] for d in dci_data],
+                x=[d["shap_pct"] for d in dci_data],
+                orientation="h",
+                marker_color=[d["color"] for d in dci_data],
+                marker_line_width=0,
+                text=[f'{d["shap_pct"]:.1f}%' for d in dci_data],
+                textposition="outside",
+                textfont=dict(color="#8A8880", size=10)
+            ))
+            fig_dci.update_layout(**pbase(), height=260,
+                                  margin=dict(l=0,r=60,t=10,b=0),
+                                  xaxis=dict(title="% contribucion SHAP", gridcolor="rgba(255,255,255,0.05)"),
+                                  yaxis=dict(gridcolor="rgba(0,0,0,0)"))
+            st.plotly_chart(fig_dci, use_container_width=True)
+            st.caption("Fuente: SHAP values sobre 87,526 pares usuario-item. H1: Co-compra SHAP=64.8% vs peso teorico=40%.")
+        with col_dci2:
+            st.markdown("**Detalle por tipo de dato**")
+            for d in dci_data:
+                bar_w = int(d["shap_pct"] / 64.8 * 100)
+                nivel_icon = {"Muy alto":"🔴","Alto":"🟠","Medio":"🟡","Bajo":"🟢","Muy bajo":"🟢"}.get(d["nivel"],"⚪")
+                st.markdown(
+                    f'<div class="rec-card" style="margin-bottom:0.5rem;padding:0.75rem 1rem">'
+                    f'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">'
+                    f'<div style="font-size:0.85rem;font-weight:600;color:#E8E6E0">{d["dato"]}</div>'
+                    f'<div style="font-size:0.72rem;color:{d["color"]};font-weight:600">{nivel_icon} {d["nivel"]}</div>'
+                    f'</div>'
+                    f'<div style="background:#2A2F45;border-radius:3px;height:4px;margin-bottom:6px">'
+                    f'<div style="background:{d["color"]};height:4px;border-radius:3px;width:{bar_w}%"></div>'
+                    f'</div>'
+                    f'<div style="font-size:0.76rem;color:#8A8880;line-height:1.5">{d["desc"]}</div>'
+                    f'<div style="font-size:0.68rem;color:rgba(138,136,128,0.5);margin-top:4px">{d["gdpr"]}</div>'
+                    f'</div>', unsafe_allow_html=True)
+        st.write("")
+        st.markdown('<div class="rec-card" style="border-color:#1D9E75">'
+            '<div style="font-size:0.88rem;font-weight:600;color:#E8E6E0;margin-bottom:6px">Validacion minimizacion de datos — GDPR art. 5(1)(c)</div>'
+            '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;font-size:0.82rem;color:#8A8880">'
+            '<div><b style="color:#1D9E75">Dato necesario:</b><br>Historial co-compras (DCI=64.8%). Sin el, el sistema no puede personalizar.</div>'
+            '<div><b style="color:#EF9F27">Dato marginal:</b><br>Estacionalidad (DCI=1.7%). El sistema funciona casi igual sin el.</div>'
+            '<div><b style="color:#1D9E75">Dato anonimo:</b><br>Popularidad (DCI=4.3%). No requiere datos personales.</div>'
+            '</div></div>', unsafe_allow_html=True)
 
 # ══════════════════════════════════════════════════════════
 # P4 — EXPERIMENTO & HALLAZGOS
