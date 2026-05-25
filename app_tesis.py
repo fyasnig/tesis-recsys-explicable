@@ -1020,24 +1020,56 @@ elif "Simulador" in pagina:
         m2.markdown(f'<div class="kpi-box fade-in-up"><div class="kpi-value" style="color:{dc}">{as_:.1f}</div><div class="kpi-label">Razones simulado</div></div>', unsafe_allow_html=True)
         m3.markdown(f'<div class="kpi-box fade-in-up"><div class="kpi-value" style="color:{dc}">{d:+.1f}</div><div class="kpi-label">Diferencia</div></div>', unsafe_allow_html=True)
 
+        # ── Graceful Degradation ─────────────────────────
+        degradacion = {
+            "No_privada":       {"confianza":94,"estrategia":"Personalized Ranking","color_est":"#1D9E75","factor_score":1.0,"ocultar_hist":False,"impacto":None},
+            "Privada_moderada": {"confianza":74,"estrategia":"Hybrid Ranking","color_est":"#EF9F27","factor_score":0.88,"ocultar_hist":False,"impacto":{"Personalizacion":-18,"Explicabilidad":-25,"Diversidad":8,"Riesgo inferencial":-45}},
+            "Privada_sensible": {"confianza":51,"estrategia":"Contextual/Global Ranking","color_est":"#D85A30","factor_score":0.72,"ocultar_hist":True,"impacto":{"Personalizacion":-42,"Explicabilidad":-31,"Diversidad":18,"Riesgo inferencial":-67}},
+        }
+        deg = degradacion.get(priv, degradacion["No_privada"])
+        col_est, col_conf = st.columns([2,1])
+        with col_est:
+            st.markdown(
+                f'<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-left:3px solid {deg["color_est"]};border-radius:8px;padding:0.5rem 0.85rem;font-size:0.78rem;margin-bottom:0.75rem"><span style="color:rgba(138,136,128,0.7);text-transform:uppercase;font-size:0.65rem;letter-spacing:0.1em">Estrategia activa</span><br><span style="color:{deg["color_est"]};font-weight:600">{deg["estrategia"]}</span></div>',
+                unsafe_allow_html=True)
+        with col_conf:
+            conf_color = "#1D9E75" if deg["confianza"]>=80 else ("#EF9F27" if deg["confianza"]>=60 else "#D85A30")
+            st.markdown(f'<div class="kpi-box" style="padding:0.5rem 0.75rem"><div class="kpi-value" style="color:{conf_color};font-size:1.4rem">{deg["confianza"]}%</div><div class="kpi-label">Confianza del modelo</div></div>', unsafe_allow_html=True)
+        if deg["impacto"]:
+            imp_html = '<div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.75rem">'
+            for dim, val in deg["impacto"].items():
+                col_imp = "#1D9E75" if (val<0 and dim=="Riesgo inferencial") else ("#D85A30" if val<0 else "#1D9E75")
+                signo = "+" if val>0 else ""
+                imp_html += f'<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:8px;padding:0.3rem 0.65rem;font-size:0.72rem"><span style="color:rgba(138,136,128,0.6)">{dim}</span> <span style="color:{col_imp};font-weight:600">{signo}{val}%</span></div>'
+            imp_html += '</div>'
+            st.markdown(imp_html, unsafe_allow_html=True)
         st.markdown("**Recomendaciones con el perfil seleccionado**")
+        items_ocultos = 0
         for i,(_, row) in enumerate(ur2.iterrows(), 1):
-            title   = str(row.get('title','Sin título'))[:65] if pd.notna(row.get('title')) else 'Sin título'
-            explain = str(row.get('esim','')) if pd.notna(row.get('esim')) else ''
+            title   = str(row.get("title","Sin título"))[:65] if pd.notna(row.get("title")) else "Sin título"
+            explain = str(row.get("esim","")) if pd.notna(row.get("esim")) else ""
             nr      = cnt(explain)
-            ind     = "🟢" if nr>=2 else ("🟡" if nr==1 else "🔴")
-            pills   = ''.join(f'<span class="reason-pill">{r.strip()[:45]}</span>'
-                              for r in explain.split(' · ') if r.strip()) if explain.strip() else \
-                      '<span style="font-size:0.76rem;color:#8A8880;font-style:italic">Sin razones visibles</span>'
-            st.markdown(f"""
-            <div class="rec-card">
-              <div style="display:flex;justify-content:space-between">
-                <div class="rec-rank">#{i}</div>
-                <div style="font-size:0.72rem;color:#8A8880">{ind} {nr} razones</div>
-              </div>
-              <div class="rec-title" style="margin-top:0.25rem">{title}</div>
-              <div style="margin-top:0.3rem">{pills}</div>
-            </div>""", unsafe_allow_html=True)
+            if nr == 0:
+                continue
+            score_r   = float(row.get("score_display",0.5)) if pd.notna(row.get("score_display")) else 0.5
+            score_deg = score_r * deg["factor_score"]
+            solo_hist = (deg["ocultar_hist"] and
+                         all("junto" in p or "recurrente" in p for p in str(row.get("explain","")).split(" · ") if p.strip()) and
+                         str(row.get("explain","")).strip() != "")
+            if solo_hist:
+                items_ocultos += 1
+                st.markdown(
+                    f'<div class="rec-card" style="opacity:0.45;border-color:rgba(216,90,48,0.3)"><div style="display:flex;justify-content:space-between"><div class="rec-rank" style="color:#D85A30">#{i} — No disponible</div><div style="font-size:0.7rem;color:#D85A30">Privacidad alta</div></div><div style="font-size:0.78rem;color:rgba(138,136,128,0.5);margin-top:0.3rem;font-style:italic">Este item requeria historial de co-compra. No disponible con privacidad alta.</div></div>',
+                    unsafe_allow_html=True)
+                continue
+            ind   = "🟢" if nr>=2 else ("🟡" if nr==1 else "🔴")
+            pills = "".join(f'<span class="reason-pill">{r.strip()[:45]}</span>' for r in explain.split(" · ") if r.strip())
+            sc    = "#1D9E75" if score_deg>0.5 else ("#EF9F27" if score_deg>0.25 else "#D85A30")
+            st.markdown(
+                f'<div class="rec-card"><div style="display:flex;justify-content:space-between;align-items:center"><div class="rec-rank">#{i}</div><div style="display:flex;align-items:center;gap:0.5rem"><span style="font-size:0.72rem;color:#8A8880">{ind} {nr} razones</span><span style="font-family:monospace;font-size:0.75rem;color:{sc};font-weight:600"> · {score_deg:.3f}</span><span style="font-size:0.62rem;color:rgba(138,136,128,0.5)">confianza</span></div></div><div class="rec-title" style="margin-top:0.25rem">{title}</div><div style="margin-top:0.3rem">{pills}</div></div>',
+                unsafe_allow_html=True)
+        if items_ocultos > 0:
+            st.caption(f"{items_ocultos} item(s) no disponibles con privacidad alta — el sistema usa fallback a ranking global.")
 
     # ── Privacy-to-Utility Exchange ──────────────────────
     st.write("")
@@ -1808,92 +1840,6 @@ elif "Equidad" in pagina or "Hallazgos 14" in pagina:
                                   xaxis=dict(gridcolor='rgba(0,0,0,0)'))
             st.plotly_chart(fig_cv, use_container_width=True)
             st.caption("Diferencias todas significativas (p<0.001) excepto ticket promedio (p=0.26). El sistema no discrimina por capacidad de pago — discrimina por volumen y diversidad de compras. El cold-start extremo explica solo el 23.9%: el 76% restante son usuarios especializados en nichos con grafos de co-compra poco densos.")
-
-elif "Equidad" in pagina or "Hallazgos 14" in pagina:
-    st.markdown('<div class="main-header">Hallazgos 14 · 15 · 16</div>', unsafe_allow_html=True)
-    st.markdown('<div class="main-sub">HTE · Fairness del catálogo · Cobertura del sistema</div>', unsafe_allow_html=True)
-    st.write("")
-    st.info("Tres análisis nuevos: HTE (efecto heterogéneo del consentimiento), fairness del catálogo (rho=-0.233) y cobertura del sistema (36% sin recomendaciones).")
-    t14, t15, t16 = st.tabs(["HTE del Experimento","Fairness del Catálogo","Cobertura del Sistema"])
-    with t14:
-        st.caption("Historial rico +0.064 (p<0.001) vs cold-start +0.026 (p=0.60 no sig.). El consentimiento solo funciona si hay historial que desbloquear.")
-        if hte_df is None:
-            st.info("Corré el bloque de mejoras para generar hte_experimento.csv.")
-        else:
-            tab_h1, tab_h2, tab_h3 = st.tabs(["Por historial","Por tipo","Por categoría"])
-            for tab_sub, dim in [(tab_h1,"Volumen historial"),(tab_h2,"Tipo de comprador"),(tab_h3,"Categoría top")]:
-                with tab_sub:
-                    sub = hte_df[hte_df["dimension"]==dim].sort_values("efecto_hte", ascending=True)
-                    if sub.empty:
-                        st.info("Sin datos.")
-                        continue
-                    clrs = [COLORS["primary"] if e>0.04 else COLORS["accent"] if e>=0 else COLORS["danger"] for e in sub["efecto_hte"]]
-                    fig = go.Figure(go.Bar(y=sub["segmento"].str[:30], x=sub["efecto_hte"],
-                                          orientation="h", marker_color=clrs, marker_line_width=0,
-                                          text=[f"p={p:.3f}" for p in sub["pval"]],
-                                          textposition="outside", textfont=dict(color="#8A8880",size=9)))
-                    fig.add_vline(x=0.04, line_dash="dash", line_color=COLORS["neutral"])
-                    fig.update_layout(**pbase(), height=max(220,len(sub)*65),
-                                      margin=dict(l=0,r=100,t=10,b=0),
-                                      xaxis=dict(title="Efecto HTE",gridcolor="rgba(255,255,255,0.05)"),
-                                      yaxis=dict(gridcolor="rgba(0,0,0,0)"))
-                    st.plotly_chart(fig, use_container_width=True)
-    with t15:
-        st.caption("rho=-0.233. Q4=41.2% vs Q1=60.4% hit rate. Sesgo de popularidad estructural.")
-        if fair_df is None:
-            st.info("Corré el bloque de mejoras para generar fairness_catalogo.csv.")
-        else:
-            col_f1, col_f2 = st.columns([3,2])
-            with col_f1:
-                fs = fair_df.sort_values("n_usuarios_rec", ascending=False).copy()
-                n_tot = len(fs)
-                fs["xi"] = np.arange(1, n_tot+1) / n_tot * 100
-                fs["yi"] = fs["n_usuarios_rec"].cumsum() / fs["n_usuarios_rec"].sum() * 100
-                fig_l = go.Figure()
-                fig_l.add_trace(go.Scatter(x=fs["xi"],y=fs["yi"],mode="lines",name="Real",line=dict(color=COLORS["primary"],width=2)))
-                fig_l.add_trace(go.Scatter(x=[0,100],y=[0,100],mode="lines",name="Perfecta",line=dict(color=COLORS["neutral"],width=1,dash="dash")))
-                fig_l.add_hline(y=50, line_color=COLORS["accent"], line_width=0.8, line_dash="dot")
-                fig_l.add_hline(y=80, line_color=COLORS["danger"], line_width=0.8, line_dash="dot")
-                fig_l.update_layout(**pbase(), height=280, margin=dict(l=0,r=0,t=10,b=0),
-                                    xaxis=dict(title="% catalogo",gridcolor="rgba(255,255,255,0.05)"),
-                                    yaxis=dict(title="% recs",gridcolor="rgba(255,255,255,0.05)"),
-                                    legend=dict(orientation="h",y=1.1,font=dict(color="#8A8880",size=10)))
-                st.plotly_chart(fig_l, use_container_width=True)
-            with col_f2:
-                if "cuartil_freq" in fair_df.columns and "hit_rate" in fair_df.columns:
-                    hr_q = fair_df.groupby("cuartil_freq", observed=True)["hit_rate"].mean()*100
-                    fig_q = go.Figure(go.Bar(x=[str(l) for l in hr_q.index], y=hr_q.values,
-                                            marker_color=[COLORS["neutral"],COLORS["secondary"],COLORS["accent"],COLORS["primary"]],
-                                            marker_line_width=0,
-                                            text=[f"{v:.1f}%" for v in hr_q.values],
-                                            textposition="outside",textfont=dict(color="#8A8880",size=10)))
-                    fig_q.update_layout(**pbase(), height=280, margin=dict(l=0,r=0,t=10,b=40),
-                                        yaxis=dict(title="Hit rate (%)",gridcolor="rgba(255,255,255,0.05)"),
-                                        xaxis=dict(gridcolor="rgba(0,0,0,0)",tickangle=-15))
-                    st.plotly_chart(fig_q, use_container_width=True)
-    with t16:
-        st.caption("3,217/5,027 usuarios cubiertos (64%). Cold-start extremo = 23.9% del total sin cobertura.")
-        if cov_df is None:
-            st.info("Corré el bloque de mejoras para generar cobertura_sistema.csv.")
-        else:
-            con_df2 = cov_df[cov_df["tiene_recs"]==True]
-            sin_df2 = cov_df[cov_df["tiene_recs"]==False]
-            k1,k2,k3,k4 = st.columns(4)
-            k1.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">' + str(len(con_df2)) + '</div><div class="kpi-label">Con cobertura (64%)</div></div>', unsafe_allow_html=True)
-            k2.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value" style="color:#D85A30">' + str(len(sin_df2)) + '</div><div class="kpi-label">Sin cobertura (36%)</div></div>', unsafe_allow_html=True)
-            k3.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">+226%</div><div class="kpi-label">Más productos</div></div>', unsafe_allow_html=True)
-            k4.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value" style="color:#EF9F27">23.9%</div><div class="kpi-label">Cold-start</div></div>', unsafe_allow_html=True)
-            st.write("")
-            metrics = [c for c in ["total_products","total_spent","num_orders","category_diversity"] if c in cov_df.columns]
-            labels = ["Productos","Gasto ($)","Ordenes","Div. cat."][:len(metrics)]
-            fig_cv = go.Figure()
-            fig_cv.add_trace(go.Bar(name="Con cobertura",x=labels,y=[con_df2[m].mean() for m in metrics],marker_color=COLORS["primary"],marker_line_width=0))
-            fig_cv.add_trace(go.Bar(name="Sin cobertura",x=labels,y=[sin_df2[m].mean() for m in metrics],marker_color=COLORS["danger"],marker_line_width=0))
-            fig_cv.update_layout(**pbase(), barmode="group", height=280, margin=dict(l=0,r=0,t=10,b=0),
-                                 legend=dict(orientation="h",y=1.1,font=dict(color="#8A8880",size=10)),
-                                 yaxis=dict(gridcolor="rgba(255,255,255,0.05)"),xaxis=dict(gridcolor="rgba(0,0,0,0)"))
-            st.plotly_chart(fig_cv, use_container_width=True)
-            st.caption("Diferencias significativas (p<0.001) excepto ticket promedio. El sistema discrimina por volumen, no por capacidad de pago.")
 
 elif "Diversidad" in pagina or "Hallazgos 17" in pagina:
     st.markdown('<div class="main-header">Hallazgos 17 · 18</div>', unsafe_allow_html=True)
