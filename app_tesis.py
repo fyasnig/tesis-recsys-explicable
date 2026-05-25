@@ -1684,7 +1684,8 @@ elif "Buscador" in pagina:
                             fig_pd.update_layout(**pbase(), height=240, margin=dict(l=0,r=0,t=10,b=0),
                                                  legend=dict(font=dict(color='#8A8880',size=9)))
                             st.plotly_chart(fig_pd, use_container_width=True)
-                    with col_r:
+                    if not modo_bb:
+                      with col_r:
                         st.markdown("**Razones más usadas para este ítem**")
                         reason_counts = {}
                         for exp in item_recs['explain'].dropna():
