@@ -521,6 +521,88 @@ with st.sidebar:
         "🎯  Diversidad & Coherencia XAI",
     ], label_visibility="collapsed")
 
+    # ── Estado dinámico del modelo ──────────────────
+    estado_cfg = {
+        "Dashboard":  {"Precision":"Alta","Privacidad":"Variable","Cobertura":"64%","XAI":"Activo"},
+        "Simulador":  {"Precision":"Alta","Privacidad":"Configurable","Cobertura":"64%","XAI":"Activo"},
+        "XAI":        {"Precision":"Alta","Privacidad":"Anonima","Cobertura":"100%","XAI":"Analisis"},
+        "Experimento":{"Precision":"Alta","Privacidad":"Mixta","Cobertura":"64%","XAI":"Validado"},
+        "Comparar":   {"Precision":"Alta","Privacidad":"Variable","Cobertura":"64%","XAI":"Activo"},
+        "Buscador":   {"Precision":"Alta","Privacidad":"Anonima","Cobertura":"64%","XAI":"Inverso"},
+        "Equidad":    {"Precision":"Alta","Privacidad":"Anonima","Cobertura":"64%","XAI":"Fairness"},
+        "Diversidad": {"Precision":"Media","Privacidad":"Neutral","Cobertura":"64%","XAI":"ILD"},
+        "Accionable": {"Precision":"Alta","Privacidad":"Neutral","Cobertura":"92%","XAI":"Contraf."},
+        "Gobernanza": {"Precision":"Alta","Privacidad":"Auditada","Cobertura":"64%","XAI":"Legal"},
+    }
+    estado_key = next((k for k in estado_cfg if k in pagina), "Dashboard")
+    estado = estado_cfg[estado_key]
+    colores_e = {
+        "Alta":"#1D9E75","Media":"#EF9F27","Baja":"#D85A30",
+        "Activo":"#1D9E75","Validado":"#1D9E75","Fairness":"#EF9F27",
+        "Legal":"#534AB7","Contraf.":"#5DCAA5","ILD":"#9B59B6","Inverso":"#534AB7","Analisis":"#5DCAA5",
+        "Variable":"#EF9F27","Configurable":"#EF9F27","Mixta":"#EF9F27",
+        "Anonima":"#1D9E75","Auditada":"#1D9E75","Neutral":"#1D9E75",
+        "64%":"#EF9F27","92%":"#1D9E75","100%":"#1D9E75",
+    }
+    rows_html = "".join(
+        f'<div class="modelo-estado-row">'
+        f'<span class="modelo-estado-key">{k}</span>'
+        f'<span class="modelo-estado-val" style="color:{colores_e.get(v,"#B4B2A9")}">{v}</span>'
+        f'</div>'
+        for k, v in estado.items()
+    )
+    st.markdown(
+        f'<div class="modelo-estado"><div class="modelo-estado-title">Estado del sistema</div>{rows_html}</div>',
+        unsafe_allow_html=True
+    )
+    st.write("")
+
+    # ── Guided Demo Mode ───────────────────────────────
+    if "demo_step" not in st.session_state:
+        st.session_state.demo_step = -1
+    if "demo_activo" not in st.session_state:
+        st.session_state.demo_activo = False
+    demo_guion = [
+        ("Dashboard de Usuario",   "1/6 — Perfil de usuario y recomendaciones con explicaciones XAI visibles."),
+        ("Simulador de Privacidad","2/6 — Cambia el nivel de privacidad y observa el impacto en las explicaciones."),
+        ("Analisis XAI Global",    "3/6 — Co-compra domina con SHAP=64.8%. SHAP-LIME rho=1.00 — interpretabilidad robusta."),
+        ("Experimento & Hallazgos","4/6 — Experimento causal: +0.04 razones con consentimiento. 19 hallazgos documentados."),
+        ("Equidad & Cobertura",    "5/6 — Sesgo popularidad rho=-0.233. 36% sin cobertura discrimina por volumen, no gasto."),
+        ("Gobernanza Regulatoria", "6/6 — Legal-by-Design Matrix: cada principio GDPR y AI Act implementado con evidencia."),
+    ]
+    if not st.session_state.demo_activo:
+        if st.button("▶  Guided Demo", use_container_width=True,
+                     help="Navega automaticamente por las pantallas clave con storytelling."):
+            st.session_state.demo_activo = True
+            st.session_state.demo_step = 0
+            st.rerun()
+    else:
+        step = st.session_state.demo_step
+        if 0 <= step < len(demo_guion):
+            nombre_paso, texto_paso = demo_guion[step]
+            st.markdown(f'<div class="demo-banner">🎬 {texto_paso}</div>', unsafe_allow_html=True)
+            col_prev, col_next, col_stop = st.columns([1,1,1])
+            with col_prev:
+                if st.button("◀", use_container_width=True, key="demo_prev"):
+                    if step > 0:
+                        st.session_state.demo_step -= 1
+                        st.rerun()
+            with col_next:
+                lbl = "▶" if step < len(demo_guion)-1 else "✓ Fin"
+                if st.button(lbl, use_container_width=True, key="demo_next"):
+                    if step < len(demo_guion)-1:
+                        st.session_state.demo_step += 1
+                    else:
+                        st.session_state.demo_activo = False
+                        st.session_state.demo_step = -1
+                    st.rerun()
+            with col_stop:
+                if st.button("✕", use_container_width=True, key="demo_stop"):
+                    st.session_state.demo_activo = False
+                    st.session_state.demo_step = -1
+                    st.rerun()
+            pagina = nombre_paso
+
     st.markdown("""<hr>
     <div style="font-size:0.7rem;color:#8A8880;line-height:1.8">
       <b style="color:#E8E6E0">Dataset:</b> Amazon Purchases<br>
@@ -766,7 +848,10 @@ if "Dashboard" in pagina:
             bar_pct   = min(int(score_val * 100), 100)
             bar_color = '#1D9E75' if score_val > 0.5 else ('#EF9F27' if score_val > 0.2 else '#534AB7')
 
-            pills = ''.join(f'<span class="reason-pill">{r.strip()[:48]}</span>'
+            if modo_bb:
+                pills = '<span style="font-size:0.78rem;color:rgba(138,136,128,0.35);font-style:italic">Explicacion no disponible</span>'
+            else:
+                pills = ''.join(f'<span class="reason-pill">{r.strip()[:48]}</span>'
                             for r in explain.split(' · ') if r.strip()) if explain.strip() else \
                     '<span style="font-size:0.78rem;color:#8A8880;font-style:italic">Sin razones visibles</span>'
 
