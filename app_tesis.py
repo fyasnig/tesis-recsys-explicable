@@ -656,6 +656,11 @@ st.markdown("""
 </script>
 """, unsafe_allow_html=True)
 
+
+def get_alias(uid, alias_map):
+    """Devuelve alias descriptivo del usuario."""
+    return alias_map.get(uid, f"Usuario {str(uid)[-6:]}")
+
 if "Dashboard" in pagina:
     # Sonido de bienvenida — se ejecuta una sola vez al entrar al dashboard
     if 'sonido_reproducido' not in st.session_state:
@@ -696,7 +701,7 @@ if "Dashboard" in pagina:
 
     users = sorted(recs['Survey ResponseID'].dropna().unique().tolist())
     uid = st.selectbox("Seleccioná un usuario", users,
-                       format_func=lambda x: f"Usuario ···{str(x)[-8:]}")
+                       format_func=lambda x: get_alias(x, alias_map))
 
     ur = recs[recs['Survey ResponseID']==uid].copy()
     ur['nr'] = ur['explain'].apply(cnt)
