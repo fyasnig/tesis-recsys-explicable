@@ -979,6 +979,8 @@ if "Dashboard" in pagina:
 # P2 — SIMULADOR DE PRIVACIDAD
 # ══════════════════════════════════════════════════════════
 elif "Simulador" in pagina:
+    modo_bb = st.session_state.get("modo_bb_global", False)
+    modo_bb = st.session_state.get("modo_bb_global", False)
     st.markdown('<div class="main-header">Simulador de Privacidad</div>', unsafe_allow_html=True)
     st.markdown('<div class="main-sub">Cambiá el nivel y observá el impacto en las explicaciones</div>', unsafe_allow_html=True)
     st.write("")
@@ -1500,6 +1502,8 @@ y auditable — exactamente lo que pide el AI Act art. 10.
 # P5 — COMPARAR USUARIOS
 # ══════════════════════════════════════════════════════════
 elif "Comparar" in pagina:
+    modo_bb = st.session_state.get("modo_bb_global", False)
+    modo_bb = st.session_state.get("modo_bb_global", False)
     st.markdown('<div class="main-header">Comparación de Usuarios</div>', unsafe_allow_html=True)
     st.markdown('<div class="main-sub">Recomendaciones y perfiles de dos usuarios lado a lado</div>', unsafe_allow_html=True)
     st.write("")
@@ -1633,6 +1637,8 @@ elif "Comparar" in pagina:
 # P6 — BUSCADOR DE ÍTEMS
 # ══════════════════════════════════════════════════════════
 elif "Buscador" in pagina:
+    modo_bb = st.session_state.get("modo_bb_global", False)
+    modo_bb = st.session_state.get("modo_bb_global", False)
     st.markdown('<div class="main-header">Buscador de Ítems</div>', unsafe_allow_html=True)
     st.markdown('<div class="main-sub">¿A quién se le recomendó este producto y por qué?</div>', unsafe_allow_html=True)
     st.write("")
