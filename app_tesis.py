@@ -396,6 +396,34 @@ with st.sidebar:
 # P1 — DASHBOARD DE USUARIO
 # ══════════════════════════════════════════════════════════
 if "Dashboard" in pagina:
+    # Sonido de bienvenida — se ejecuta una sola vez al entrar al dashboard
+    if 'sonido_reproducido' not in st.session_state:
+        st.session_state.sonido_reproducido = True
+        st.markdown("""
+        <script>
+        setTimeout(function() {
+          try {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            function tone(freq, t, dur, vol) {
+              const o = ctx.createOscillator();
+              const g = ctx.createGain();
+              o.connect(g); g.connect(ctx.destination);
+              o.type = 'sine';
+              o.frequency.setValueAtTime(freq, t);
+              g.gain.setValueAtTime(0, t);
+              g.gain.linearRampToValueAtTime(vol, t + 0.03);
+              g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+              o.start(t); o.stop(t + dur);
+            }
+            const t = ctx.currentTime;
+            tone(392.00, t + 0.00, 0.5, 0.08);
+            tone(523.25, t + 0.12, 0.5, 0.09);
+            tone(659.25, t + 0.22, 0.5, 0.08);
+            tone(783.99, t + 0.30, 0.7, 0.10);
+          } catch(e) {}
+        }, 300);
+        </script>
+        """, unsafe_allow_html=True)
     st.markdown('<div class="main-header">Dashboard de Usuario</div>', unsafe_allow_html=True)
     st.markdown('<div class="main-sub">Recomendaciones personalizadas con explicaciones XAI</div>', unsafe_allow_html=True)
     st.write("")
