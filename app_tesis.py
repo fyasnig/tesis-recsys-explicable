@@ -1100,20 +1100,69 @@ elif "Simulador" in pagina:
 
         # ── Graceful Degradation ─────────────────────────
         degradacion = {
-            "No_privada":       {"confianza":94,"estrategia":"Personalized Ranking","color_est":"#1D9E75","factor_score":1.0,"ocultar_hist":False,"impacto":None},
-            "Privada_moderada": {"confianza":74,"estrategia":"Hybrid Ranking","color_est":"#EF9F27","factor_score":0.88,"ocultar_hist":False,"impacto":{"Personalizacion":-18,"Explicabilidad":-25,"Diversidad":8,"Riesgo inferencial":-45}},
-            "Privada_sensible": {"confianza":51,"estrategia":"Contextual/Global Ranking","color_est":"#D85A30","factor_score":0.72,"ocultar_hist":True,"impacto":{"Personalizacion":-42,"Explicabilidad":-31,"Diversidad":18,"Riesgo inferencial":-67}},
+            "No_privada": {
+                "confianza":94, "factor_score":1.0, "ocultar_hist":False,
+                "estrategia":"Hyper-personalized AI", "color_est":"#1D9E75",
+                "descripcion": "El sistema utiliza señales longitudinales, afinidad de marca y comportamiento histórico para maximizar personalización. Todas las capacidades de inferencia están activas.",
+                "impacto": {"Personalización":92,"Explicabilidad":100,"Cobertura":64,"Riesgo inferencial":85},
+                "senales_activas": ["Historial de compras","Afinidad de marca","Categoría favorita","Señales estacionales","Popularidad del ítem","Co-compradores frecuentes"],
+                "senales_bloqueadas": []
+            },
+            "Privada_moderada": {
+                "confianza":74, "factor_score":0.88, "ocultar_hist":False,
+                "estrategia":"Hybrid AI", "color_est":"#EF9F27",
+                "descripcion": "Señales de perfil personal deshabilitadas. El sistema mantiene cobertura usando patrones agregados, co-compras y señales contextuales. Privacy-aware graceful degradation.",
+                "impacto": {"Personalización":74,"Explicabilidad":75,"Cobertura":64,"Riesgo inferencial":40},
+                "senales_activas": ["Señales estacionales","Popularidad del ítem","Co-compradores frecuentes"],
+                "senales_bloqueadas": ["Afinidad de marca","Categoría favorita"]
+            },
+            "Privada_sensible": {
+                "confianza":51, "factor_score":0.72, "ocultar_hist":True,
+                "estrategia":"Privacy-preserving AI", "color_est":"#D85A30",
+                "descripcion": "El sistema minimiza inferencias personales y prioriza señales globales y contextuales. Historial longitudinal deshabilitado. Recomendación basada en tendencias generales.",
+                "impacto": {"Personalización":50,"Explicabilidad":69,"Cobertura":64,"Riesgo inferencial":15},
+                "senales_activas": ["Señales estacionales","Popularidad del ítem"],
+                "senales_bloqueadas": ["Historial de compras","Afinidad de marca","Categoría favorita","Co-compradores frecuentes"]
+            },
         }
         deg = degradacion.get(priv, degradacion["No_privada"])
         if not modo_bb:
+            # ── Estrategia + Confianza ──────────────────────
             col_est, col_conf = st.columns([2,1])
             with col_est:
                 st.markdown(
-                    f'<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-left:3px solid {deg["color_est"]};border-radius:8px;padding:0.5rem 0.85rem;font-size:0.78rem;margin-bottom:0.75rem"><span style="color:rgba(138,136,128,0.7);text-transform:uppercase;font-size:0.65rem;letter-spacing:0.1em">Estrategia activa</span><br><span style="color:{deg["color_est"]};font-weight:600">{deg["estrategia"]}</span></div>',
+                    f'<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-left:3px solid {deg["color_est"]};border-radius:8px;padding:0.75rem 0.85rem;font-size:0.78rem;margin-bottom:0.75rem">'
+                    f'<span style="color:rgba(138,136,128,0.7);text-transform:uppercase;font-size:0.65rem;letter-spacing:0.1em">Estrategia activa</span><br>'
+                    f'<span style="color:{deg["color_est"]};font-weight:600;font-size:0.95rem">{deg["estrategia"]}</span><br>'
+                    f'<span style="color:#B4B2A9;font-size:0.75rem;line-height:1.5;display:block;margin-top:0.35rem">{deg["descripcion"]}</span>'
+                    f'</div>',
                     unsafe_allow_html=True)
             with col_conf:
                 conf_color = "#1D9E75" if deg["confianza"]>=80 else ("#EF9F27" if deg["confianza"]>=60 else "#D85A30")
                 st.markdown(f'<div class="kpi-box" style="padding:0.5rem 0.75rem"><div class="kpi-value" style="color:{conf_color};font-size:1.4rem">{deg["confianza"]}%</div><div class="kpi-label">Confianza del modelo</div></div>', unsafe_allow_html=True)
+            st.write("")
+            # ── Tabla de impacto algorítmico ────────────────
+            st.markdown("**Impacto algorítmico de este nivel de privacidad**")
+            imp = deg["impacto"]
+            imp_cols = st.columns(4)
+            imp_items = [
+                ("Personalización", imp["Personalización"], "%", "#1D9E75" if imp["Personalización"]>=75 else "#EF9F27" if imp["Personalización"]>=50 else "#D85A30"),
+                ("Explicabilidad",  imp["Explicabilidad"],  "%", "#1D9E75" if imp["Explicabilidad"]>=75  else "#EF9F27" if imp["Explicabilidad"]>=50  else "#D85A30"),
+                ("Cobertura",       imp["Cobertura"],       "%", "#1D9E75"),
+                ("Riesgo inferencial", imp["Riesgo inferencial"], "%", "#1D9E75" if imp["Riesgo inferencial"]<=30 else "#EF9F27" if imp["Riesgo inferencial"]<=60 else "#D85A30"),
+            ]
+            for col_i, (lbl, val, unit, color) in zip(imp_cols, imp_items):
+                col_i.markdown(f'<div class="kpi-box" style="padding:0.5rem 0.6rem"><div class="kpi-value" style="color:{color};font-size:1.2rem">{val}{unit}</div><div class="kpi-label">{lbl}</div></div>', unsafe_allow_html=True)
+            st.write("")
+            # ── Señales deshabilitadas ──────────────────────
+            if deg["senales_bloqueadas"]:
+                st.markdown("**🔒 Datos que el sistema ya NO utiliza con este nivel de privacidad:**")
+                bloq_html = "".join(
+                    f'<span style="display:inline-block;background:rgba(216,90,48,0.08);border:1px solid rgba(216,90,48,0.25);border-radius:20px;padding:0.2rem 0.7rem;font-size:0.75rem;color:#D85A30;margin:0.2rem 0.15rem">🔒 {s}</span>'
+                    for s in deg["senales_bloqueadas"]
+                )
+                st.markdown(bloq_html, unsafe_allow_html=True)
+                st.write("")
         if not modo_bb and deg["impacto"]:
             imp_html = '<div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.75rem">'
             for dim, val in deg["impacto"].items():
