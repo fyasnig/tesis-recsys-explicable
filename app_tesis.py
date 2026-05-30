@@ -1552,6 +1552,103 @@ elif "Simulador" in pagina:
             "a su privacidad frente a la calidad de las recomendaciones."
         )
 
+        # ── Privacy-Utility Frontier ─────────────────────
+        st.write("")
+        st.markdown("---")
+        st.markdown("**Privacy-Utility Frontier — el punto óptimo entre privacidad y rendimiento**")
+        st.caption(
+            "Inspirada en la frontera eficiente de Markowitz, esta curva muestra las configuraciones "
+            "alcanzables del sistema. Cada punto representa un nivel de privacidad con su correspondiente "
+            "trade-off entre utilidad algorítmica y protección de datos. No existe un punto dominante: "
+            "la elección óptima depende de las preferencias del usuario."
+        )
+        # Datos de los tres niveles de privacidad
+        puf_data = [
+            {"nivel": "No_privada",       "label": "🟢 Priv. Baja",  "privacidad": 0.15, "utilidad": 0.92, "color": "#1D9E75"},
+            {"nivel": "Privada_moderada", "label": "🟡 Priv. Media", "privacidad": 0.50, "utilidad": 0.74, "color": "#EF9F27"},
+            {"nivel": "Privada_sensible", "label": "🔴 Priv. Alta",  "privacidad": 0.85, "utilidad": 0.50, "color": "#D85A30"},
+        ]
+        # Punto activo según selección del usuario
+        priv_to_idx = {"No_privada": 0, "Privada_moderada": 1, "Privada_sensible": 2}
+        idx_activo = priv_to_idx.get(priv, 0)
+        xs = [d["privacidad"] for d in puf_data]
+        ys = [d["utilidad"]   for d in puf_data]
+        labels = [d["label"]  for d in puf_data]
+        colors = [d["color"]  for d in puf_data]
+        fig_puf = go.Figure()
+        # Área bajo la curva — zona alcanzable
+        fig_puf.add_trace(go.Scatter(
+            x=xs + [xs[-1], xs[0]],
+            y=ys + [0, 0],
+            fill="toself",
+            fillcolor="rgba(29,158,117,0.06)",
+            line=dict(color="rgba(0,0,0,0)"),
+            showlegend=False, hoverinfo="skip"
+        ))
+        # Curva de la frontera
+        fig_puf.add_trace(go.Scatter(
+            x=xs, y=ys,
+            mode="lines",
+            line=dict(color="#1D9E75", width=2, dash="dot"),
+            name="Frontera alcanzable",
+            showlegend=True
+        ))
+        # Puntos de cada nivel
+        for i, d in enumerate(puf_data):
+            size = 18 if i == idx_activo else 10
+            fig_puf.add_trace(go.Scatter(
+                x=[d["privacidad"]], y=[d["utilidad"]],
+                mode="markers+text",
+                marker=dict(size=size, color=d["color"],
+                            line=dict(width=2 if i==idx_activo else 0, color="#FFFFFF")),
+                text=[d["label"]],
+                textposition="top center",
+                textfont=dict(color=d["color"], size=11, family="Arial"),
+                name=d["label"],
+                hovertemplate=(
+                    f'<b>{d["label"]}</b><br>'
+                    f'Protección: {d["privacidad"]:.0%}<br>'
+                    f'Utilidad: {d["utilidad"]:.0%}<extra></extra>'
+                )
+            ))
+        # Anotación del punto activo
+        d_act = puf_data[idx_activo]
+        fig_puf.add_annotation(
+            x=d_act["privacidad"], y=d_act["utilidad"],
+            text="← Tu configuración actual",
+            showarrow=True, arrowhead=2,
+            arrowcolor=d_act["color"],
+            font=dict(color=d_act["color"], size=11),
+            ax=60, ay=-30
+        )
+        fig_puf.update_layout(
+            **pbase(),
+            height=340,
+            xaxis=dict(
+                title="Nivel de protección de datos →",
+                range=[-0.05, 1.05],
+                tickformat=".0%",
+                gridcolor="rgba(255,255,255,0.05)"
+            ),
+            yaxis=dict(
+                title="Utilidad algorítmica →",
+                range=[0.3, 1.05],
+                tickformat=".0%",
+                gridcolor="rgba(255,255,255,0.05)"
+            ),
+            legend=dict(orientation="h", y=-0.2,
+                        font=dict(color="#8A8880", size=10)),
+            margin=dict(l=40, r=40, t=20, b=60)
+        )
+        st.plotly_chart(fig_puf, use_container_width=True)
+        st.caption(
+            "La zona sombreada representa el espacio de configuraciones alcanzables por el sistema. "
+            "El punto resaltado corresponde a tu configuración actual. "
+            "A diferencia de la frontera eficiente de Markowitz, aquí no existe una solución óptima universal: "
+            "el punto adecuado depende de la valoración individual que cada usuario asigne "
+            "a su privacidad frente a la calidad de las recomendaciones."
+        )
+
 
 # ══════════════════════════════════════════════════════════
 # P3 — ANÁLISIS XAI GLOBAL
