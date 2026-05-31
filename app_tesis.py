@@ -519,7 +519,6 @@ with st.sidebar:
         "⚖️  Comparar Usuarios",
         "🔎  Buscador de Ítems",
         "📈  Equidad & Cobertura",
-        "🎯  Diversidad & Coherencia XAI",
         "🔮  Explicación Accionable",
         "⚖️  Gobernanza Regulatoria",
     ], label_visibility="collapsed")
