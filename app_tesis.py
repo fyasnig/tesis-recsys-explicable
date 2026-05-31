@@ -1406,7 +1406,6 @@ elif "Simulador" in pagina:
             "U(c)=NDCG/NDCGmax · P(c)=Σ(wₛ·(1−cₛ))/Σwₛ · pesos normativos GDPR."
         )
 
-
 # ══════════════════════════════════════════════════════════
 # P3 — ANÁLISIS XAI GLOBAL
 # ══════════════════════════════════════════════════════════
