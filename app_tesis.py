@@ -514,17 +514,37 @@ with st.sidebar:
         Tesis de Maestría · Franco Yasnig</div>
     </div><hr>""", unsafe_allow_html=True)
 
-    pagina = st.radio("Nav", [
-        "🏠  Dashboard de Usuario",
-        "🔒  Simulador de Privacidad",
-        "📊  Análisis XAI Global",
-        "🧪  Experimento & Hallazgos",
-        "⚖️  Comparar Usuarios",
-        "🔎  Buscador de Ítems",
-        "📈  Equidad & Cobertura",
-        "🔮  Explicación Accionable",
-        "⚖️  Gobernanza Regulatoria",
-    ], label_visibility="collapsed")
+    # ── Modo Black-Box filtra el menú ─────────────────
+    if "modo_bb_global" not in st.session_state:
+        st.session_state.modo_bb_global = False
+
+    modo_bb_global = st.toggle("⬛ Modo Black-Box",
+        value=st.session_state.modo_bb_global,
+        help="Activo: muestra el sistema sin explicaciones XAI. Desactivo: muestra todas las pantallas.")
+    st.session_state.modo_bb_global = modo_bb_global
+
+    if modo_bb_global:
+        st.markdown('<div class="defensa-badge" style="background:rgba(216,90,48,0.1);border-color:rgba(216,90,48,0.4);color:#D85A30">⬛ MODO BLACK-BOX</div>', unsafe_allow_html=True)
+        opciones_menu = [
+            "🏠  Dashboard de Usuario",
+            "🔒  Simulador de Privacidad",
+            "⚖️  Comparar Usuarios",
+            "🔎  Buscador de Ítems",
+        ]
+    else:
+        opciones_menu = [
+            "🏠  Dashboard de Usuario",
+            "🔒  Simulador de Privacidad",
+            "📊  Análisis XAI Global",
+            "🧪  Experimento & Hallazgos",
+            "⚖️  Comparar Usuarios",
+            "🔎  Buscador de Ítems",
+            "📈  Equidad & Cobertura",
+            "🔮  Explicación Accionable",
+            "⚖️  Gobernanza Regulatoria",
+        ]
+
+    pagina = st.radio("Nav", opciones_menu, label_visibility="collapsed")
 
     # ── Modo A/B para encuesta ──────────────────────
     _modo = st.query_params.get("modo", "tratamiento")
@@ -714,14 +734,11 @@ if "Dashboard" in pagina:
         Estás viendo una lista de productos recomendados para este usuario.
         Podés explorar distintos usuarios usando el selector de arriba.
         </div>''', unsafe_allow_html=True)
-    # Before vs After toggle
-    modo_bb = st.toggle("⬛ Ver como sistema Black-Box (sin XAI)", value=False,
-        help="Muestra como se veria este sistema SIN explicabilidad — como Amazon tradicional.")
+    modo_bb = st.session_state.get("modo_bb_global", False)
     if modo_bb:
         st.markdown('<div class="bb-banner"><b>Modo Black-Box activo</b> — '
             'Las explicaciones XAI estan ocultas. Esto es lo que ve un usuario '
-            'en un sistema de recomendacion tradicional: productos sin contexto, sin control, sin auditoria. '
-            'Desactiva el toggle para ver el sistema explicable.</div>',
+            'en un sistema de recomendacion tradicional: productos sin contexto, sin control, sin auditoria.</div>',
             unsafe_allow_html=True)
     if mostrar_xai and not modo_bb:
         st.info("📖 **Cómo usar esta pantalla:** Seleccioná cualquiera de los 3,217 usuarios del estudio. Vas a ver su perfil de compras, las métricas del sistema de recomendación, y los productos recomendados con las razones por las que el modelo los eligió. Las etiquetas verdes en cada producto son las **explicaciones XAI** — el núcleo de esta tesis.")
