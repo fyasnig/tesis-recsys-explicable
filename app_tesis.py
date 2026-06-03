@@ -1385,6 +1385,12 @@ elif "Simulador" in pagina:
             annotation_text="Equilibrio recomendado", annotation_position="top left",
             annotation_font=dict(color=COLORS["accent"], size=9)
         )
+        # Zona de equilibrio recomendada (sweet spot) en P=0.35
+        fig_puf.add_vline(
+            x=0.35, line_dash="dash", line_color=COLORS["accent"], line_width=1.2,
+            annotation_text="Equilibrio recomendado", annotation_position="top left",
+            annotation_font=dict(color=COLORS["accent"], size=9)
+        )
         fig_puf.update_layout(
             **pbase(),
             height=380,
