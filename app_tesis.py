@@ -1266,10 +1266,10 @@ elif "Simulador" in pagina:
         st.markdown("---")
         st.markdown("**Privacy-Utility Frontier — frontera eficiente privacidad-utilidad**")
         st.caption(
-            "Generada mediante la exploración exhaustiva de las 32 configuraciones posibles (2⁵ señales). "
-            "La curva verde muestra los puntos no dominados: configuraciones donde no existe otra con mayor "
-            "privacidad Y mayor utilidad simultáneamente. Tu nivel activo aparece resaltado. "
-            "U(c) = NDCG@10_c / NDCG@10_max · P(c) = Σ(wₛ·(1−cₛ)) / Σwₛ con pesos normativos GDPR."
+            "Generada mediante la exploración exhaustiva de las 32 configuraciones posibles (2⁵ señales = 5 señales on/off). "
+            "Curva verde: 13 puntos eficientes (no dominados). Puntos grises: configuraciones dominadas. "
+            "U(c) = NDCG@10_c / NDCG@10_max   ·   P(c) = Σ(wₛ·(1−cₛ)) / Σwₛ con pesos normativos GDPR. "
+            "Correlación pesos normativos vs. SHAP: ρ = 0.896 (validación de robustez)."
         )
         # ── Calcular las 32 configuraciones ─────────────────────
         import itertools as _it
@@ -1379,6 +1379,12 @@ elif "Simulador" in pagina:
             annotation_text="Quiebre S1", annotation_position="top right",
             annotation_font=dict(color="#8A8880", size=9)
         )
+        # Zona de equilibrio recomendada (sweet spot) en P=0.35
+        fig_puf.add_vline(
+            x=0.35, line_dash="dash", line_color=COLORS["accent"], line_width=1.2,
+            annotation_text="Equilibrio recomendado", annotation_position="top left",
+            annotation_font=dict(color=COLORS["accent"], size=9)
+        )
         fig_puf.update_layout(
             **pbase(),
             height=380,
@@ -1400,10 +1406,10 @@ elif "Simulador" in pagina:
         )
         st.plotly_chart(fig_puf, use_container_width=True)
         st.caption(
-            "La zona sombreada = espacio alcanzable. Curva verde = 13 puntos eficientes "
-            "de 32 configuraciones posibles (2⁵). Línea punteada = quiebre en P=0.60 "
-            "(desactivar S1 co-compra cuesta 28% de utilidad). "
-            "U(c)=NDCG/NDCGmax · P(c)=Σ(wₛ·(1−cₛ))/Σwₛ · pesos normativos GDPR."
+            "La zona sombreada representa el espacio de configuraciones alcanzables (32 combinaciones de 5 señales). "
+            "La línea punteada vertical en P=0.60 marca el quiebre estructural: desactivar S1 (co-compra) "
+            "reduce la utilidad en un 28% respecto al máximo. La línea naranja en P=0.35 indica la zona de "
+            "equilibrio recomendada: >85% de utilidad con reducción significativa de exposición de datos."
         )
 
 
