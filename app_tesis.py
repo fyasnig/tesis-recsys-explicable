@@ -836,9 +836,11 @@ if "Dashboard" in pagina:
     st.caption("📊 **Métricas del sistema para este usuario.** El score máximo es 1.00 cuando el ítem tiene co-compra directa muy fuerte. Las razones promedio indican qué tan explicables son las recomendaciones: más razones = más contexto visible para el usuario.")
     if not modo_bb:
         k1,k2,k3,k4 = st.columns(4)
+        k2_active = True
     else:
-        k1 = st.columns(1)[0]
+        k1,_,_,_ = st.columns(4)
         k2 = k3 = k4 = None
+        k2_active = False
     ms = ur['score_display'].max() if 'score_display' in ur.columns else 0
     kpi_list = [(k1,len(ur),"Recomendaciones")]
     if not modo_bb:
@@ -1160,12 +1162,12 @@ elif "Simulador" in pagina:
         st.write("")
 
         exchange_data = {
-        "Dimension": ["Razon co-compra visible","Razon afinidad marca","Razon categoria preferida",
-                      "Cobertura del sistema","Explicaciones por rec",
-                      "Perfilado longitudinal","Inferencia conductual","Trazabilidad cross-session"],
-        "Priv. Baja":     ["Si","Si","Si","64%","2.95","Alto","Alta","Alta"],
-        "Priv. Moderada": ["Si","Si","Si","64%","2.55","Medio","Media","Media"],
-        "Priv. Alta":     ["Si","No","No","64%","2.32","Bajo","Baja","Baja"],
+            "Dimension": ["Razon co-compra visible","Razon afinidad marca","Razon categoria preferida",
+                          "Cobertura del sistema","Explicaciones por rec",
+                          "Perfilado longitudinal","Inferencia conductual","Trazabilidad cross-session"],
+            "Priv. Baja":     ["Si","Si","Si","64%","2.95","Alto","Alta","Alta"],
+            "Priv. Moderada": ["Si","Si","Si","64%","2.55","Medio","Media","Media"],
+            "Priv. Alta":     ["Si","No","No","64%","2.32","Bajo","Baja","Baja"],
         "Tipo": ["utilidad","utilidad","utilidad","utilidad","utilidad","riesgo","riesgo","riesgo"],
     }
     import pandas as pd
