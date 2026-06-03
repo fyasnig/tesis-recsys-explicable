@@ -1381,30 +1381,29 @@ elif "Simulador" in pagina:
         )
         fig_puf.update_layout(
             **pbase(),
-            height=340,
+            height=380,
             xaxis=dict(
-                title="Nivel de protección de datos →",
+                title="Índice de protección de datos P(c) →",
                 range=[-0.05, 1.05],
                 tickformat=".0%",
                 gridcolor="rgba(255,255,255,0.05)"
             ),
             yaxis=dict(
-                title="Utilidad algorítmica →",
-                range=[0.3, 1.05],
+                title="Utilidad algorítmica U(c) →",
+                range=[0.25, 1.08],
                 tickformat=".0%",
                 gridcolor="rgba(255,255,255,0.05)"
             ),
-            legend=dict(orientation="h", y=-0.2,
+            legend=dict(orientation="h", y=-0.22,
                         font=dict(color="#8A8880", size=10)),
-            margin=dict(l=40, r=40, t=20, b=60)
+            margin=dict(l=50, r=40, t=20, b=80)
         )
         st.plotly_chart(fig_puf, use_container_width=True)
         st.caption(
-            "La zona sombreada representa el espacio de configuraciones alcanzables por el sistema. "
-            "El punto resaltado corresponde a tu configuración actual. "
-            "A diferencia de la frontera eficiente de Markowitz, aquí no existe una solución óptima universal: "
-            "el punto adecuado depende de la valoración individual que cada usuario asigne "
-            "a su privacidad frente a la calidad de las recomendaciones."
+            "La zona sombreada = espacio alcanzable. Curva verde = 13 puntos eficientes "
+            "de 32 configuraciones posibles (2⁵). Línea punteada = quiebre en P=0.60 "
+            "(desactivar S1 co-compra cuesta 28% de utilidad). "
+            "U(c)=NDCG/NDCGmax · P(c)=Σ(wₛ·(1−cₛ))/Σwₛ · pesos normativos GDPR."
         )
 
 
