@@ -1324,6 +1324,187 @@ elif "XAI" in pagina:
             '<div><b style="color:#1D9E75">Dato anonimo:</b><br>Popularidad (DCI=4.3%). No requiere datos personales.</div>'
             '</div></div>', unsafe_allow_html=True)
 
+
+# ══════════════════════════════════════════════════════════
+# P3 — ANÁLISIS XAI GLOBAL
+# ══════════════════════════════════════════════════════════
+elif "XAI" in pagina or "Análisis" in pagina:
+    st.markdown('<div class="main-header">Análisis XAI Global</div>', unsafe_allow_html=True)
+    st.markdown('<div class="main-sub">SHAP + LIME · Importancia de señales · Calibración</div>', unsafe_allow_html=True)
+    st.write("")
+    st.info("🔬 **Qué muestra esta pantalla:** Análisis global del modelo usando dos métodos de explicabilidad (SHAP y LIME). SHAP mide cuánto contribuye cada señal al score final en promedio. LIME construye modelos locales lineales alrededor de cada predicción. Que ambos métodos coincidan (ρ=1.00) valida que la interpretación es robusta y no depende del método elegido.")
+
+    t1,t2,t3,t4,t5 = st.tabs(["📈 Importancia SHAP","🔗 Correlación señales","📉 Slice por posición","🎯 Calibración","💰 Valor de tus datos"])
+
+    FL = {"pct_shap_S1_copurchase":"Co-compra","pct_shap_S2_affinities":"Afinidad perfil",
+          "pct_shap_S3_temporal_eff":"Estacionalidad","pct_shap_S4_recency_item":"Recencia",
+          "pct_shap_S5_popularity":"Popularidad",
+          "pct_S1_copurchase":"Co-compra","pct_S2_affinities":"Afinidad perfil",
+          "pct_S3_temporal_eff":"Estacionalidad","pct_S4_recency_item":"Recencia",
+          "pct_S5_popularity":"Popularidad"}
+
+    with t1:
+        if shap_g is None:
+            st.info("Corré el bloque XAI para generar xai_shap_global_importance.csv.")
+        else:
+            sg = shap_g.sort_values("mean_abs_shap", ascending=True).copy()
+            sg["pct"] = sg["mean_abs_shap"]/sg["mean_abs_shap"].sum()*100
+            c1,c2 = st.columns([3,2])
+            with c1:
+                st.markdown("**Importancia relativa SHAP vs peso teórico**")
+                st.caption("Las barras verdes (SHAP) muestran la importancia real medida empíricamente. Las barras grises son los pesos teóricos. Hallazgo clave: Co-compra tiene peso=40% pero importancia SHAP=64.8%.")
+                fig = go.Figure()
+                fig.add_trace(go.Bar(y=sg["label"],x=sg["pct"],orientation="h",name="SHAP",
+                                     marker_color=COLORS["primary"],marker_line_width=0))
+                fig.add_trace(go.Bar(y=sg["label"],x=sg["weight"]*100,orientation="h",
+                                     name="Peso teórico",marker_color="rgba(180,178,169,0.3)",
+                                     marker_line_color="rgba(180,178,169,0.6)",marker_line_width=1))
+                fig.update_layout(**pbase(),barmode="overlay",height=300,
+                                  legend=dict(orientation="h",y=1.1,font=dict(color="#8A8880",size=10)),
+                                  xaxis=dict(title="%",gridcolor="rgba(255,255,255,0.05)"),
+                                  yaxis=dict(gridcolor="rgba(0,0,0,0)"))
+                st.plotly_chart(fig, use_container_width=True)
+            with c2:
+                st.markdown("**Tabla de importancia**")
+                tbl = sg[["label","weight","mean_abs_shap"]].copy()
+                tbl["Peso"] = (tbl["weight"]*100).map("{:.0f}%".format)
+                tbl["SHAP"] = (tbl["mean_abs_shap"]/tbl["mean_abs_shap"].sum()*100).map("{:.1f}%".format)
+                tbl = tbl.rename(columns={"label":"Señal"}).drop(columns=["weight","mean_abs_shap"])
+                st.dataframe(tbl.sort_values("SHAP",ascending=False), hide_index=True, use_container_width=True)
+                st.markdown("""<div style="background:#1E2130;border:1px solid #2A2F45;border-radius:10px;padding:0.85rem;font-size:0.8rem;color:#8A8880;line-height:1.7;margin-top:0.75rem">
+                  <b style="color:#1D9E75">ρ SHAP-LIME = 1.000</b><br>
+                  Dos métodos XAI independientes, mismo ranking — interpretabilidad robusta y verificable.
+                </div>""", unsafe_allow_html=True)
+
+        if shap_priv is not None:
+            st.markdown("**Importancia SHAP por grupo de privacidad**")
+            pc = [c for c in shap_priv.columns if c.startswith("pct_shap_")]
+            if pc:
+                dm = shap_priv[["privacy_level"]+pc].melt(id_vars="privacy_level",value_vars=pc,var_name="f",value_name="pct")
+                dm["f"] = dm["f"].map(FL).fillna(dm["f"])
+                dm["pct"] *= 100
+                fp = px.bar(dm,x="f",y="pct",color="privacy_level",barmode="group",
+                            color_discrete_map={"No_privada":COLORS["primary"],"Privada_moderada":COLORS["accent"],"Privada_sensible":COLORS["danger"]},
+                            labels={"pct":"SHAP (%)","f":""},template="plotly_dark")
+                fp.update_layout(**pbase(),height=270,
+                                 legend=dict(title="",orientation="h",y=1.1,font=dict(color="#8A8880",size=10)),
+                                 yaxis=dict(gridcolor="rgba(255,255,255,0.05)"),xaxis=dict(gridcolor="rgba(0,0,0,0)"))
+                st.plotly_chart(fp, use_container_width=True)
+                st.caption("Variación máxima en co-compra: 0.9% — el modelo de scoring es neutral a la privacidad del usuario.")
+
+    with t2:
+        if corr_df is None:
+            st.info("Corré el bloque XAI para generar xai_shap_signal_correlation.csv.")
+        else:
+            st.markdown("**Correlación Spearman entre SHAP values**")
+            st.caption("Verde oscuro = alta correlación. Hallazgo: 9 de 10 pares son independientes.")
+            z = corr_df.values
+            fc = go.Figure(go.Heatmap(z=z,x=list(corr_df.columns),y=list(corr_df.index),
+                                      colorscale="RdYlGn",zmid=0,zmin=-1,zmax=1,
+                                      text=[[f"{v:.2f}" for v in row] for row in z],
+                                      texttemplate="%{text}",textfont=dict(size=11)))
+            fc.update_layout(**pbase(),height=360,margin=dict(l=0,r=0,t=10,b=0))
+            st.plotly_chart(fc, use_container_width=True)
+
+    with t3:
+        if shap_sl is None:
+            st.info("Corré el bloque XAI para generar xai_shap_slice_by_rank.csv.")
+        else:
+            st.markdown("**Importancia SHAP por posición en el ranking**")
+            st.caption("Co-compra cae de 84.6% (Top 1-3) a 55.4% (Pos 11-20) — fallback explícito hacia señales de ítem.")
+            ps = [c for c in shap_sl.columns if c.startswith("pct_")]
+            if ps:
+                dm2 = shap_sl[["rank_group"]+ps].melt(id_vars="rank_group",value_vars=ps,var_name="f",value_name="pct")
+                dm2["f"] = dm2["f"].map(FL).fillna(dm2["f"])
+                dm2["pct"] *= 100
+                fs = px.line(dm2,x="rank_group",y="pct",color="f",markers=True,
+                             color_discrete_map={"Co-compra":COLORS["primary"],"Afinidad perfil":COLORS["secondary"],
+                                                 "Popularidad":COLORS["accent"],"Estacionalidad":COLORS["neutral"],"Recencia":"#5DCAA5"},
+                             labels={"pct":"SHAP (%)","rank_group":"Posición"},template="plotly_dark")
+                fs.update_layout(**pbase(),height=350,
+                                 legend=dict(title="",orientation="h",y=1.1,font=dict(color="#8A8880",size=10)),
+                                 yaxis=dict(gridcolor="rgba(255,255,255,0.05)"),xaxis=dict(gridcolor="rgba(255,255,255,0.05)"))
+                st.plotly_chart(fs, use_container_width=True)
+
+    with t4:
+        if calib is None:
+            st.info("Corré el bloque XAI para generar xai_score_calibration.csv.")
+        else:
+            st.markdown("**Calibración del score_final — hit rate por decil**")
+            st.caption("Correlación perfecta (ρ=1.00). D10 tiene 27x más hits que D1 — validez externa del modelo.")
+            cc1,cc2 = st.columns([3,2])
+            with cc1:
+                clrs = [COLORS["neutral"] if i<5 else COLORS["primary"] for i in range(len(calib))]
+                fca = go.Figure()
+                fca.add_trace(go.Bar(x=calib["score_decile"],y=calib["hit_rate"]*100,
+                                     marker_color=clrs,marker_line_width=0,
+                                     text=(calib["hit_rate"]*100).map("{:.2f}%".format),
+                                     textposition="outside",textfont=dict(color="#8A8880",size=9)))
+                fca.add_hline(y=calib["hit_rate"].mean()*100,line_dash="dash",line_color=COLORS["accent"])
+                fca.update_layout(**pbase(),height=310,showlegend=False,
+                                  xaxis=dict(title="Decil de score",gridcolor="rgba(0,0,0,0)"),
+                                  yaxis=dict(title="Hit rate (%)",gridcolor="rgba(255,255,255,0.05)"))
+                st.plotly_chart(fca, use_container_width=True)
+            with cc2:
+                d1  = calib[calib["score_decile"]=="D1"]["hit_rate"].values[0]
+                d10 = calib[calib["score_decile"]=="D10"]["hit_rate"].values[0]
+                ratio = round(d10/d1) if d1>0 else 0
+                for v,l in [("ρ=1.00","Correlación decil-hit"),(f"{ratio}x","D10 vs D1"),(f"{d10:.2%}","Hit rate D10")]:
+                    st.markdown(f'<div class="kpi-box" style="margin-bottom:0.6rem"><div class="kpi-value">{v}</div><div class="kpi-label">{l}</div></div>', unsafe_allow_html=True)
+
+    with t5:
+        st.markdown("**Data Contribution Index (DCI) — cuanto vale cada dato tuyo para el modelo**")
+        st.caption("El DCI muestra cuanto contribuye cada dato al score final, medido con SHAP. Convierte la importancia tecnica en algo concreto.")
+        st.write("")
+        dci_data = [
+            {"dato":"Historial de co-compras","shap_pct":64.8,"gdpr":"Art. 5 — Datos de comportamiento","nivel":"Muy alto","color":"#1D9E75",
+             "desc":"El dato mas valioso. Sin el, la precision cae ~13%."},
+            {"dato":"Afinidad de perfil (marca/cat)","shap_pct":20.1,"gdpr":"Art. 5 — Preferencias inferidas","nivel":"Alto","color":"#534AB7",
+             "desc":"Tu marca y categoria favorita. Ocultar esto reduce la personalizacion."},
+            {"dato":"Recencia del item","shap_pct":9.1,"gdpr":"Art. 5 — Datos temporales","nivel":"Medio","color":"#EF9F27",
+             "desc":"Dato agregado, no individual — bajo riesgo de privacidad."},
+            {"dato":"Popularidad del item","shap_pct":4.3,"gdpr":"Art. 5 — Datos publicos agregados","nivel":"Bajo","color":"#B4B2A9",
+             "desc":"Dato completamente anonimo. El modelo NO necesita datos personales para esto."},
+            {"dato":"Estacionalidad","shap_pct":1.7,"gdpr":"Art. 5 — Datos contextuales","nivel":"Muy bajo","color":"#D85A30",
+             "desc":"Contribucion marginal. El sistema NO necesita este dato — validacion minimizacion GDPR."},
+        ]
+        k1,k2,k3,k4 = st.columns(4)
+        k1.markdown('<div class="kpi-box"><div class="kpi-value">5</div><div class="kpi-label">Tipos de datos usados</div></div>', unsafe_allow_html=True)
+        k2.markdown('<div class="kpi-box"><div class="kpi-value" style="color:#1D9E75">64.8%</div><div class="kpi-label">Valor historial (DCI max)</div></div>', unsafe_allow_html=True)
+        k3.markdown('<div class="kpi-box"><div class="kpi-value" style="color:#D85A30">1.7%</div><div class="kpi-label">Valor estacionalidad (DCI min)</div></div>', unsafe_allow_html=True)
+        k4.markdown('<div class="kpi-box"><div class="kpi-value" style="color:#EF9F27">38x</div><div class="kpi-label">Ratio max/min DCI</div></div>', unsafe_allow_html=True)
+        st.write("")
+        col_dci1, col_dci2 = st.columns([2,3])
+        with col_dci1:
+            st.markdown("**Contribucion de cada dato al modelo**")
+            fig_dci = go.Figure(go.Bar(
+                y=[d["dato"] for d in dci_data], x=[d["shap_pct"] for d in dci_data],
+                orientation="h", marker_color=[d["color"] for d in dci_data], marker_line_width=0,
+                text=[f'{d["shap_pct"]:.1f}%' for d in dci_data],
+                textposition="outside", textfont=dict(color="#8A8880", size=10)
+            ))
+            fig_dci.update_layout(**pbase(), height=260, margin=dict(l=0,r=60,t=10,b=0),
+                                  xaxis=dict(title="% contribucion SHAP", gridcolor="rgba(255,255,255,0.05)"),
+                                  yaxis=dict(gridcolor="rgba(0,0,0,0)"))
+            st.plotly_chart(fig_dci, use_container_width=True)
+        with col_dci2:
+            st.markdown("**Detalle por tipo de dato**")
+            for d in dci_data:
+                bar_w = int(d["shap_pct"] / 64.8 * 100)
+                nivel_icon = {"Muy alto":"🔴","Alto":"🟠","Medio":"🟡","Bajo":"🟢","Muy bajo":"🟢"}.get(d["nivel"],"⚪")
+                st.markdown(
+                    f'<div class="rec-card" style="margin-bottom:0.5rem;padding:0.75rem 1rem">'
+                    f'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">'
+                    f'<div style="font-size:0.85rem;font-weight:600;color:#E8E6E0">{d["dato"]}</div>'
+                    f'<div style="font-size:0.72rem;color:{d["color"]};font-weight:600">{nivel_icon} {d["nivel"]}</div>'
+                    f'</div>'
+                    f'<div style="background:#2A2F45;border-radius:3px;height:4px;margin-bottom:6px">'
+                    f'<div style="background:{d["color"]};height:4px;border-radius:3px;width:{bar_w}%"></div>'
+                    f'</div>'
+                    f'<div style="font-size:0.76rem;color:#8A8880;line-height:1.5">{d["desc"]}</div>'
+                    f'<div style="font-size:0.68rem;color:rgba(138,136,128,0.5);margin-top:4px">{d["gdpr"]}</div>'
+                    f'</div>', unsafe_allow_html=True)
+
 # ══════════════════════════════════════════════════════════
 # P4 — EXPERIMENTO & HALLAZGOS
 # ══════════════════════════════════════════════════════════
@@ -1916,92 +2097,6 @@ elif "Equidad" in pagina or "Hallazgos 14" in pagina:
             labels = ["Productos","Gasto ($)","Ordenes","Div. cat."][:len(metrics)]
             fig_cv = go.Figure()
             fig_cv.add_trace(go.Bar(name="Con cobertura",x=labels,y=[con_df2[m].mean() for m in metrics],marker_color=COLORS["primary"],marker_line_width=0))
-            fig_cv.add_trace(go.Bar(name="Sin cobertura",x=labels,y=[sin_df2[m].mean() for m in metrics],marker_color=COLORS["danger"],marker_line_width=0))
-            fig_cv.update_layout(**pbase(), barmode="group", height=280, margin=dict(l=0,r=0,t=10,b=0),
-                                 legend=dict(orientation="h",y=1.1,font=dict(color="#8A8880",size=10)),
-                                 yaxis=dict(gridcolor="rgba(255,255,255,0.05)"),xaxis=dict(gridcolor="rgba(0,0,0,0)"))
-            st.plotly_chart(fig_cv, use_container_width=True)
-            st.caption("Diferencias significativas (p<0.001) excepto ticket promedio. El sistema discrimina por volumen, no por capacidad de pago.")
-
-elif "Diversidad" in pagina or "Hallazgos 17" in pagina:
-    st.markdown('<div class="main-header">Hallazgos 17 · 18</div>', unsafe_allow_html=True)
-    st.markdown('<div class="main-sub">Diversidad · Razones XAI por categoría</div>', unsafe_allow_html=True)
-    st.write("")
-    st.info("H17: ILD mide diversidad de categorías en recomendaciones (rho=-0.562 con hit rate). H18: razón XAI dominante por tipo de ítem — propiedad emergente del grafo.")
-    t17, t18 = st.tabs(["H17 ILD","H18 Razones por Categoría"])
-    with t17:
-        st.caption("ILD = número de categorías distintas en las recomendaciones. rho(ILD, hit_rate)=-0.562: especialización predice mejor la compra real.")
-        if ild_df is None:
-            st.info("Corré el bloque ILD para generar ild_analisis.csv.")
-        else:
-            k1,k2,k3,k4 = st.columns(4)
-            k1.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">' + f'{ild_df["ild_category"].mean():.1f}' + '</div><div class="kpi-label">ILD media</div></div>', unsafe_allow_html=True)
-            k2.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">' + f'{ild_df["ild_category"].median():.0f}' + '</div><div class="kpi-label">ILD mediana</div></div>', unsafe_allow_html=True)
-            k3.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value" style="color:#D85A30">' + f'{(ild_df["ild_category"]==1).mean():.1%}' + '</div><div class="kpi-label">Mono-categoría</div></div>', unsafe_allow_html=True)
-            k4.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value" style="color:#1D9E75">' + f'{(ild_df["ild_category"]>=5).mean():.1%}' + '</div><div class="kpi-label">Muy diversos</div></div>', unsafe_allow_html=True)
-            col_a, col_b = st.columns(2)
-            with col_a:
-                ild_hist = ild_df["ild_category"].value_counts().sort_index()
-                fig_h = px.bar(x=ild_hist.index, y=ild_hist.values,
-                               color_discrete_sequence=[COLORS["primary"]],
-                               labels={"x":"N categorias","y":"N usuarios"}, template="plotly_dark")
-                fig_h.add_vline(x=ild_df["ild_category"].mean(), line_dash="dash", line_color=COLORS["accent"])
-                fig_h.update_layout(**pbase(), height=240, showlegend=False, margin=dict(l=0,r=0,t=10,b=0))
-                st.plotly_chart(fig_h, use_container_width=True)
-                st.caption("Pico en 1-2 (especializados) y cola larga hasta 20 (generalistas).")
-            with col_b:
-                if "cuartil_hist" in ild_df.columns:
-                    ild_q = ild_df.groupby("cuartil_hist", observed=True)["ild_category"].median().reset_index()
-                    fig_q2 = px.bar(ild_q, x="cuartil_hist", y="ild_category",
-                                   color_discrete_sequence=[COLORS["secondary"]],
-                                   labels={"cuartil_hist":"Cuartil","ild_category":"ILD mediana"},
-                                   template="plotly_dark", text="ild_category")
-                    fig_q2.update_traces(texttemplate="%{text:.0f}", textposition="outside")
-                    fig_q2.update_layout(**pbase(), height=240, showlegend=False, margin=dict(l=0,r=0,t=10,b=0))
-                    st.plotly_chart(fig_q2, use_container_width=True)
-                    st.caption("Q1=3.0 a Q4=10.0. Más historial = más diversidad = menor precisión.")
-    with t18:
-        st.caption("Repeat domina en 8/10 categorías. Gift Card no usa Popularidad sino Repeat (30.7%). Propiedad emergente del grafo de co-compra.")
-        if raz_df is None:
-            st.info("Corré el bloque de análisis para generar razones_por_categoria.csv.")
-        else:
-            REASON_COLORS = {"Co-compra":COLORS["primary"],"Afinidad categoria":COLORS["secondary"],
-                             "Repeat":COLORS["accent"],"Popularidad":"#9B59B6","Estacionalidad":"#5DCAA5",
-                             "Afinidad marca":"#E74C3C","Importancia categoria":"#F39C12",
-                             "Recencia":COLORS["neutral"],"Importancia marca":"#1ABC9C","Sin razon":"#444","Otra":"#666"}
-            top_cats = raz_df["category"].value_counts().head(10).index.tolist()
-            cat_r = raz_df[raz_df["category"].isin(top_cats)].groupby(["category","reason_type"]).size().reset_index(name="n")
-            totals = cat_r.groupby("category")["n"].transform("sum")
-            cat_r["pct"] = cat_r["n"] / totals * 100
-            reason_order = ["Co-compra","Repeat","Afinidad categoria","Importancia categoria","Popularidad","Estacionalidad","Afinidad marca","Importancia marca","Recencia","Sin razon","Otra"]
-            fig_st = go.Figure()
-            for reason in reason_order:
-                sub = cat_r[cat_r["reason_type"]==reason]
-                if sub.empty: continue
-                cat_vals = {row["category"]: row["pct"] for _,row in sub.iterrows()}
-                fig_st.add_trace(go.Bar(name=reason, x=[cat_vals.get(c,0) for c in top_cats], y=top_cats,
-                                        orientation="h", marker_color=REASON_COLORS.get(reason,COLORS["neutral"]), marker_line_width=0))
-            fig_st.update_layout(**pbase(), barmode="stack", height=360, margin=dict(l=0,r=0,t=10,b=0),
-                                 legend=dict(orientation="h",y=1.12,font=dict(color="#8A8880",size=9)),
-                                 xaxis=dict(title="% de razones",gridcolor="rgba(255,255,255,0.05)"),
-                                 yaxis=dict(gridcolor="rgba(0,0,0,0)"))
-            st.plotly_chart(fig_st, use_container_width=True)
-
-elif "Accionable" in pagina or "Hallazgos 19" in pagina:
-    st.markdown('<div class="main-header">Hallazgo 19 - Contrafactual</div>', unsafe_allow_html=True)
-    st.markdown('<div class="main-sub">Delta minimo para entrar al Top-5 - GDPR art. 22</div>', unsafe_allow_html=True)
-    st.write("")
-    st.info("Para cada usuario: que tiene que cambiar para que un item NO recomendado entre al Top-5. Conecta con GDPR art. 22.")
-    if cf_df is None:
-        st.info("Corre bloque_contrafactual.py para generar contrafactual_analisis.csv.")
-    else:
-        k1,k2,k3,k4 = st.columns(4)
-        v1 = f'{cf_df["gap_score"].median():.4f}'
-        v2 = f'{cf_df["delta_s1_needed"].median():.4f}'
-        v3 = f'{cf_df["factible_s1"].mean():.1%}'
-        v4 = f'{(cf_df["gap_score"] < 0.05).mean():.1%}'
-        k1.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">'+v1+'</div><div class="kpi-label">Gap mediano</div></div>', unsafe_allow_html=True)
-        k2.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value">'+v2+'</div><div class="kpi-label">Delta S1 mediano</div></div>', unsafe_allow_html=True)
         k3.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value" style="color:#1D9E75">'+v3+'</div><div class="kpi-label">Casos factibles</div></div>', unsafe_allow_html=True)
         k4.markdown('<div class="kpi-box fade-in-up"><div class="kpi-value" style="color:#EF9F27">'+v4+'</div><div class="kpi-label">Gap muy bajo</div></div>', unsafe_allow_html=True)
         st.write("")
