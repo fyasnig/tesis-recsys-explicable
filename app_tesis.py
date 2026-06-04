@@ -405,7 +405,7 @@ if not st.session_state.app_iniciada:
         <div class="w-stat"><span class="w-stat-num">5,027</span><span class="w-stat-lbl">Usuarios</span></div>
         <div class="w-stat"><span class="w-stat-num">939K</span><span class="w-stat-lbl">Ítems</span></div>
         <div class="w-stat"><span class="w-stat-num">19</span><span class="w-stat-lbl">Hallazgos</span></div>
-        <div class="w-stat"><span class="w-stat-num">10</span><span class="w-stat-lbl">Pantallas</span></div>
+        <div class="w-stat"><span class="w-stat-num">9</span><span class="w-stat-lbl">Pantallas</span></div>
         <div class="w-stat"><span class="w-stat-num">0.050</span><span class="w-stat-lbl">NDCG@10</span></div>
       </div>
       <div class="w-progress-wrap">
