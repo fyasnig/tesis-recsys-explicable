@@ -1149,7 +1149,7 @@ elif "Simulador" in pagina:
                 ("Personalización", imp["Personalización"], "%", "#1D9E75" if imp["Personalización"]>=75 else "#EF9F27" if imp["Personalización"]>=50 else "#D85A30"),
                 ("Explicabilidad",  imp["Explicabilidad"],  "%", "#1D9E75" if imp["Explicabilidad"]>=75  else "#EF9F27" if imp["Explicabilidad"]>=50  else "#D85A30"),
                 ("Cobertura",       imp["Cobertura"],       "%", "#1D9E75"),
-                ("Riesgo inferencial", imp["Riesgo inferencial"], "%", "#1D9E75" if imp["Riesgo inferencial"]<=30 else "#EF9F27" if imp["Riesgo inferencial"]<=60 else "#D85A30"),
+                ("Riesgo inferencial", imp["Riesgo inferencial"], "%", "#D85A30" if imp["Riesgo inferencial"]>=70 else "#EF9F27" if imp["Riesgo inferencial"]>=40 else "#1D9E75"),
             ]
             for col_i, (lbl, val, unit, color) in zip(imp_cols, imp_items):
                 col_i.markdown(f'<div class="kpi-box" style="padding:0.5rem 0.6rem"><div class="kpi-value" style="color:{color};font-size:1.2rem">{val}{unit}</div><div class="kpi-label">{lbl}</div></div>', unsafe_allow_html=True)
