@@ -1997,19 +1997,20 @@ elif "Comparar" in pagina:
         total = sum(rc.values()) or 1
         return {k: v/total*100 for k,v in rc.items() if v > 0}
 
-    sa = get_sigs(ur_a); sb = get_sigs(ur_b)
-    all_s = sorted(set(list(sa.keys())+list(sb.keys())))
-    fig_c = go.Figure()
-    fig_c.add_trace(go.Bar(name=f"A ···{str(uid_a)[-8:]}", x=all_s, y=[sa.get(s,0) for s in all_s],
-                           marker_color=COLORS['primary'], marker_line_width=0))
-    fig_c.add_trace(go.Bar(name=f"B ···{str(uid_b)[-8:]}", x=all_s, y=[sb.get(s,0) for s in all_s],
-                           marker_color=COLORS['secondary'], marker_line_width=0))
-    fig_c.update_layout(**pbase(), barmode='group', height=260,
-                        margin=dict(l=0,r=0,t=10,b=0),
-                        legend=dict(orientation='h',y=1.1,font=dict(color='#8A8880',size=10)),
-                        yaxis=dict(title='% del total',gridcolor='rgba(255,255,255,0.05)'),
-                        xaxis=dict(gridcolor='rgba(0,0,0,0)'))
-    st.plotly_chart(fig_c, use_container_width=True)
+    if not modo_bb:
+        sa = get_sigs(ur_a); sb = get_sigs(ur_b)
+        all_s = sorted(set(list(sa.keys())+list(sb.keys())))
+        fig_c = go.Figure()
+        fig_c.add_trace(go.Bar(name=f"A ···{str(uid_a)[-8:]}", x=all_s, y=[sa.get(s,0) for s in all_s],
+                               marker_color=COLORS['primary'], marker_line_width=0))
+        fig_c.add_trace(go.Bar(name=f"B ···{str(uid_b)[-8:]}", x=all_s, y=[sb.get(s,0) for s in all_s],
+                               marker_color=COLORS['secondary'], marker_line_width=0))
+        fig_c.update_layout(**pbase(), barmode='group', height=260,
+                            margin=dict(l=0,r=0,t=10,b=0),
+                            legend=dict(orientation='h',y=1.1,font=dict(color='#8A8880',size=10)),
+                            yaxis=dict(title='% del total',gridcolor='rgba(255,255,255,0.05)'),
+                            xaxis=dict(gridcolor='rgba(0,0,0,0)'))
+        st.plotly_chart(fig_c, use_container_width=True)
 
 # ══════════════════════════════════════════════════════════
 # P6 — BUSCADOR DE ÍTEMS
