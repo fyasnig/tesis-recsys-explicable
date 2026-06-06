@@ -1054,10 +1054,10 @@ elif "Simulador" in pagina:
                             format_func=lambda x: get_alias(x, alias_map))
         priv = "Privada_sensible"
     else:
-      with ctrl:
-        uid2 = st.selectbox("Usuario", users, key='s_uid',
-                            format_func=lambda x: get_alias(x, alias_map))
-        priv = st.select_slider("Privacidad",
+        with ctrl:
+            uid2 = st.selectbox("Usuario", users, key='s_uid',
+                                format_func=lambda x: get_alias(x, alias_map))
+            priv = st.select_slider("Privacidad",
             options=["No_privada","Privada_moderada","Privada_sensible"],
             value="Privada_sensible",
             format_func=lambda x: {"No_privada":"🟢 Baja — muestra todo",
