@@ -121,26 +121,173 @@ if 'app_iniciada' not in st.session_state:
 
 if not st.session_state.app_iniciada:
     st.markdown("""
-    <div class="welcome-card">
-      <div class="welcome-title">Sistema de Recomendación</div>
-      <div class="welcome-title shimmer-text">Explicable</div>
-      <div class="welcome-sub">Tesis de Maestría · Franco Yasnig · Amazon Purchases 2018–2024</div>
-      <div style="margin: 1.5rem 0 2rem">
-        <div class="stat-welcome"><span class="stat-num">5,027</span><span class="stat-lbl">Usuarios</span></div>
-        <div class="stat-welcome"><span class="stat-num">939K</span><span class="stat-lbl">Ítems</span></div>
-        <div class="stat-welcome"><span class="stat-num">19</span><span class="stat-lbl">Hallazgos XAI</span></div>
-        <div class="stat-welcome"><span class="stat-num">10</span><span class="stat-lbl">Pantallas</span></div>
-        <div class="stat-welcome"><span class="stat-num pulse-green">NDCG=0.050</span><span class="stat-lbl">Métrica offline</span></div>
+    <style>
+    html, body, [data-testid="stAppViewContainer"] { background: #0A0D14 !important; }
+    [data-testid="stAppViewContainer"]::before {
+        content: '';
+        position: fixed; top:0; left:0; right:0; bottom:0;
+        background:
+            radial-gradient(ellipse 60% 50% at 15% 60%, rgba(29,158,117,0.12) 0%, transparent 70%),
+            radial-gradient(ellipse 50% 40% at 85% 25%, rgba(83,74,183,0.10) 0%, transparent 70%);
+        pointer-events: none; z-index: 0;
+    }
+    [data-testid="stSidebar"]    { display: none !important; }
+    [data-testid="stHeader"]     { background: transparent !important; }
+    [data-testid="stToolbar"]    { display: none !important; }
+    [data-testid="stDecoration"] { display: none !important; }
+    .block-container { padding-top: 0 !important; max-width: 100% !important; }
+
+    .w-page {
+        height: 100vh;
+        display: flex; flex-direction: column;
+        align-items: center; justify-content: center;
+        text-align: center; padding: 1.5rem;
+        position: relative; z-index: 1;
+    }
+    .w-badge {
+        display: inline-flex; align-items: center; gap: 0.5rem;
+        background: rgba(29,158,117,0.1);
+        border: 1px solid rgba(29,158,117,0.3);
+        color: #1D9E75; border-radius: 100px;
+        padding: 0.3rem 1.1rem; font-size: 0.72rem;
+        font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase;
+        margin-bottom: 1.2rem;
+        animation: fadeInUp 0.5s ease both;
+    }
+    .w-badge-dot {
+        width: 6px; height: 6px; background: #1D9E75;
+        border-radius: 50%; animation: pulse-green 2s ease-in-out infinite;
+    }
+    .w-title {
+        font-family: 'DM Serif Display', serif;
+        font-size: clamp(2rem, 5vw, 3.8rem);
+        color: #ECE9E3; letter-spacing: -0.03em;
+        line-height: 1; margin: 0;
+        animation: fadeInUp 0.6s ease 0.1s both;
+    }
+    .w-title-accent {
+        font-family: 'DM Serif Display', serif; font-style: italic;
+        font-size: clamp(2rem, 5vw, 3.8rem);
+        letter-spacing: -0.03em; line-height: 1.05; margin: 0 0 0.4rem;
+        background: linear-gradient(100deg, #1D9E75 0%, #5DCAA5 40%, #1D9E75 80%);
+        background-size: 200% auto;
+        -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        animation: fadeInUp 0.6s ease 0.15s both, shimmer 5s linear infinite;
+    }
+    .w-divider {
+        width: 40px; height: 1px;
+        background: linear-gradient(90deg, transparent, #1D9E75, transparent);
+        margin: 0.8rem auto 1rem;
+        animation: fadeInUp 0.6s ease 0.25s both;
+    }
+    .w-desc {
+        font-size: 0.92rem; color: rgba(180,178,169,0.85);
+        line-height: 1.6; max-width: 460px; margin: 0 auto 1.5rem;
+        font-weight: 300; animation: fadeInUp 0.6s ease 0.3s both;
+    }
+    .w-desc strong { color: #ECE9E3; font-weight: 500; }
+    .w-stats {
+        display: flex; gap: 0.8rem; justify-content: center;
+        flex-wrap: wrap; margin-bottom: 2rem;
+        animation: fadeInUp 0.6s ease 0.4s both;
+    }
+    .w-stat {
+        background: rgba(255,255,255,0.025);
+        border: 1px solid rgba(255,255,255,0.07);
+        border-radius: 12px; padding: 0.75rem 1.1rem;
+        min-width: 80px;
+    }
+    .w-stat-num {
+        font-family: 'DM Serif Display', serif;
+        font-size: 1.5rem; color: #1D9E75;
+        display: block; line-height: 1; margin-bottom: 0.3rem;
+    }
+    .w-stat-lbl {
+        font-size: 0.62rem; color: rgba(138,136,128,0.8);
+        text-transform: uppercase; letter-spacing: 0.12em; font-weight: 500;
+    }
+
+    /* Barra de progreso animada */
+    .w-progress-wrap {
+        width: 200px; margin: 0 auto;
+        animation: fadeInUp 0.6s ease 0.5s both;
+    }
+    .w-progress-label {
+        font-size: 0.72rem; color: rgba(138,136,128,0.6);
+        letter-spacing: 0.1em; text-transform: uppercase;
+        margin-bottom: 0.5rem;
+    }
+    .w-progress-bar {
+        height: 2px; background: rgba(255,255,255,0.06);
+        border-radius: 2px; overflow: hidden;
+    }
+    .w-progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #1D9E75, #5DCAA5);
+        border-radius: 2px;
+        animation: progressFill 3s linear forwards;
+    }
+    @keyframes progressFill {
+        from { width: 0%; }
+        to   { width: 100%; }
+    }
+
+    .w-tags {
+        display: flex; gap: 0.4rem; justify-content: center;
+        flex-wrap: wrap; margin-top: 1.2rem;
+        animation: fadeInUp 0.6s ease 0.6s both;
+    }
+    .w-tag {
+        font-size: 0.62rem; color: rgba(138,136,128,0.4);
+        letter-spacing: 0.1em; text-transform: uppercase;
+        padding: 0.2rem 0.5rem;
+        border: 1px solid rgba(255,255,255,0.04); border-radius: 4px;
+    }
+    </style>
+
+    <div class="w-page">
+      <div class="w-badge">
+        <span class="w-badge-dot"></span>
+        Tesis de Maestría &nbsp;·&nbsp; Franco Yasnig
+      </div>
+      <div class="w-title">Sistema de Recomendación</div>
+      <div class="w-title-accent">Explicable</div>
+      <div class="w-divider"></div>
+      <div class="w-desc">
+        Sistema híbrido con <strong>explicabilidad XAI</strong>,
+        control de privacidad granular y
+        <strong>compliance regulatorio</strong> operacionalizado
+        sobre Amazon Purchases 2018–2024.
+      </div>
+      <div class="w-stats">
+        <div class="w-stat"><span class="w-stat-num">5,027</span><span class="w-stat-lbl">Usuarios</span></div>
+        <div class="w-stat"><span class="w-stat-num">939K</span><span class="w-stat-lbl">Ítems</span></div>
+        <div class="w-stat"><span class="w-stat-num">19</span><span class="w-stat-lbl">Hallazgos</span></div>
+        <div class="w-stat"><span class="w-stat-num">10</span><span class="w-stat-lbl">Pantallas</span></div>
+        <div class="w-stat"><span class="w-stat-num">0.050</span><span class="w-stat-lbl">NDCG@10</span></div>
+      </div>
+      <div class="w-progress-wrap">
+        <div class="w-progress-label">Cargando sistema...</div>
+        <div class="w-progress-bar">
+          <div class="w-progress-fill"></div>
+        </div>
+      </div>
+      <div class="w-tags">
+        <span class="w-tag">SHAP</span>
+        <span class="w-tag">LIME</span>
+        <span class="w-tag">GDPR</span>
+        <span class="w-tag">AI Act</span>
+        <span class="w-tag">XAI</span>
+        <span class="w-tag">Privacy-by-Design</span>
+        <span class="w-tag">AI Governance</span>
       </div>
     </div>
     """, unsafe_allow_html=True)
-    st.write("")
-    col_btn = st.columns([1,2,1])[1]
-    with col_btn:
-        if st.button("🚀  Explorar el sistema", use_container_width=True, type="primary"):
-            st.session_state.app_iniciada = True
-            st.rerun()
-    st.stop()
+
+    import time
+    time.sleep(3)
+    st.session_state.app_iniciada = True
+    st.rerun()
 
 
 
