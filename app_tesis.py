@@ -87,9 +87,14 @@ def pbase():
 # ── CARGA ─────────────────────────────────────────────────
 @st.cache_data(show_spinner=False)
 def load(f, fb=None):
+    # Buscar en el directorio del script (necesario para Streamlit Cloud)
+    script_dir = Path(__file__).parent if '__file__' in dir() else Path('.')
     for fn in ([f] + ([fb] if fb else [])):
-        if fn and Path(fn).exists():
-            return pd.read_parquet(fn) if fn.endswith('.parquet') else pd.read_csv(fn)
+        if not fn: continue
+        for base in [Path('.'), script_dir]:
+            full = base / fn
+            if full.exists():
+                return pd.read_parquet(str(full)) if fn.endswith('.parquet') else pd.read_csv(str(full))
     return None
 
 with st.spinner("Cargando datos..."):
