@@ -1048,24 +1048,56 @@ elif "Simulador" in pagina:
         m2.markdown(f'<div class="kpi-box fade-in-up"><div class="kpi-value" style="color:{dc}">{as_:.1f}</div><div class="kpi-label">Razones simulado</div></div>', unsafe_allow_html=True)
         m3.markdown(f'<div class="kpi-box fade-in-up"><div class="kpi-value" style="color:{dc}">{d:+.1f}</div><div class="kpi-label">Diferencia</div></div>', unsafe_allow_html=True)
 
+        # ── Graceful Degradation ─────────────────────────
+        degradacion = {
+            "No_privada":       {"confianza":94,"estrategia":"Personalized Ranking","color_est":"#1D9E75","factor_score":1.0,"ocultar_hist":False,"impacto":None},
+            "Privada_moderada": {"confianza":74,"estrategia":"Hybrid Ranking","color_est":"#EF9F27","factor_score":0.88,"ocultar_hist":False,"impacto":{"Personalizacion":-18,"Explicabilidad":-25,"Diversidad":8,"Riesgo inferencial":-45}},
+            "Privada_sensible": {"confianza":51,"estrategia":"Contextual/Global Ranking","color_est":"#D85A30","factor_score":0.72,"ocultar_hist":True,"impacto":{"Personalizacion":-42,"Explicabilidad":-31,"Diversidad":18,"Riesgo inferencial":-67}},
+        }
+        deg = degradacion.get(priv, degradacion["No_privada"])
+        col_est, col_conf = st.columns([2,1])
+        with col_est:
+            st.markdown(
+                f'<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-left:3px solid {deg["color_est"]};border-radius:8px;padding:0.5rem 0.85rem;font-size:0.78rem;margin-bottom:0.75rem"><span style="color:rgba(138,136,128,0.7);text-transform:uppercase;font-size:0.65rem;letter-spacing:0.1em">Estrategia activa</span><br><span style="color:{deg["color_est"]};font-weight:600">{deg["estrategia"]}</span></div>',
+                unsafe_allow_html=True)
+        with col_conf:
+            conf_color = "#1D9E75" if deg["confianza"]>=80 else ("#EF9F27" if deg["confianza"]>=60 else "#D85A30")
+            st.markdown(f'<div class="kpi-box" style="padding:0.5rem 0.75rem"><div class="kpi-value" style="color:{conf_color};font-size:1.4rem">{deg["confianza"]}%</div><div class="kpi-label">Confianza del modelo</div></div>', unsafe_allow_html=True)
+        if deg["impacto"]:
+            imp_html = '<div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.75rem">'
+            for dim, val in deg["impacto"].items():
+                col_imp = "#1D9E75" if (val<0 and dim=="Riesgo inferencial") else ("#D85A30" if val<0 else "#1D9E75")
+                signo = "+" if val>0 else ""
+                imp_html += f'<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:8px;padding:0.3rem 0.65rem;font-size:0.72rem"><span style="color:rgba(138,136,128,0.6)">{dim}</span> <span style="color:{col_imp};font-weight:600">{signo}{val}%</span></div>'
+            imp_html += '</div>'
+            st.markdown(imp_html, unsafe_allow_html=True)
         st.markdown("**Recomendaciones con el perfil seleccionado**")
+        items_ocultos = 0
         for i,(_, row) in enumerate(ur2.iterrows(), 1):
-            title   = str(row.get('title','Sin título'))[:65] if pd.notna(row.get('title')) else 'Sin título'
-            explain = str(row.get('esim','')) if pd.notna(row.get('esim')) else ''
+            title   = str(row.get("title","Sin título"))[:65] if pd.notna(row.get("title")) else "Sin título"
+            explain = str(row.get("esim","")) if pd.notna(row.get("esim")) else ""
             nr      = cnt(explain)
-            ind     = "🟢" if nr>=2 else ("🟡" if nr==1 else "🔴")
-            pills   = ''.join(f'<span class="reason-pill">{r.strip()[:45]}</span>'
-                              for r in explain.split(' · ') if r.strip()) if explain.strip() else \
-                      '<span style="font-size:0.76rem;color:#8A8880;font-style:italic">Sin razones visibles</span>'
-            st.markdown(f"""
-            <div class="rec-card">
-              <div style="display:flex;justify-content:space-between">
-                <div class="rec-rank">#{i}</div>
-                <div style="font-size:0.72rem;color:#8A8880">{ind} {nr} razones</div>
-              </div>
-              <div class="rec-title" style="margin-top:0.25rem">{title}</div>
-              <div style="margin-top:0.3rem">{pills}</div>
-            </div>""", unsafe_allow_html=True)
+            if nr == 0:
+                continue
+            score_r   = float(row.get("score_display",0.5)) if pd.notna(row.get("score_display")) else 0.5
+            score_deg = score_r * deg["factor_score"]
+            solo_hist = (deg["ocultar_hist"] and
+                         all("junto" in p or "recurrente" in p for p in str(row.get("explain","")).split(" · ") if p.strip()) and
+                         str(row.get("explain","")).strip() != "")
+            if solo_hist:
+                items_ocultos += 1
+                st.markdown(
+                    f'<div class="rec-card" style="opacity:0.45;border-color:rgba(216,90,48,0.3)"><div style="display:flex;justify-content:space-between"><div class="rec-rank" style="color:#D85A30">#{i} — No disponible</div><div style="font-size:0.7rem;color:#D85A30">Privacidad alta</div></div><div style="font-size:0.78rem;color:rgba(138,136,128,0.5);margin-top:0.3rem;font-style:italic">Este item requeria historial de co-compra. No disponible con privacidad alta.</div></div>',
+                    unsafe_allow_html=True)
+                continue
+            ind   = "🟢" if nr>=2 else ("🟡" if nr==1 else "🔴")
+            pills = "".join(f'<span class="reason-pill">{r.strip()[:45]}</span>' for r in explain.split(" · ") if r.strip())
+            sc    = "#1D9E75" if score_deg>0.5 else ("#EF9F27" if score_deg>0.25 else "#D85A30")
+            st.markdown(
+                f'<div class="rec-card"><div style="display:flex;justify-content:space-between;align-items:center"><div class="rec-rank">#{i}</div><div style="display:flex;align-items:center;gap:0.5rem"><span style="font-size:0.72rem;color:#8A8880">{ind} {nr} razones</span><span style="font-family:monospace;font-size:0.75rem;color:{sc};font-weight:600"> · {score_deg:.3f}</span><span style="font-size:0.62rem;color:rgba(138,136,128,0.5)">confianza</span></div></div><div class="rec-title" style="margin-top:0.25rem">{title}</div><div style="margin-top:0.3rem">{pills}</div></div>',
+                unsafe_allow_html=True)
+        if items_ocultos > 0:
+            st.caption(f"{items_ocultos} item(s) no disponibles con privacidad alta — el sistema usa fallback a ranking global.")
 
     # ── Privacy-to-Utility Exchange ──────────────────────
     st.write("")
