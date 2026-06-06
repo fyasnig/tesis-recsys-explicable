@@ -1257,6 +1257,138 @@ elif "XAI" in pagina:
                   El score predice compras reales de forma monotónica perfecta — <b style="color:#1D9E75">validez externa</b> del modelo.
                 </div>""", unsafe_allow_html=True)
 
+# P3 — ANÁLISIS XAI GLOBAL
+# ══════════════════════════════════════════════════════════
+elif "XAI" in pagina:
+    st.markdown('<div class="main-header">Análisis XAI Global</div>', unsafe_allow_html=True)
+    st.markdown('<div class="main-sub">SHAP + LIME · Importancia de señales · Calibración</div>', unsafe_allow_html=True)
+    st.write("")
+    st.info("🔬 **Qué muestra esta pantalla:** Análisis global del modelo usando dos métodos de explicabilidad (SHAP y LIME). SHAP mide cuánto contribuye cada señal al score final en promedio. LIME construye modelos locales lineales alrededor de cada predicción. Que ambos métodos coincidan (ρ=1.00) valida que la interpretación es robusta y no depende del método elegido.")
+
+    t1,t2,t3,t4,t5 = st.tabs(["📈 Importancia SHAP","🔗 Correlación señales","📉 Slice por posición","🎯 Calibración","💰 Valor de tus datos"])
+
+    FL = {'pct_shap_S1_copurchase':'Co-compra','pct_shap_S2_affinities':'Afinidad perfil',
+          'pct_shap_S3_temporal_eff':'Estacionalidad','pct_shap_S4_recency_item':'Recencia',
+          'pct_shap_S5_popularity':'Popularidad',
+          'pct_S1_copurchase':'Co-compra','pct_S2_affinities':'Afinidad perfil',
+          'pct_S3_temporal_eff':'Estacionalidad','pct_S4_recency_item':'Recencia',
+          'pct_S5_popularity':'Popularidad'}
+
+    with t1:
+        if shap_g is None:
+            st.info("Corré el bloque XAI para generar `xai_shap_global_importance.csv`.")
+        else:
+            sg = shap_g.sort_values('mean_abs_shap', ascending=True).copy()
+            sg['pct'] = sg['mean_abs_shap']/sg['mean_abs_shap'].sum()*100
+            c1,c2 = st.columns([3,2])
+            with c1:
+                st.markdown("**Importancia relativa SHAP vs peso teórico**")
+                st.caption("Las barras verdes (SHAP) muestran la importancia *real* medida empíricamente. Las barras grises son los pesos teóricos asignados al diseñar el modelo. Si SHAP > peso teórico, esa señal discrimina más de lo esperado. **Hallazgo clave:** Co-compra tiene peso=40% pero importancia SHAP=64.8% — su alta varianza la hace mucho más discriminante de lo que sugiere el peso.")
+                fig = go.Figure()
+                fig.add_trace(go.Bar(y=sg['label'],x=sg['pct'],orientation='h',name='SHAP',
+                                     marker_color=COLORS['primary'],marker_line_width=0))
+                fig.add_trace(go.Bar(y=sg['label'],x=sg['weight']*100,orientation='h',
+                                     name='Peso teórico',marker_color='rgba(180,178,169,0.3)',
+                                     marker_line_color='rgba(180,178,169,0.6)',marker_line_width=1))
+                fig.update_layout(**pbase(),barmode='overlay',height=300,
+                                  legend=dict(orientation='h',y=1.1,font=dict(color='#8A8880',size=10)),
+                                  xaxis=dict(title='%',gridcolor='rgba(255,255,255,0.05)'),
+                                  yaxis=dict(gridcolor='rgba(0,0,0,0)'))
+                st.plotly_chart(fig, use_container_width=True)
+            with c2:
+                st.markdown("**Tabla de importancia**")
+                tbl = sg[['label','weight','mean_abs_shap']].copy()
+                tbl['Peso'] = (tbl['weight']*100).map('{:.0f}%'.format)
+                tbl['SHAP'] = (tbl['mean_abs_shap']/tbl['mean_abs_shap'].sum()*100).map('{:.1f}%'.format)
+                tbl = tbl.rename(columns={'label':'Señal'}).drop(columns=['weight','mean_abs_shap'])
+                st.dataframe(tbl.sort_values('SHAP',ascending=False), hide_index=True, use_container_width=True)
+                st.markdown("""<div style="background:#1E2130;border:1px solid #2A2F45;border-radius:10px;padding:0.85rem;font-size:0.8rem;color:#8A8880;line-height:1.7;margin-top:0.75rem">
+                  <b style="color:#1D9E75">ρ SHAP-LIME = 1.000</b><br>
+                  Dos métodos XAI independientes, mismo ranking — interpretabilidad robusta y verificable.
+                </div>""", unsafe_allow_html=True)
+
+        if shap_priv is not None:
+            st.markdown("**Importancia SHAP por grupo de privacidad**")
+            pc = [c for c in shap_priv.columns if c.startswith('pct_shap_')]
+            if pc:
+                dm = shap_priv[['privacy_level']+pc].melt(id_vars='privacy_level',value_vars=pc,var_name='f',value_name='pct')
+                dm['f'] = dm['f'].map(FL).fillna(dm['f'])
+                dm['pct'] *= 100
+                fp = px.bar(dm,x='f',y='pct',color='privacy_level',barmode='group',
+                            color_discrete_map={'No_privada':COLORS['primary'],'Privada_moderada':COLORS['accent'],'Privada_sensible':COLORS['danger']},
+                            labels={'pct':'SHAP (%)','f':''},template='plotly_dark')
+                fp.update_layout(**pbase(),height=270,
+                                 legend=dict(title='',orientation='h',y=1.1,font=dict(color='#8A8880',size=10)),
+                                 yaxis=dict(gridcolor='rgba(255,255,255,0.05)'),xaxis=dict(gridcolor='rgba(0,0,0,0)'))
+                st.plotly_chart(fp, use_container_width=True)
+                st.caption("✅ Variación máxima en co-compra: 0.9% — el modelo de scoring es neutral a la privacidad del usuario.")
+
+    with t2:
+        if corr_df is None:
+            st.info("Corré el bloque XAI para generar `xai_shap_signal_correlation.csv`.")
+        else:
+            st.markdown("**Correlación Spearman entre SHAP values — ¿señales sustitutos o complementarias?**")
+            st.caption("**Cómo leer este gráfico:** Cada celda muestra la correlación entre dos señales. Verde oscuro = alta correlación (se mueven juntas). Amarillo claro = independientes. Rojo = correlación negativa. Si dos señales tienen ρ≈0, capturan dimensiones distintas del comportamiento de compra — son complementarias, no redundantes. **Hallazgo:** 9 de 10 pares son independientes. La única excepción es recencia-popularidad (ρ=0.54), que tiene sentido: ítems populares tienden a haberse vendido recientemente.")
+            z = corr_df.values
+            fc = go.Figure(go.Heatmap(z=z,x=list(corr_df.columns),y=list(corr_df.index),
+                                      colorscale='RdYlGn',zmid=0,zmin=-1,zmax=1,
+                                      text=[[f'{v:.2f}' for v in row] for row in z],
+                                      texttemplate='%{text}',textfont=dict(size=11)))
+            fc.update_layout(**pbase(),height=360,margin=dict(l=0,r=0,t=10,b=0))
+            st.plotly_chart(fc, use_container_width=True)
+
+    with t3:
+        if shap_sl is None:
+            st.info("Corré el bloque XAI para generar `xai_shap_slice_by_rank.csv`.")
+        else:
+            st.markdown("**Importancia SHAP por posición en el ranking — fallback explícito**")
+            st.caption("**Cómo leer este gráfico:** El eje X muestra la posición en el ranking (Top 1-3 son los mejores candidatos, Pos 11-20 los más débiles). El eje Y muestra qué porcentaje del score se explica por cada señal. Lo notable: en el Top 1-3, la co-compra explica el 84.6% del score — el sistema usa casi exclusivamente esa señal para los mejores candidatos. A partir de la posición 4, otras señales como afinidad de perfil y popularidad compensan. Esto se llama **fallback explícito**: el modelo usa señales más débiles cuando la co-compra no es suficientemente fuerte.")
+            ps = [c for c in shap_sl.columns if c.startswith('pct_')]
+            if ps:
+                dm2 = shap_sl[['rank_group']+ps].melt(id_vars='rank_group',value_vars=ps,var_name='f',value_name='pct')
+                dm2['f'] = dm2['f'].map(FL).fillna(dm2['f'])
+                dm2['pct'] *= 100
+                fs = px.line(dm2,x='rank_group',y='pct',color='f',markers=True,
+                             color_discrete_map={'Co-compra':COLORS['primary'],'Afinidad perfil':COLORS['secondary'],
+                                                 'Popularidad':COLORS['accent'],'Estacionalidad':COLORS['neutral'],'Recencia':'#5DCAA5'},
+                             labels={'pct':'SHAP (%)','rank_group':'Posición'},template='plotly_dark')
+                fs.update_layout(**pbase(),height=350,
+                                 legend=dict(title='',orientation='h',y=1.1,font=dict(color='#8A8880',size=10)),
+                                 yaxis=dict(gridcolor='rgba(255,255,255,0.05)'),xaxis=dict(gridcolor='rgba(255,255,255,0.05)'))
+                st.plotly_chart(fs, use_container_width=True)
+                st.caption("Co-compra cae de 84.6% (Top 1-3) a 55.4% (Pos 11-20) — fallback explícito hacia señales de ítem.")
+
+    with t4:
+        if calib is None:
+            st.info("Corré el bloque XAI para generar `xai_score_calibration.csv`.")
+        else:
+            st.markdown("**Calibración del score_final — hit rate por decil**")
+            st.caption("**Cómo leer este gráfico:** Los 87,526 pares usuario-ítem se dividen en 10 grupos (deciles) ordenados por score. D1 son los ítems con score más bajo, D10 los de score más alto. El eje Y muestra qué porcentaje de esos ítems el usuario *efectivamente compró* después (hit rate). Si el modelo está bien calibrado, el hit rate debe crecer de izquierda a derecha. **Hallazgo:** La correlación es perfecta (ρ=1.00) — cada decil tiene más compras reales que el anterior. D10 tiene 27 veces más hits que D1, lo que valida que el score predice compras reales.")
+            cc1,cc2 = st.columns([3,2])
+            with cc1:
+                clrs = [COLORS['neutral'] if i<5 else COLORS['primary'] for i in range(len(calib))]
+                fca = go.Figure()
+                fca.add_trace(go.Bar(x=calib['score_decile'],y=calib['hit_rate']*100,
+                                     marker_color=clrs,marker_line_width=0,
+                                     text=(calib['hit_rate']*100).map('{:.2f}%'.format),
+                                     textposition='outside',textfont=dict(color='#8A8880',size=9)))
+                fca.add_hline(y=calib['hit_rate'].mean()*100,line_dash='dash',line_color=COLORS['accent'],
+                              annotation_text=f"Media: {calib['hit_rate'].mean():.2%}",
+                              annotation_font_color=COLORS['accent'])
+                fca.update_layout(**pbase(),height=310,showlegend=False,
+                                  xaxis=dict(title='Decil de score',gridcolor='rgba(0,0,0,0)'),
+                                  yaxis=dict(title='Hit rate (%)',gridcolor='rgba(255,255,255,0.05)'))
+                st.plotly_chart(fca, use_container_width=True)
+            with cc2:
+                d1  = calib[calib['score_decile']=='D1']['hit_rate'].values[0]
+                d10 = calib[calib['score_decile']=='D10']['hit_rate'].values[0]
+                ratio = round(d10/d1) if d1>0 else 0
+                for v,l in [("ρ=1.00","Correlación decil-hit"),(f"{ratio}x","D10 vs D1"),(f"{d10:.2%}","Hit rate D10")]:
+                    st.markdown(f'<div class="kpi-box" style="margin-bottom:0.6rem"><div class="kpi-value">{v}</div><div class="kpi-label">{l}</div></div>', unsafe_allow_html=True)
+                st.markdown("""<div style="background:#1E2130;border:1px solid #2A2F45;border-radius:10px;padding:0.85rem;font-size:0.79rem;color:#8A8880;margin-top:0.5rem;line-height:1.7">
+                  El score predice compras reales de forma monotónica perfecta — <b style="color:#1D9E75">validez externa</b> del modelo.
+                </div>""", unsafe_allow_html=True)
+
     with t5:
         st.markdown("**Data Contribution Index (DCI) — cuanto vale cada dato tuyo para el modelo**")
         st.caption("Cada senal del modelo usa un tipo de dato personal distinto. El DCI muestra cuanto contribuye cada dato al score final, medido con SHAP. Esto convierte la importancia tecnica en algo concreto: el valor real que tiene tu historial, tus marcas o tu estacionalidad para el algoritmo.")
