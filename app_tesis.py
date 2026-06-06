@@ -1492,7 +1492,7 @@ elif "XAI" in pagina:
 # ══════════════════════════════════════════════════════════
 # P3 — ANÁLISIS XAI GLOBAL
 # ══════════════════════════════════════════════════════════
-elif "XAI" in pagina or "Análisis" in pagina:
+elif pagina.startswith("📊"):
     st.markdown('<div class="main-header">Análisis XAI Global</div>', unsafe_allow_html=True)
     st.markdown('<div class="main-sub">SHAP + LIME · Importancia de señales · Calibración</div>', unsafe_allow_html=True)
     st.write("")
@@ -2054,10 +2054,10 @@ elif "Buscador" in pagina:
 # P7 — HALLAZGOS 14·15·16
 # ══════════════════════════════════════════════════════════
 elif "Equidad" in pagina or "Hallazgos 14" in pagina:
-    st.markdown('<div class="main-header">Hallazgos 14 · 15 · 16</div>', unsafe_allow_html=True)
+    st.markdown('<div class="main-header">Equidad & Cobertura</div>', unsafe_allow_html=True)
     st.markdown('<div class="main-sub">HTE · Fairness del catálogo · Cobertura del sistema</div>', unsafe_allow_html=True)
     st.write("")
-    st.info("📈 **Qué muestra esta pantalla:** Tres análisis nuevos que complementan los 13 hallazgos originales. El HTE revela que el consentimiento beneficia más a usuarios con historial rico. El fairness documenta un sesgo de popularidad estructural (ρ=−0.233). La cobertura muestra que el 36% de usuarios no recibe recomendaciones por densidad insuficiente del grafo.")
+    st.info("📈 Esta pantalla analiza tres dimensiones de equidad del sistema. **HTE:** el consentimiento mejora más las recomendaciones en usuarios con historial rico (+0.064) que en usuarios nuevos (+0.026, no significativo). **Fairness:** los ítems más recomendados tienen peor hit rate — sesgo de popularidad estructural (ρ=−0.233). **Cobertura:** el 36% de usuarios no recibe recomendaciones, no por falta de datos sino porque sus compras son muy especializadas y el grafo de co-compra no tiene suficiente densidad en esos nichos.")
 
     t14, t15, t16 = st.tabs(["🔬 HTE del Experimento","📦 Fairness del Catálogo","👥 Cobertura del Sistema"])
 
