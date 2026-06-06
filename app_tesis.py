@@ -1552,6 +1552,49 @@ elif "XAI" in pagina:
     st.markdown('<div class="main-header">Análisis XAI Global</div>', unsafe_allow_html=True)
     st.markdown('<div class="main-sub">SHAP + LIME · Importancia de señales · Calibración</div>', unsafe_allow_html=True)
     st.write("")
+
+    with t5:
+        st.markdown("**Data Contribution Index (DCI) — cuánto vale cada dato tuyo para el modelo**")
+        st.caption("Cada señal del modelo usa un tipo de dato personal distinto. El DCI muestra cuánto contribuye cada tipo de dato al score final, medido con SHAP. Convierte la importancia algorítmica en un lenguaje comprensible para el usuario.")
+        st.write("")
+        k1, k2, k3, k4 = st.columns(4)
+        k1.markdown('<div class="kpi-box"><div class="kpi-value" style="color:#1D9E75">64.8%</div><div class="kpi-label">Co-compra (DCI)</div></div>', unsafe_allow_html=True)
+        k2.markdown('<div class="kpi-box"><div class="kpi-value" style="color:#1D9E75">64.8%</div><div class="kpi-label">Señal dominante</div></div>', unsafe_allow_html=True)
+        k3.markdown('<div class="kpi-box"><div class="kpi-value" style="color:#D85A30">1.7%</div><div class="kpi-label">Estacionalidad (DCI)</div></div>', unsafe_allow_html=True)
+        k4.markdown('<div class="kpi-box"><div class="kpi-value" style="color:#EF9F27">38x</div><div class="kpi-label">Ratio máx/mín DCI</div></div>', unsafe_allow_html=True)
+        st.write("")
+        dci_data = [
+            {"señal": "S1 Co-compra",     "dato": "Historial de compras compartidas",   "dci": 64.8, "sensibilidad": "Alta",   "color": COLORS["primary"]},
+            {"señal": "S2 Afinidad",       "dato": "Marca y categoría favorita",          "dci": 21.2, "sensibilidad": "Alta",   "color": COLORS["primary"]},
+            {"señal": "S3 Popularidad",    "dato": "Frecuencia global del ítem",           "dci":  4.3, "sensibilidad": "Baja",   "color": COLORS["neutral"]},
+            {"señal": "S4 Recencia",       "dato": "Fecha de última compra",               "dci":  8.0, "sensibilidad": "Media",  "color": COLORS["accent"]},
+            {"señal": "S5 Estacionalidad", "dato": "Mes de compra (patrón temporal)",      "dci":  1.7, "sensibilidad": "Baja",   "color": COLORS["neutral"]},
+        ]
+        fig_dci = go.Figure(go.Bar(
+            x=[d["señal"] for d in dci_data],
+            y=[d["dci"] for d in dci_data],
+            marker_color=[d["color"] for d in dci_data],
+            marker_line_width=0,
+            text=[f"{d['dci']}%" for d in dci_data],
+            textposition="outside",
+            textfont=dict(color="#8A8880", size=11),
+        ))
+        fig_dci.update_layout(
+            **pbase(), height=300, showlegend=False,
+            margin=dict(l=0, r=0, t=10, b=0),
+            yaxis=dict(title="DCI (%)", gridcolor="rgba(255,255,255,0.05)"),
+            xaxis=dict(gridcolor="rgba(0,0,0,0)")
+        )
+        st.plotly_chart(fig_dci, use_container_width=True)
+        st.write("")
+        col_d1, col_d2, col_d3 = st.columns(3)
+        with col_d1:
+            st.markdown(f'<div style="background:#1E2130;border:1px solid rgba(29,158,117,0.3);border-radius:8px;padding:0.75rem;font-size:0.78rem"><b style="color:#1D9E75">Dato necesario:</b><br>Historial co-compras (DCI=64.8%). Sin esta señal el sistema pierde el 65% de su capacidad explicativa.</div>', unsafe_allow_html=True)
+        with col_d2:
+            st.markdown(f'<div style="background:#1E2130;border:1px solid rgba(239,159,39,0.3);border-radius:8px;padding:0.75rem;font-size:0.78rem"><b style="color:#EF9F27">Dato marginal:</b><br>Estacionalidad (DCI=1.7%). El sistema puede prescindir de esta señal con pérdida mínima — compatible con minimización de datos (GDPR art. 5.1.c).</div>', unsafe_allow_html=True)
+        with col_d3:
+            st.markdown(f'<div style="background:#1E2130;border:1px solid rgba(91,127,212,0.3);border-radius:8px;padding:0.75rem;font-size:0.78rem"><b style="color:#5B7FD4">Dato anónimo:</b><br>Popularidad (DCI=4.3%). No requiere datos del usuario individual — compatible con cualquier nivel de privacidad.</div>', unsafe_allow_html=True)
+
 # ══════════════════════════════════════════════════════════
 # P4 — EXPERIMENTO & HALLAZGOS
 # ══════════════════════════════════════════════════════════
