@@ -108,6 +108,7 @@ with st.spinner("Cargando datos..."):
     cov_df    = load('cobertura_sistema.csv')
     ild_df    = load('ild_analisis.csv')
     raz_df    = load('razones_por_categoria.csv')
+    cf_df     = load('contrafactual_analisis.csv')
     if corr_df is not None and corr_df.columns[0] != corr_df.index[0]:
         corr_df = corr_df.set_index(corr_df.columns[0])
 
@@ -134,6 +135,7 @@ with st.sidebar:
         "🔎  Buscador de Ítems",
         "📈  Hallazgos 14·15·16",
         "🎯  Hallazgos 17·18",
+        "🔮  Hallazgos 19",
     ], label_visibility="collapsed")
 
     st.markdown("""<hr>
@@ -1218,3 +1220,63 @@ elif "Hallazgos 17" in pagina:
                                  xaxis=dict(title="% de razones",gridcolor="rgba(255,255,255,0.05)"),
                                  yaxis=dict(gridcolor="rgba(0,0,0,0)"))
             st.plotly_chart(fig_st, use_container_width=True)
+
+elif "Hallazgos 19" in pagina:
+    st.markdown('<div class="main-header">Hallazgo 19 - Contrafactual</div>', unsafe_allow_html=True)
+    st.markdown('<div class="main-sub">Delta minimo para entrar al Top-5 - GDPR art. 22</div>', unsafe_allow_html=True)
+    st.write("")
+    st.info("Para cada usuario: que tiene que cambiar para que un item NO recomendado entre al Top-5. Conecta con GDPR art. 22.")
+    if cf_df is None:
+        st.info("Corre bloque_contrafactual.py para generar contrafactual_analisis.csv.")
+    else:
+        k1,k2,k3,k4 = st.columns(4)
+        v1 = f'{cf_df["gap_score"].median():.4f}'
+        v2 = f'{cf_df["delta_s1_needed"].median():.4f}'
+        v3 = f'{cf_df["factible_s1"].mean():.1%}'
+        v4 = f'{(cf_df["gap_score"] < 0.05).mean():.1%}'
+        k1.markdown('<div class="kpi-box"><div class="kpi-value">'+v1+'</div><div class="kpi-label">Gap mediano</div></div>', unsafe_allow_html=True)
+        k2.markdown('<div class="kpi-box"><div class="kpi-value">'+v2+'</div><div class="kpi-label">Delta S1 mediano</div></div>', unsafe_allow_html=True)
+        k3.markdown('<div class="kpi-box"><div class="kpi-value" style="color:#1D9E75">'+v3+'</div><div class="kpi-label">Casos factibles</div></div>', unsafe_allow_html=True)
+        k4.markdown('<div class="kpi-box"><div class="kpi-value" style="color:#EF9F27">'+v4+'</div><div class="kpi-label">Gap muy bajo</div></div>', unsafe_allow_html=True)
+        st.write("")
+        col1, col2 = st.columns(2)
+        with col1:
+            st.markdown("**Distribucion del gap de score**")
+            st.caption("72.3% de usuarios tiene gap < 0.05. El item #6 esta muy cerca del Top-5.")
+            gap_clip = cf_df["gap_score"].clip(upper=cf_df["gap_score"].quantile(0.95))
+            fig_gap = px.histogram(gap_clip, nbins=40, color_discrete_sequence=[COLORS["primary"]],
+                                   labels={"value":"Gap de score","count":"N usuarios"}, template="plotly_dark")
+            fig_gap.add_vline(x=cf_df["gap_score"].median(), line_dash="dash", line_color=COLORS["accent"])
+            fig_gap.update_layout(**pbase(), height=260, showlegend=False, margin=dict(l=0,r=0,t=10,b=0))
+            st.plotly_chart(fig_gap, use_container_width=True)
+        with col2:
+            st.markdown("**Dificultad del contrafactual**")
+            st.caption("42.7% muy facil - 35.2% facil - 14.4% moderado - 7.8% dificil.")
+            if "dificultad" in cf_df.columns:
+                dc = cf_df["dificultad"].value_counts()
+                fig_pie = px.pie(values=dc.values, names=dc.index,
+                                 color_discrete_sequence=[COLORS["primary"],COLORS["accent"],COLORS["secondary"],COLORS["danger"]],
+                                 hole=0.4, template="plotly_dark")
+                fig_pie.update_layout(**pbase(), height=260, margin=dict(l=0,r=0,t=10,b=0),
+                                      legend=dict(font=dict(color="#8A8880",size=9)))
+                st.plotly_chart(fig_pie, use_container_width=True)
+        st.markdown("**Delta necesario por senal para entrar al Top-5**")
+        st.caption("Menor delta = via mas eficiente. S1 co-compra requiere el menor cambio.")
+        senales = ["S1 Co-compra (W=0.40)","S2 Afinidad (W=0.25)","S5 Popularidad (W=0.10)"]
+        d1 = cf_df["delta_s1_needed"].median()
+        d2 = cf_df["delta_s2_needed"].median() if "delta_s2_needed" in cf_df.columns else 0
+        d5 = cf_df["delta_s5_needed"].median() if "delta_s5_needed" in cf_df.columns else 0
+        fig_bar = go.Figure(go.Bar(x=senales, y=[d1,d2,d5],
+                                   marker_color=[COLORS["primary"],COLORS["secondary"],"#9B59B6"],
+                                   marker_line_width=0, text=[f"{d:.4f}" for d in [d1,d2,d5]],
+                                   textposition="outside", textfont=dict(color="#8A8880",size=10)))
+        fig_bar.add_hline(y=0.3, line_dash="dash", line_color=COLORS["neutral"])
+        fig_bar.update_layout(**pbase(), height=260, showlegend=False, margin=dict(l=0,r=0,t=10,b=0),
+                              yaxis=dict(title="Delta necesario",gridcolor="rgba(255,255,255,0.05)"),
+                              xaxis=dict(gridcolor="rgba(0,0,0,0)"))
+        st.plotly_chart(fig_bar, use_container_width=True)
+        col_g1, col_g2 = st.columns(2)
+        with col_g1:
+            st.success("92.2% de casos tienen contrafactual factible — GDPR art. 22 implementado.")
+        with col_g2:
+            st.info("Neutral a privacidad: No privada d=0.065, Moderada d=0.069, Sensible d=0.061.")
