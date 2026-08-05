@@ -1261,74 +1261,123 @@ elif "Simulador" in pagina:
         st.plotly_chart(fig_radar, use_container_width=True)
         st.caption("El radar muestra el trade-off real entre utilidad algoritmica y proteccion de datos. No existe configuracion optima — es una decision del usuario segun sus prioridades. Consentimiento informado cuantificado.")
 
-        # ── Privacy-Utility Frontier ─────────────────────
+        # ── Privacy-Utility Frontier (32 configuraciones) ──────
         st.write("")
         st.markdown("---")
-        st.markdown("**Privacy-Utility Frontier — el punto óptimo entre privacidad y rendimiento**")
+        st.markdown("**Privacy-Utility Frontier — frontera eficiente privacidad-utilidad**")
         st.caption(
-            "Inspirada en la frontera eficiente de Markowitz, esta curva muestra las configuraciones "
-            "alcanzables del sistema. Cada punto representa un nivel de privacidad con su correspondiente "
-            "trade-off entre utilidad algorítmica y protección de datos. No existe un punto dominante: "
-            "la elección óptima depende de las preferencias del usuario."
+            "Generada mediante la exploración exhaustiva de las 32 configuraciones posibles (2⁵ señales). "
+            "La curva verde muestra los puntos no dominados: configuraciones donde no existe otra con mayor "
+            "privacidad Y mayor utilidad simultáneamente. Tu nivel activo aparece resaltado. "
+            "U(c) = NDCG@10_c / NDCG@10_max · P(c) = Σ(wₛ·(1−cₛ)) / Σwₛ con pesos normativos GDPR."
         )
-        # Datos de los tres niveles de privacidad
-        puf_data = [
-            {"nivel": "No_privada",       "label": "🟢 Priv. Baja",  "privacidad": 0.15, "utilidad": 0.92, "color": "#1D9E75"},
-            {"nivel": "Privada_moderada", "label": "🟡 Priv. Media", "privacidad": 0.50, "utilidad": 0.74, "color": "#EF9F27"},
-            {"nivel": "Privada_sensible", "label": "🔴 Priv. Alta",  "privacidad": 0.85, "utilidad": 0.50, "color": "#D85A30"},
-        ]
-        # Punto activo según selección del usuario
-        priv_to_idx = {"No_privada": 0, "Privada_moderada": 1, "Privada_sensible": 2}
-        idx_activo = priv_to_idx.get(priv, 0)
-        xs = [d["privacidad"] for d in puf_data]
-        ys = [d["utilidad"]   for d in puf_data]
-        labels = [d["label"]  for d in puf_data]
-        colors = [d["color"]  for d in puf_data]
+        # ── Calcular las 32 configuraciones ─────────────────────
+        import itertools as _it
+        _W = {'S1':0.40,'S2':0.35,'S4':0.10,'S5':0.10,'S3':0.05}
+        _W_SHAP = {'S1':0.648,'S2':0.212,'S3':0.111,'S4':0.012,'S5':0.017}
+        _SENALES = list(_W.keys())
+        _NDCG_MAX = 0.050
+        _NDCG_BASE = 0.018
+        _SHAP_TOT = sum(_W_SHAP.values())
+        _W_TOT = sum(_W.values())
+
+        def _u(cfg):
+            shap_act = sum(_W_SHAP[s] for s in _SENALES if cfg[s]==1)
+            return (_NDCG_BASE + (_NDCG_MAX-_NDCG_BASE)*(shap_act/_SHAP_TOT)) / _NDCG_MAX
+
+        def _p(cfg):
+            return sum(_W[s]*(1-cfg[s]) for s in _SENALES) / _W_TOT
+
+        _puf_pts = []
+        for combo in _it.product([0,1], repeat=5):
+            cfg = dict(zip(_SENALES, combo))
+            _puf_pts.append({"cfg": cfg, "U": _u(cfg), "P": _p(cfg)})
+
+        # Frontera eficiente (puntos no dominados)
+        def _es_efic(u0, p0, pts):
+            return not any(r["P"]>=p0 and r["U"]>u0 for r in pts)
+
+        _front = sorted([r for r in _puf_pts if _es_efic(r["U"],r["P"],_puf_pts)], key=lambda r: r["P"])
+        _domin = [r for r in _puf_pts if not _es_efic(r["U"],r["P"],_puf_pts)]
+
+        # Niveles predefinidos con coordenadas reales
+        _cfg_niveles = {
+            "No_privada":       {'S1':1,'S2':1,'S3':1,'S4':1,'S5':1},
+            "Privada_moderada": {'S1':1,'S2':0,'S3':1,'S4':1,'S5':1},
+            "Privada_sensible": {'S1':0,'S2':0,'S3':1,'S4':0,'S5':1},
+        }
+        _niv_info = {
+            "No_privada":       {"label":"🟢 No_privada",       "color":COLORS["primary"]},
+            "Privada_moderada": {"label":"🟡 Privada_moderada", "color":COLORS["accent"]},
+            "Privada_sensible": {"label":"🔴 Privada_sensible", "color":COLORS["danger"]},
+        }
+        for nk, cfg in _cfg_niveles.items():
+            _niv_info[nk]["U"] = _u(cfg)
+            _niv_info[nk]["P"] = _p(cfg)
+
+        # Punto activo
+        _activo = _niv_info.get(priv, _niv_info["No_privada"])
+
         fig_puf = go.Figure()
-        # Área bajo la curva — zona alcanzable
+
+        # Zona alcanzable
+        _fx = [r["P"] for r in _front] + [_front[-1]["P"], _front[0]["P"]]
+        _fy = [r["U"] for r in _front] + [0, 0]
         fig_puf.add_trace(go.Scatter(
-            x=xs + [xs[-1], xs[0]],
-            y=ys + [0, 0],
-            fill="toself",
-            fillcolor="rgba(29,158,117,0.06)",
+            x=_fx, y=_fy, fill="toself",
+            fillcolor="rgba(29,158,117,0.07)",
             line=dict(color="rgba(0,0,0,0)"),
             showlegend=False, hoverinfo="skip"
         ))
-        # Curva de la frontera
+
+        # Puntos dominados
         fig_puf.add_trace(go.Scatter(
-            x=xs, y=ys,
-            mode="lines",
-            line=dict(color="#1D9E75", width=2, dash="dot"),
-            name="Frontera alcanzable",
-            showlegend=True
+            x=[r["P"] for r in _domin], y=[r["U"] for r in _domin],
+            mode="markers",
+            marker=dict(size=5, color="#8A8880", opacity=0.35),
+            name="Configuraciones dominadas",
+            hovertemplate="P=%{x:.0%} · U=%{y:.0%}<extra>dominada</extra>"
         ))
-        # Puntos de cada nivel
-        for i, d in enumerate(puf_data):
-            size = 18 if i == idx_activo else 10
+
+        # Curva frontera eficiente
+        fig_puf.add_trace(go.Scatter(
+            x=[r["P"] for r in _front], y=[r["U"] for r in _front],
+            mode="lines+markers",
+            line=dict(color=COLORS["primary"], width=2),
+            marker=dict(size=7, color=COLORS["primary"]),
+            name="Frontera eficiente",
+            hovertemplate="P=%{x:.0%} · U=%{y:.0%}<extra>frontera</extra>"
+        ))
+
+        # Los 3 niveles predefinidos
+        for nk, ni in _niv_info.items():
+            es_activo = (nk == priv)
             fig_puf.add_trace(go.Scatter(
-                x=[d["privacidad"]], y=[d["utilidad"]],
+                x=[ni["P"]], y=[ni["U"]],
                 mode="markers+text",
-                marker=dict(size=size, color=d["color"],
-                            line=dict(width=2 if i==idx_activo else 0, color="#FFFFFF")),
-                text=[d["label"]],
-                textposition="top center",
-                textfont=dict(color=d["color"], size=11, family="Arial"),
-                name=d["label"],
-                hovertemplate=(
-                    f'<b>{d["label"]}</b><br>'
-                    f'Protección: {d["privacidad"]:.0%}<br>'
-                    f'Utilidad: {d["utilidad"]:.0%}<extra></extra>'
-                )
+                marker=dict(size=16 if es_activo else 10, color=ni["color"],
+                            line=dict(width=2 if es_activo else 0, color="#FFFFFF")),
+                text=[ni["label"]], textposition="top center",
+                textfont=dict(color=ni["color"], size=10),
+                name=ni["label"],
+                hovertemplate=f'<b>{ni["label"]}</b><br>P={ni["P"]:.0%} · U={ni["U"]:.0%}<extra></extra>'
             ))
-        # Anotación del punto activo
-        d_act = puf_data[idx_activo]
+
+        # Anotación punto activo
         fig_puf.add_annotation(
-            x=d_act["privacidad"], y=d_act["utilidad"],
+            x=_activo["P"], y=_activo["U"],
             text="← Tu configuración actual",
             showarrow=True, arrowhead=2,
-            arrowcolor=d_act["color"],
-            font=dict(color=d_act["color"], size=11),
-            ax=60, ay=-30
+            arrowcolor=_activo["color"],
+            font=dict(color=_activo["color"], size=11),
+            ax=65, ay=-35
+        )
+
+        # Línea del quiebre estructural en P=0.60
+        fig_puf.add_vline(
+            x=0.60, line_dash="dot", line_color="#8A8880", line_width=1,
+            annotation_text="Quiebre S1", annotation_position="top right",
+            annotation_font=dict(color="#8A8880", size=9)
         )
         fig_puf.update_layout(
             **pbase(),
