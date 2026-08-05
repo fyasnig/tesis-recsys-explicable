@@ -1153,6 +1153,7 @@ elif "Simulador" in pagina:
         if items_ocultos > 0:
             st.caption(f"{items_ocultos} item(s) no disponibles con privacidad alta — el sistema usa fallback a ranking global.")
 
+
     # ── Privacy-to-Utility Exchange ──────────────────────
     if not modo_bb:
         st.write("")
@@ -1168,48 +1169,49 @@ elif "Simulador" in pagina:
             "Priv. Baja":     ["Si","Si","Si","64%","2.95","Alto","Alta","Alta"],
             "Priv. Moderada": ["Si","Si","Si","64%","2.55","Medio","Media","Media"],
             "Priv. Alta":     ["Si","No","No","64%","2.32","Bajo","Baja","Baja"],
-        "Tipo": ["utilidad","utilidad","utilidad","utilidad","utilidad","riesgo","riesgo","riesgo"],
-    }
-    import pandas as pd
-    df_ex = pd.DataFrame(exchange_data)
-    col_ex1, col_ex2 = st.columns(2)
-    with col_ex1:
-        st.markdown("**Lo que ganas compartiendo datos**")
-        df_util = df_ex[df_ex["Tipo"]=="utilidad"][["Dimension","Priv. Baja","Priv. Moderada","Priv. Alta"]]
-        st.dataframe(df_util, hide_index=True, use_container_width=True)
-    with col_ex2:
-        st.markdown("**Lo que proteges limitando datos**")
-        df_riesgo = df_ex[df_ex["Tipo"]=="riesgo"][["Dimension","Priv. Baja","Priv. Moderada","Priv. Alta"]]
-        st.dataframe(df_riesgo, hide_index=True, use_container_width=True)
+            "Tipo": ["utilidad","utilidad","utilidad","utilidad","utilidad","riesgo","riesgo","riesgo"],
+        }
+        import pandas as pd
+        df_ex = pd.DataFrame(exchange_data)
+        col_ex1, col_ex2 = st.columns(2)
+        with col_ex1:
+            st.markdown("**Lo que ganas compartiendo datos**")
+            df_util = df_ex[df_ex["Tipo"]=="utilidad"][["Dimension","Priv. Baja","Priv. Moderada","Priv. Alta"]]
+            st.dataframe(df_util, hide_index=True, use_container_width=True)
+        with col_ex2:
+            st.markdown("**Lo que proteges limitando datos**")
+            df_riesgo = df_ex[df_ex["Tipo"]=="riesgo"][["Dimension","Priv. Baja","Priv. Moderada","Priv. Alta"]]
+            st.dataframe(df_riesgo, hide_index=True, use_container_width=True)
 
-    st.write("")
-    categorias_r = ["Explicabilidad","Personalizacion","Cobertura","Protec. perfilado","Protec. inferencia","Minimizacion datos"]
-    niveles_r = {
-        "Priv. Baja":     [1.0, 1.0, 1.0, 0.1, 0.1, 0.1],
-        "Priv. Moderada": [0.85, 0.85, 1.0, 0.5, 0.5, 0.5],
-        "Priv. Alta":     [0.60, 0.40, 1.0, 1.0, 1.0, 1.0],
-    }
-    colores_r = [COLORS["primary"], COLORS["accent"], COLORS["secondary"]]
-    fig_radar = go.Figure()
-    for (nombre, valores), color in zip(niveles_r.items(), colores_r):
-        fig_radar.add_trace(go.Scatterpolar(
-            r=valores + [valores[0]],
-            theta=categorias_r + [categorias_r[0]],
-            fill="toself", name=nombre, line_color=color, opacity=0.8
-        ))
-    fig_radar.update_layout(
-        **pbase(),
-        polar=dict(
-            radialaxis=dict(visible=True, range=[0,1], gridcolor="rgba(255,255,255,0.08)",
-                            tickfont=dict(color="#8A8880",size=9)),
-            angularaxis=dict(gridcolor="rgba(255,255,255,0.08)", tickfont=dict(color="#B4B2A9",size=10))
-        ),
-        height=380,
-        legend=dict(orientation="h", y=-0.15, font=dict(color="#8A8880",size=10)),
-        margin=dict(l=40,r=40,t=20,b=60)
-    )
-    st.plotly_chart(fig_radar, use_container_width=True)
-    st.caption("El radar muestra el trade-off real entre utilidad algoritmica y proteccion de datos. No existe configuracion optima — es una decision del usuario segun sus prioridades. Consentimiento informado cuantificado.")
+        st.write("")
+        categorias_r = ["Explicabilidad","Personalizacion","Cobertura","Protec. perfilado","Protec. inferencia","Minimizacion datos"]
+        niveles_r = {
+            "Priv. Baja":     [1.0, 1.0, 1.0, 0.1, 0.1, 0.1],
+            "Priv. Moderada": [0.85, 0.85, 1.0, 0.5, 0.5, 0.5],
+            "Priv. Alta":     [0.60, 0.40, 1.0, 1.0, 1.0, 1.0],
+        }
+        colores_r = [COLORS["primary"], COLORS["accent"], COLORS["secondary"]]
+        fig_radar = go.Figure()
+        for (nombre, valores), color in zip(niveles_r.items(), colores_r):
+            fig_radar.add_trace(go.Scatterpolar(
+                r=valores + [valores[0]],
+                theta=categorias_r + [categorias_r[0]],
+                fill="toself", name=nombre, line_color=color, opacity=0.8
+            ))
+        fig_radar.update_layout(
+            **pbase(),
+            polar=dict(
+                radialaxis=dict(visible=True, range=[0,1], gridcolor="rgba(255,255,255,0.08)",
+                                tickfont=dict(color="#8A8880",size=9)),
+                angularaxis=dict(gridcolor="rgba(255,255,255,0.08)", tickfont=dict(color="#B4B2A9",size=10))
+            ),
+            height=380,
+            legend=dict(orientation="h", y=-0.15, font=dict(color="#8A8880",size=10)),
+            margin=dict(l=40,r=40,t=20,b=60)
+        )
+        st.plotly_chart(fig_radar, use_container_width=True)
+        st.caption("El radar muestra el trade-off real entre utilidad algoritmica y proteccion de datos. No existe configuracion optima — es una decision del usuario segun sus prioridades. Consentimiento informado cuantificado.")
+
 
 # ══════════════════════════════════════════════════════════
 # P3 — ANÁLISIS XAI GLOBAL
